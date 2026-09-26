@@ -1,0 +1,166 @@
+---
+// Replace these with REAL testimonials (with written permission) before launch.
+const testimonials = [
+  {
+    quote: "I came to VISVA VED burnt out and hollow. Three days later, something fundamental shifted — not just relaxation, but a deep homecoming. The Sudarshan Kriya changed how I breathe through life.",
+    name: "Priya Sharma",
+    detail: "Mumbai · Happiness Program",
+  },
+  {
+    quote: "The silence of the forest, the quality of the teachings, the simplicity of sattvic food — every element was intentional. I left carrying practices I still use two years on.",
+    name: "Arjun Mehta",
+    detail: "Bengaluru · 7-Day Sadhana",
+  },
+  {
+    quote: "Not your average yoga retreat. The integration of asana with pranayama and the philosophy behind each movement made this the most embodied and intelligent practice I have encountered.",
+    name: "Leila Fernandes",
+    detail: "Goa · Sri Sri Yoga",
+  },
+  {
+    quote: "We brought our entire leadership team. Six months later, we have measurably lower conflict, higher retention, and leaders who actually know how to regulate themselves under pressure.",
+    name: "Vikram Nair",
+    detail: "Delhi · Corporate Wellness",
+  },
+];
+
+// Turns "Priya Sharma" into "PS"
+const initials = (name: string) =>
+  name
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
+---
+
+<section id="stories" class="section testimonials">
+  <div class="container testimonials-inner">
+    <header class="testimonials-heading">
+      <p class="eyebrow">Their Words</p>
+      <h2>Stories of Becoming</h2>
+    </header>
+
+    <ul class="cards">
+      {testimonials.map((t) => (
+        <li>
+          <figure class="card">
+            <!-- Five stars, announced once as "Rated 5 out of 5" -->
+            <div class="stars" role="img" aria-label="Rated 5 out of 5">
+              {[1, 2, 3, 4, 5].map(() => (
+                <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    fill="currentColor"
+                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                  />
+                </svg>
+              ))}
+            </div>
+
+            <blockquote>
+              <p>"{t.quote}"</p>
+            </blockquote>
+
+            <figcaption class="author">
+              <span class="avatar" aria-hidden="true">{initials(t.name)}</span>
+              <span>
+                <span class="author-name">{t.name}</span>
+                <span class="author-detail">{t.detail}</span>
+              </span>
+            </figcaption>
+          </figure>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .testimonials { background: var(--color-sand); }
+  .testimonials-inner { max-width: calc(1152px + var(--gutter) * 2); }
+
+  .testimonials-heading { text-align: center; }
+  h2 {
+    margin-top: 12px;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+  }
+
+  /* ---------- Grid ---------- */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-top: 64px;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* ---------- Card ---------- */
+  .card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;                 /* cards in the same row get equal heights */
+    padding: 32px;
+    background: var(--color-cream);
+    border: 1px solid rgba(184, 134, 11, 0.12);
+    border-radius: var(--radius-card);
+  }
+
+  .stars {
+    display: flex;
+    gap: 2px;
+    color: var(--color-gold);
+  }
+
+  blockquote {
+    flex: 1;                      /* pushes the author row to the bottom */
+    margin-top: 20px;
+  }
+  blockquote p {
+    font-size: 1rem;
+    line-height: 1.625;
+    color: #3a2010;
+  }
+
+  /* ---------- Author ---------- */
+  .author {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .avatar {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--color-gold);
+    color: var(--color-cream);
+    font-weight: 700;
+    font-size: 0.875rem;
+  }
+  .author-name,
+  .author-detail { display: block; }
+  .author-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+    line-height: 1.43;
+    color: var(--color-ink);
+  }
+  .author-detail {
+    font-weight: 400;
+    font-size: 0.75rem;
+    line-height: 1.33;
+    color: var(--color-bark);
+  }
+
+  /* ---------- Phone: one column ---------- */
+  @media (max-width: 768px) {
+    .cards {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 40px;
+    }
+    .card { padding: 24px; }
+  }
+</style>
