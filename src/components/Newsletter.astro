@@ -1,0 +1,119 @@
+---
+// Signups are collected by Netlify Forms once the site is live (see step 6, publishing).
+---
+
+<section id="newsletter" class="newsletter">
+  <div class="newsletter-inner">
+    <p class="eyebrow">Stay Connected</p>
+    <h2>Begin Your Journey Within</h2>
+
+    <p class="text">
+      Receive seasonal programme schedules, guided practices, and wisdom letters.
+      Join 40,000 seekers on the path.
+    </p>
+    <p class="offer">10% off your first retreat when you subscribe.</p>
+
+    <form
+      class="form"
+      name="newsletter"
+      method="POST"
+      data-netlify="true"
+      netlify-honeypot="bot-field"
+    >
+      <!-- Hidden trap field: people never see it, but spam bots fill it in -->
+      <p class="sr-only" aria-hidden="true">
+        <label>Don't fill this in: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+      </p>
+
+      <label for="newsletter-email" class="sr-only">Email address</label>
+      <input
+        id="newsletter-email"
+        class="input"
+        type="email"
+        name="email"
+        placeholder="your@email.com"
+        autocomplete="email"
+        required
+      />
+      <button class="btn submit" type="submit">Subscribe</button>
+    </form>
+
+    <p class="privacy">No spam. Unsubscribe anytime.</p>
+  </div>
+</section>
+
+<style>
+  .newsletter {
+    background: var(--color-forest);
+    padding: min(var(--section-pad), 96px) var(--gutter);
+  }
+
+  .newsletter-inner {
+    max-width: 672px;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .eyebrow { color: rgba(212, 168, 64, 0.8); }
+
+  h2 {
+    margin-top: 12px;
+    font-size: clamp(2rem, 3.4vw, 2.8rem);   /* ~45px on desktop */
+    line-height: 1.5;
+    color: var(--color-cream);
+  }
+
+  .text {
+    margin-top: 16px;
+    font-size: 1rem;
+    line-height: 1.625;
+    color: rgba(249, 244, 236, 0.75);
+  }
+  .offer {
+    font-size: 0.875rem;
+    color: var(--color-gold-light);
+  }
+
+  /* ---------- Form ---------- */
+  .form {
+    display: flex;
+    gap: 12px;
+    max-width: 448px;
+    margin: 32px auto 0;
+  }
+
+  .input {
+    flex: 1;
+    min-width: 0;                 /* lets the field shrink on narrow screens */
+    padding: 14px 20px;
+    border: 1px solid rgba(249, 244, 236, 0.25);
+    border-radius: var(--radius-pill);
+    background: rgba(249, 244, 236, 0.15);
+    color: var(--color-cream);
+    font-size: 0.875rem;
+  }
+  .input::placeholder { color: rgba(249, 244, 236, 0.5); }
+  .input:focus {
+    outline: none;
+    border-color: var(--color-gold-light);
+    background: rgba(249, 244, 236, 0.2);
+  }
+
+  .submit {
+    padding: 14px 28px;
+    background: var(--color-gold);
+    color: var(--color-cream);
+  }
+  .submit:hover { background: #a0750a; }
+
+  .privacy {
+    margin-top: 16px;
+    font-size: 0.75rem;
+    color: rgba(249, 244, 236, 0.55);
+  }
+
+  /* ---------- Phone: stack the field and button ---------- */
+  @media (max-width: 480px) {
+    .form { flex-direction: column; }
+  }
+</style>
