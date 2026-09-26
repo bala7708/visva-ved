@@ -1,0 +1,90 @@
+---
+import { Image } from "astro:assets";
+
+import mountainYoga from "../assets/images/gallery/mountain-yoga.jpg";
+import ashram from "../assets/images/gallery/ashram.jpg";
+import dawn from "../assets/images/gallery/dawn.jpg";
+import armsRaised from "../assets/images/gallery/arms-raised.jpg";
+import ocean from "../assets/images/gallery/ocean.jpg";
+
+// "area" places each photo in the grid (see grid-template-areas in the CSS)
+const photos = [
+  { image: mountainYoga, alt: "Yoga on a mountain top at sunrise", area: "a" },
+  { image: ashram, alt: "A mountain ashram retreat centre in the forest", area: "b" },
+  { image: dawn, alt: "Seated meditation at dawn", area: "c" },
+  { image: armsRaised, alt: "A silhouette with arms raised at sunset", area: "d" },
+  { image: ocean, alt: "A woman facing the ocean in stillness", area: "e" },
+];
+---
+
+<section class="section">
+  <div class="container">
+    <header class="gallery-heading">
+      <p class="eyebrow">Our Sanctuaries</p>
+      <h2>Where Healing Happens</h2>
+    </header>
+
+    <ul class="gallery">
+      {photos.map((p) => (
+        <li class="photo" style={`grid-area: ${p.area}`}>
+          <Image
+            src={p.image}
+            alt={p.alt}
+            widths={[420, 840]}
+            sizes="(max-width: 768px) 50vw, 416px"
+          />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .gallery-heading { text-align: center; }
+  h2 {
+    margin-top: 12px;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+  }
+
+  /* ---------- The grid ---------- */
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 220px);
+    /* A map of the grid: each letter is a photo, "." is an empty space.
+       A letter repeated in two rows makes that photo twice as tall. */
+    grid-template-areas:
+      "a b c"
+      "a d e"
+      ". d .";
+    gap: 16px;
+    margin-top: 64px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .photo {
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background: #fffbeb;          /* shows while the photo loads */
+  }
+  .photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;            /* fills the tile, cropping the edges if needed */
+  }
+
+  /* ---------- Tablet and phone: two columns ---------- */
+  @media (max-width: 768px) {
+    .gallery {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: 220px repeat(2, 160px);
+      grid-template-areas:
+        "a a"
+        "b c"
+        "d e";
+      gap: 12px;
+      margin-top: 40px;
+    }
+  }
+</style>
