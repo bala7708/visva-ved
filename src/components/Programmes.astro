@@ -1,0 +1,382 @@
+---
+import { Image } from "astro:assets";
+
+// Photos (src/assets/images/programmes/)
+import happiness from "../assets/images/programmes/happiness.jpg";
+import sahaj from "../assets/images/programmes/sahaj.jpg";
+import yoga from "../assets/images/programmes/yoga.jpg";
+import silence from "../assets/images/programmes/silence.jpg";
+import corporate from "../assets/images/programmes/corporate.jpg";
+import teacher from "../assets/images/programmes/teacher.jpg";
+
+// The six programmes. Edit this list to change the cards.
+// "accent" sets the color of the badge, the label and the "Book a Slot" link.
+const programmes = [
+  {
+    category: "Foundation Course",
+    title: "The Happiness Program",
+    text: "Learn the Sudarshan Kriya™ — a powerful rhythmic breathing technique that harmonises the body, mind and emotions, eliminating stress and leaving you refreshed.",
+    duration: "3 Days",
+    badge: "Most Popular",
+    accent: "var(--color-gold)",
+    image: happiness,
+    alt: "A person meditating in silhouette at sunrise",
+  },
+  {
+    category: "Deep Rest Practice",
+    title: "Sahaj Samadhi Meditation",
+    text: "A mantra-based practice that effortlessly dissolves accumulated stress and fatigue, restoring the nervous system to its natural state of calm alertness.",
+    duration: "4 Days",
+    badge: "Transformative",
+    accent: "var(--color-forest)",
+    image: sahaj,
+    alt: "A person meditating in a sunlit wooden shelter",
+  },
+  {
+    category: "Classical Tradition",
+    title: "Sri Sri Yoga",
+    text: "Ancient yogic wisdom woven into a modern sequence — asanas, pranayama and meditation that work together to open energy channels and awaken inner vitality.",
+    duration: "5 Days",
+    badge: "All Levels",
+    accent: "var(--color-clay)",
+    image: yoga,
+    alt: "A group meditating with hands at their chests",
+  },
+  {
+    category: "7-Day Silence Program",
+    title: "Silent Sadhana Retreat",
+    text: "Step away from the noise of the world. Seven days of silence, deep meditation, and inner inquiry guided by senior teachers in a secluded forest sanctuary.",
+    duration: "7 Days",
+    badge: "Advanced",
+    accent: "var(--color-bark)",
+    image: silence,
+    alt: "A woman meditating on a beach at sunset",
+  },
+  {
+    category: "For Teams & Leaders",
+    title: "Corporate Wellness",
+    text: "Science-backed breathwork, mindfulness protocols, and leadership seminars designed to reduce burnout and build resilient, high-performing teams.",
+    duration: "2 Days",
+    badge: "Organizations",
+    accent: "var(--color-gold)",
+    image: corporate,
+    alt: "A group sitting in a circle in a bright studio",
+  },
+  {
+    category: "Certification Course",
+    title: "Teacher Training",
+    text: "Deepen your practice and share the gift of breath with others. A comprehensive training in teaching Sudarshan Kriya, yoga nidra, and guided meditation.",
+    duration: "21 Days",
+    badge: "Professional",
+    accent: "var(--color-forest)",
+    image: teacher,
+    alt: "A woman with eyes closed and hands in prayer position",
+  },
+];
+---
+
+<section id="programs" class="section">
+  <div class="container">
+    <header class="programmes-heading">
+      <p class="eyebrow">Our Offerings</p>
+      <h2>Programmes for Every Seeker</h2>
+      <p class="intro">
+        Whether you are taking your first conscious breath or deepening a lifetime
+        practice, there is a path here for you.
+      </p>
+    </header>
+
+    <!-- Tabs: clicking one highlights the matching card -->
+    <div class="filters" role="group" aria-label="Highlight a programme">
+      {programmes.map((p, i) => (
+        <button
+          type="button"
+          class="filter"
+          data-target={p.category}
+          aria-pressed={i === 0 ? "true" : "false"}
+        >
+          {p.category}
+        </button>
+      ))}
+      <a class="filter" href="#numerology">Dr. Mayuri</a>
+    </div>
+
+    <!-- Cards -->
+    <ul class="cards">
+      {programmes.map((p, i) => (
+        <li
+          class:list={["card", { "is-selected": i === 0 }]}
+          data-category={p.category}
+          style={`--accent: ${p.accent}`}
+        >
+          <div class="card-media">
+            <Image
+              src={p.image}
+              alt={p.alt}
+              widths={[420, 840]}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 411px"
+            />
+            <span class="badge">{p.badge}</span>
+            <span class="duration">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              {p.duration}
+            </span>
+          </div>
+
+          <div class="card-body">
+            <p class="card-label">{p.category}</p>
+            <h3>{p.title}</h3>
+            <p class="card-text">{p.text}</p>
+            <a class="card-link" href="#book">
+              Book a Slot<span class="sr-only"> for {p.title}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+          </div>
+        </li>
+      ))}
+    </ul>
+
+    <div class="catalog">
+      <a class="catalog-link" href="#">
+        View Full Course Catalog
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ---------- Heading ---------- */
+  .programmes-heading { text-align: center; }
+  h2 {
+    margin-top: 12px;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+  }
+  .intro {
+    max-width: 512px;
+    margin: 16px auto 0;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  /* ---------- Tabs ---------- */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 64px;
+  }
+  .filter {
+    padding: 8px 20px;
+    border: 1px solid rgba(184, 134, 11, 0.2);
+    border-radius: var(--radius-pill);
+    background: var(--color-sand);
+    color: var(--color-bark);
+    font-weight: 500;
+    font-size: 0.875rem;
+    line-height: 1.43;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .filter:hover { border-color: var(--color-gold); }
+  .filter[aria-pressed="true"] {
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+    color: var(--color-cream);
+  }
+
+  /* ---------- Card grid ---------- */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 40px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--color-cream);
+    border: 1px solid rgba(184, 134, 11, 0.12);
+    border-radius: var(--radius-card);
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  /* Highlighted card: 1px border + 1px ring = the 2px gold border from Figma,
+     without making the card jump in size */
+  .card.is-selected {
+    border-color: var(--color-gold);
+    box-shadow: 0 0 0 1px var(--color-gold), 0 8px 32px rgba(184, 134, 11, 0.13);
+  }
+
+  /* ---------- Card photo ---------- */
+  .card-media {
+    position: relative;
+    height: 208px;
+    background: #fffbeb;
+  }
+  .card-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* Dark fade at the bottom so the duration text is readable */
+  .card-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(28, 15, 0, 0.5), rgba(28, 15, 0, 0) 60%);
+  }
+
+  .badge {
+    position: absolute;
+    z-index: 1;                   /* sits above the dark fade */
+    top: 12px;
+    right: 12px;
+    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+    background: var(--accent);
+    color: var(--color-cream);
+    font-weight: 600;
+    font-size: 0.75rem;
+    line-height: 1.33;
+  }
+
+  .duration {
+    position: absolute;
+    z-index: 1;
+    left: 16px;
+    bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-cream);
+    font-weight: 500;
+    font-size: 0.75rem;
+  }
+  .duration svg { color: var(--color-gold-light); }
+
+  /* ---------- Card text ---------- */
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;                      /* fills the card so all links line up */
+    padding: 24px;
+  }
+  .card-label {
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  h3 {
+    margin-top: 4px;
+    font-size: 1.25rem;
+    line-height: 1.4;
+  }
+  .card-text {
+    flex: 1;
+    margin-top: 12px;
+    font-size: 0.875rem;
+    line-height: 1.625;
+  }
+  .card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    margin-top: 20px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--accent);
+  }
+  .card-link svg { transition: transform 0.2s; }
+  .card-link:hover svg { transform: translateX(4px); }
+
+  /* ---------- Catalog button ---------- */
+  .catalog {
+    display: flex;
+    justify-content: center;
+    margin-top: 48px;
+  }
+  .catalog-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 32px;
+    border: 1.5px solid var(--color-gold);
+    border-radius: var(--radius-pill);
+    color: var(--color-gold);
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .catalog-link:hover {
+    background: var(--color-gold);
+    color: var(--color-cream);
+  }
+
+  /* ---------- Tablet: 2 columns ---------- */
+  @media (max-width: 1024px) {
+    .cards { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ---------- Phone: 1 column, tabs scroll sideways ---------- */
+  @media (max-width: 640px) {
+    .filters {
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      overflow-x: auto;
+      margin-top: 40px;
+      margin-inline: calc(var(--gutter) * -1);   /* lets the row run to the screen edges */
+      padding: 0 var(--gutter) 4px;
+      scrollbar-width: none;                     /* hides the scrollbar */
+    }
+    .cards { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  const section = document.getElementById("programs");
+
+  if (section) {
+    const buttons = section.querySelectorAll<HTMLButtonElement>("button.filter");
+    const cards = section.querySelectorAll<HTMLElement>(".card");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = button.dataset.target;
+
+        // Mark only the clicked tab as selected
+        buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
+
+        // Highlight the matching card and scroll it into view if it's off-screen
+        cards.forEach((card) => {
+          const isMatch = card.dataset.category === target;
+          card.classList.toggle("is-selected", isMatch);
+          if (isMatch) {
+            card.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "nearest" });
+          }
+        });
+      });
+    });
+  }
+</script>
