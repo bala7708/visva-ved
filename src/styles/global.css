@@ -13,6 +13,10 @@
   --color-cream: #f9f4ec;      /* page background */
   --color-butter: #fef3c6;     /* image card backgrounds */
 
+    --color-gold-light: #d4a840;
+
+    --color-sand: #f0e8d8;       /* alternate section background */
+
   /* Fonts */
   --font-display: "DM Serif Display", Georgia, "Times New Roman", serif;
   --font-body: "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;

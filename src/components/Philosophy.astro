@@ -1,0 +1,123 @@
+---
+// When the client sends the ashram photo:
+//   1. Put it in src/assets/images/ as philosophy.jpg
+//   2. Uncomment these two lines:
+// import { Image } from "astro:assets";
+// import photo from "../assets/images/philosophy.jpg";
+//   3. Replace the "PHOTO GOES HERE" comment below with:
+// <Image src={photo} alt="Ashram in a forested mountain setting" widths={[480, 800, 1216]} sizes="(max-width: 900px) 100vw, 608px" />
+---
+
+<section id="about" class="section">
+  <div class="container philosophy">
+    <!-- Left column: text -->
+    <div class="philosophy-text">
+      <p class="eyebrow">Our Philosophy</p>
+      <h2>Where Ancient Wisdom Meets the Living Breath</h2>
+
+      <p class="lead">
+        VISVA VED — "the knowledge of all" — draws from the Vedic understanding
+        that well-being is not the absence of suffering but the fullness of presence.
+        Founded on the principle that the breath is the bridge between body and
+        consciousness, we offer time-tested practices in their original integrity.
+      </p>
+      <p class="lead">
+        Our retreats are held in sanctuaries of natural beauty — forest hermitages
+        and mountain ashrams — where silence, simplicity, and sattvic living create
+        the conditions for genuine inner shift.
+      </p>
+
+      <div class="actions">
+        <a class="btn btn--primary" href="#programs">View All Courses</a>
+        <a class="btn btn--outline" href="#stories">Read Stories</a>
+      </div>
+    </div>
+
+    <!-- Right column: image card with lotus badge -->
+    <div class="philosophy-media">
+      <div class="media-card">
+        <!-- PHOTO GOES HERE -->
+      </div>
+      <span class="badge" aria-hidden="true">🪷</span>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Two equal columns with a 64px gap, vertically centered */
+  .philosophy {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+  }
+
+  /* ---------- Text ---------- */
+  h2 { margin-top: 16px; }
+
+  .lead {
+    margin-top: 24px;
+    line-height: 1.625;
+  }
+  .lead + .lead { margin-top: 20px; }  /* the second paragraph sits a bit closer */
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  /* ---------- Image card ---------- */
+  .philosophy-media { position: relative; }
+
+  .media-card {
+    position: relative;
+    height: 760px;
+    border-radius: var(--radius-card);
+    overflow: hidden;              /* keeps the photo inside the rounded corners */
+    background: var(--color-butter);
+  }
+  /* Used once the photo is added */
+  .media-card :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* The soft white fade at the top of the card, from Figma */
+  .media-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(176deg, #ffffff 3%, rgba(255, 255, 255, 0) 50%);
+    pointer-events: none;
+  }
+
+  /* Gold circle with the lotus, overlapping the top-right corner */
+  .badge {
+    position: absolute;
+    top: -16px;
+    right: -16px;
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--color-gold);
+    font-size: 1.5rem;
+    box-shadow: 0 8px 20px rgba(28, 15, 0, 0.15);
+  }
+
+  /* ---------- Tablet and mobile: stack the columns ---------- */
+  @media (max-width: 900px) {
+    .philosophy {
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+    .media-card { height: 440px; }
+    .badge { right: 16px; }       /* keep the badge on screen on narrow phones */
+  }
+  @media (max-width: 600px) {
+    .media-card { height: 340px; }
+  }
+</style>

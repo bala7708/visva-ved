@@ -1,27 +1,17 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Header from "../components/Header.astro";
+import Hero from "../components/Hero.astro";
+import Philosophy from "../components/Philosophy.astro";
+import Science from "../components/Science.astro";
 ---
 
 <BaseLayout>
   <Header />
 
   <main>
-    <!-- Temporary test section. We'll replace it with the real sections next. -->
-    <section class="section">
-      <div class="container">
-        <p class="eyebrow">Our Philosophy</p>
-        <h2>Where Ancient Wisdom Meets the Living Breath</h2>
-        <p style="max-width: 60ch; margin-top: 24px;">
-          VISVA VED — "the knowledge of all" — draws from the Vedic understanding
-          that well-being is not the absence of suffering but the fullness of presence.
-        </p>
-        <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 32px;">
-          <a class="btn btn--primary" href="#">View All Courses</a>
-          <a class="btn btn--outline" href="#">Read Stories</a>
-          <a class="btn btn--gold" href="#">Book a Slot</a>
-        </div>
-      </div>
-    </section>
+    <Hero />
+    <Philosophy />
+    <Science />
   </main>
 </BaseLayout>

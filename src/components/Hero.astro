@@ -1,0 +1,172 @@
+---
+// The Image component optimises the photo automatically
+import { Image } from "astro:assets";
+import heroImage from "/public/images/hero.jpg";
+---
+
+<section class="hero">
+  <!-- Background photo. alt="" because it's decorative: screen readers skip it -->
+  <div class="hero-bg">
+    <Image
+      src={heroImage}
+      alt=""
+      widths={[768, 1280, 1920, 2560]}
+      sizes="100vw"
+      loading="eager"
+      fetchpriority="high"
+    />
+  </div>
+
+  <div class="hero-content">
+    <h1>
+      <span>Embrace</span>
+      <em>Your Highest</em>
+      <span>Self</span>
+    </h1>
+
+    <p class="hero-text">
+      Ancient breathwork, meditation and yoga held within the stillness of nature.
+      Proven practices. Lasting transformation.
+    </p>
+
+    <div class="hero-actions">
+      <a class="btn hero-btn hero-btn--solid" href="#programs">Explore Courses</a>
+      <a class="btn hero-btn hero-btn--ghost" href="#about">Our Philosophy</a>
+    </div>
+  </div>
+
+  <a class="scroll-hint" href="#about" aria-label="Scroll to the next section">
+    <span class="scroll-label">Scroll</span>
+    <span class="scroll-line"></span>
+  </a>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    display: grid;
+    place-items: center;          /* centers the text both ways */
+    min-height: calc(100svh - 80px);  /* fills the screen below the header */
+    padding: 96px var(--gutter) 140px;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  /* ---------- Background photo ---------- */
+  .hero-bg {
+    position: absolute;
+    inset: 0;                     /* stretches to all four edges */
+    z-index: -1;
+  }
+  .hero-bg :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;            /* fills the space without stretching */
+  }
+  /* Dark layer over the photo so the text is easy to read */
+  .hero-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(28, 15, 0, 0.25) 0%,
+      rgba(28, 15, 0, 0.45) 60%,
+      rgba(28, 15, 0, 0.65) 100%
+    );
+  }
+
+  /* ---------- Text ---------- */
+  .hero-content { max-width: 896px; }
+
+  h1 {
+    font-size: clamp(3.5rem, 8vw, 6.5rem);   /* 104px on desktop */
+    line-height: 1.05;
+    color: var(--color-cream);
+  }
+  h1 span,
+  h1 em { display: block; }                 /* each part on its own line */
+  h1 em {
+    font-style: italic;
+    color: var(--color-gold-light);
+  }
+
+  .hero-text {
+    max-width: 576px;
+    margin: 24px auto 0;
+    font-size: 1.125rem;                     /* 18px */
+    line-height: 1.625;
+    color: rgba(249, 244, 236, 0.82);
+  }
+
+  /* ---------- Buttons ---------- */
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 40px;
+  }
+  .hero-btn {
+    padding: 16px 32px;
+    font-size: 1rem;
+    color: var(--color-cream);
+  }
+  .hero-btn--solid { background: var(--color-gold); }
+  .hero-btn--solid:hover { background: #a0750a; }
+  .hero-btn--ghost { border-color: rgba(212, 168, 64, 0.6); }
+  .hero-btn--ghost:hover {
+    border-color: var(--color-gold-light);
+    background: rgba(212, 168, 64, 0.12);
+  }
+
+  /* ---------- "Scroll" hint at the bottom ---------- */
+  .scroll-hint {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .scroll-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(212, 168, 64, 0.7);
+  }
+  .scroll-line {
+    position: relative;
+    width: 1px;
+    height: 48px;
+    overflow: hidden;
+    background: rgba(212, 168, 64, 0.2);
+  }
+  /* A small glowing line that slides down, inviting people to scroll */
+  .scroll-line::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: -24px;
+    width: 1px;
+    height: 24px;
+    background: linear-gradient(to bottom, var(--color-gold-light), transparent);
+    animation: scroll-drip 2s ease-in-out infinite;
+  }
+  @keyframes scroll-drip {
+    to { top: 48px; }
+  }
+
+  /* ---------- Mobile ---------- */
+  @media (max-width: 600px) {
+    .hero { padding-top: 72px; }
+    .hero-text { font-size: 1rem; }
+    .hero-actions { flex-direction: column; align-items: stretch; }
+  }
+  /* Hide the scroll hint on short screens, where it would overlap the buttons */
+  @media (max-height: 700px) {
+    .scroll-hint { display: none; }
+  }
+</style>
