@@ -1,0 +1,245 @@
+---
+// The twelve services. Edit this list to change the tiles.
+const services = [
+  { icon: "💼", label: "Job / Career / Business" },
+  { icon: "📈", label: "Lucky Profession" },
+  { icon: "🤝", label: "Partnerships – spouse / business" },
+  { icon: "💍", label: "Marriage – delays / matchmaking / success" },
+  { icon: "❤️", label: "Love / Arranged Marriage" },
+  { icon: "✈️", label: "Foreign Settlements" },
+  { icon: "📅", label: "Lucky C-section date" },
+  { icon: "🔤", label: "Name analysis and balancing" },
+  { icon: "👶", label: "Baby name / correction" },
+  { icon: "✍️", label: "Signature Analysis" },
+  { icon: "🚗", label: "Lucky colour / car / mobile number / house" },
+  { icon: "🌟", label: "Predictions and Remedies" },
+];
+
+// Contact details. Confirm the full number (with country code) with the client.
+const phoneDisplay = "7208173256";
+const whatsappLink = "https://wa.me/917208173256";   // +91 = India's country code
+---
+
+<section id="numerology" class="section numerology">
+  <div class="container numerology-inner">
+    <!-- Heading row -->
+    <div class="numerology-head">
+      <div>
+        <p class="eyebrow">Visva Ved · Dr. Mayuri</p>
+        <h2>Numerology</h2>
+        <p class="subtitle">Consultation for problems related to:</p>
+      </div>
+
+      <div class="tagline">
+        <p>Right Numbers<br />Brighter<br />Destinations</p>
+        <span class="tagline-line" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <!-- Service tiles -->
+    <ul class="services">
+      {services.map((s) => (
+        <li class="service">
+          <span class="service-icon" aria-hidden="true">{s.icon}</span>
+          <span>{s.label}</span>
+        </li>
+      ))}
+    </ul>
+
+    <!-- Contact card -->
+    <div class="contact-card">
+      <div class="contact-info">
+        <p class="contact-label">Connect with</p>
+        <h3>Dr. Mayuri</h3>
+        <p class="contact-role">Certified Numerologist · Visva Ved</p>
+        <a class="contact-phone" href={whatsappLink} target="_blank" rel="noopener">
+                    <img src="/images/whatsapp.svg" alt="" width="20" height="20" />
+          <span>{phoneDisplay}</span>
+          <span class="sr-only">(opens WhatsApp in a new tab)</span>
+        </a>
+      </div>
+
+      <div class="contact-aside">
+        <ul class="values" aria-label="What a consultation offers">
+          <li>Clarity</li>
+          <li>Guidance</li>
+          <li>Positive Change</li>
+        </ul>
+        <a class="btn contact-btn" href="#book">Book a Slot →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .numerology { background: var(--color-sand); }
+  .numerology-inner { max-width: calc(848px + var(--gutter) * 2); }
+
+  /* ---------- Heading row ---------- */
+  .numerology-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 32px;
+  }
+  h2 {
+    margin-top: 12px;
+    font-size: clamp(3.5rem, 8vw, 6rem);   /* 96px on desktop */
+    line-height: 1;
+  }
+  .subtitle {
+    margin-top: 12px;
+    font-size: 1rem;
+  }
+
+  .tagline {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+  }
+  .tagline p {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1.75rem, 3vw, 2.25rem);   /* 36px on desktop */
+    line-height: 1.25;
+    color: var(--color-forest);
+  }
+  .tagline-line {
+    width: 48px;
+    height: 1px;
+    margin-top: 16px;
+    background: var(--color-gold);
+  }
+
+  /* ---------- Service tiles ---------- */
+  .services {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 64px;
+    padding: 0;
+    list-style: none;
+  }
+  .service {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: var(--color-cream);
+    border: 1px solid rgba(184, 134, 11, 0.12);
+    border-radius: var(--radius-card);
+    font-weight: 500;
+    font-size: 0.875rem;
+    line-height: 1.25;
+    color: var(--color-ink);
+  }
+  .service-icon {
+    flex-shrink: 0;             /* the emoji never gets squashed by long text */
+    font-size: 1.25rem;
+    line-height: 1.4;
+  }
+
+  /* ---------- Contact card ---------- */
+  .contact-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 32px;
+    margin-top: 64px;
+    padding: 48px;
+    background: var(--color-ink);
+    border-radius: 24px;
+  }
+
+  .contact-label {
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--color-gold-light);
+  }
+  h3 {
+    margin-top: 8px;
+    font-size: 2.25rem;        /* 36px */
+    line-height: 1.1;
+    color: var(--color-cream);
+  }
+  .contact-role {
+    margin-top: 4px;
+    font-weight: 400;
+    font-size: 0.875rem;
+    color: rgba(249, 244, 236, 0.55);
+  }
+  .contact-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: var(--color-cream);
+  }
+  .contact-phone:hover span:first-of-type {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .contact-aside {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .values {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+    font-weight: 400;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(212, 168, 64, 0.6);
+  }
+  .contact-btn {
+    padding: 16px 32px;
+    font-size: 1rem;
+    background: var(--color-gold);
+    color: var(--color-cream);
+  }
+  .contact-btn:hover { background: #a0750a; }
+
+  /* ---------- Tablet and phone ---------- */
+  @media (max-width: 768px) {
+    .numerology-head {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .tagline {
+      align-items: flex-start;
+      text-align: left;
+    }
+    .services {
+      grid-template-columns: 1fr;
+      margin-top: 40px;
+    }
+    .contact-card {
+      flex-direction: column;
+      align-items: stretch;
+      margin-top: 40px;
+      padding: 32px 24px;
+    }
+    .contact-aside {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .values {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 4px 16px;
+    }
+  }
+</style>
