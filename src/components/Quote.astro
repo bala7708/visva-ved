@@ -1,0 +1,62 @@
+---
+// Change the quote and its author here once the client confirms the wording.
+const quote =
+  "Joy is not something you acquire — it is your nature. The practices at VISVA VED do not give you something new; they remove what was always in the way.";
+const author = "Sri Sri Ravi Shankar, Founder, Art of Living";
+---
+
+<section class="quote-band">
+  <figure class="quote">
+    <!-- Decorative quotation mark -->
+    <svg class="quote-mark" width="48" height="48" viewBox="0 0 48 48" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M8 36V25.5C8 17.4 12.6 12.1 20.2 10l1.5 3.2c-4.3 1.6-6.6 4.6-6.9 8.8H20V36H8Zm20 0V25.5c0-8.1 4.6-13.4 12.2-15.5l1.5 3.2c-4.3 1.6-6.6 4.6-6.9 8.8H40V36H28Z"
+      />
+    </svg>
+
+    <blockquote>
+      <p>"{quote}"</p>
+    </blockquote>
+
+    <figcaption>— {author}</figcaption>
+  </figure>
+</section>
+
+<style>
+  .quote-band {
+    background: var(--color-ink);
+    padding: min(var(--section-pad), 96px) var(--gutter);
+  }
+
+  .quote {
+    max-width: 768px;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .quote-mark {
+    display: block;
+    margin-inline: auto;
+    color: var(--color-gold);
+    opacity: 0.7;
+  }
+
+  blockquote p {
+    margin-top: 32px;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1.5rem, 2.6vw, 2.2rem);   /* 35px on desktop */
+    line-height: 1.625;
+    color: var(--color-cream);
+  }
+
+  figcaption {
+    margin-top: 32px;
+    font-weight: 400;
+    font-size: 0.875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-gold-light);
+  }
+</style>
