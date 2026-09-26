@@ -1,0 +1,737 @@
+---
+// The booking popup. Every link with href="#book" opens it.
+// Settings (time slots, closed days…) are at the top of the <script> below.
+---
+
+<dialog id="booking-modal" class="booking" aria-labelledby="booking-title">
+  <div class="booking-inner">
+    <!-- ========== Header ========== -->
+    <header class="booking-header">
+      <div class="teacher">
+        <span class="avatar" aria-hidden="true">VV</span>
+        <div>
+          <h2 id="booking-title" class="teacher-name">Visva Ved Teacher</h2>
+          <p id="booking-meta" class="teacher-meta">Retreat Consultation · 45 min · Free Consultation</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <span class="meet-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m22 8-6 4 6 4V8Z" />
+            <rect x="2" y="6" width="14" height="12" rx="2" ry="2" />
+          </svg>
+          Google Meet
+        </span>
+        <form method="dialog">
+          <button class="close" type="submit" aria-label="Close booking">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+          </button>
+        </form>
+      </div>
+    </header>
+
+    <!-- ========== Booking form ========== -->
+    <form
+      id="booking-form"
+      class="booking-form"
+      name="booking"
+      method="POST"
+      data-netlify="true"
+      netlify-honeypot="bot-field"
+    >
+      <!-- Hidden fields, filled in by the script -->
+      <input type="hidden" name="form-name" value="booking" />
+      <input type="hidden" name="programme" id="booking-programme" value="General consultation" />
+      <input type="hidden" name="date" id="booking-date" />
+      <input type="hidden" name="time" id="booking-time" />
+      <input type="hidden" name="start" id="booking-start" />
+      <input type="hidden" name="end" id="booking-end" />
+      <p class="sr-only" aria-hidden="true">
+        <label>Don't fill this in: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+      </p>
+
+      <div class="picker">
+        <!-- Calendar -->
+        <div class="calendar">
+          <div class="cal-head">
+            <p id="cal-month" class="cal-month" aria-live="polite"></p>
+            <div class="cal-nav">
+              <button type="button" id="cal-prev" class="icon-btn" aria-label="Previous month">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+              </button>
+              <button type="button" id="cal-next" class="icon-btn" aria-label="Next month">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="cal-weekdays" aria-hidden="true">
+            <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+          </div>
+          <div id="cal-grid" class="cal-grid"></div>
+        </div>
+
+        <!-- Time slots -->
+        <div class="slots">
+          <p class="tz">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+              <path d="M2 12h20" />
+            </svg>
+            Asia / Kolkata
+          </p>
+          <p id="slot-day" class="slot-day">Choose a date</p>
+          <div id="slot-list" class="slot-list"></div>
+        </div>
+      </div>
+
+      <!-- Your details -->
+      <div class="details">
+        <p class="details-title">Your Details</p>
+
+        <div class="fields">
+          <div class="field">
+            <label for="booking-name">Your Name</label>
+            <input id="booking-name" name="name" type="text" autocomplete="name" placeholder="Priya Sharma" required />
+          </div>
+          <div class="field">
+            <label for="booking-email">Your Email</label>
+            <input id="booking-email" name="email" type="email" autocomplete="email" placeholder="priya@gmail.com" required />
+          </div>
+          <div class="field">
+            <label for="booking-phone">WhatsApp Number <span class="optional">Optional</span></label>
+            <input id="booking-phone" name="whatsapp" type="tel" autocomplete="tel" placeholder="+91 98765-43210" />
+          </div>
+        </div>
+
+        <button type="submit" id="booking-submit" class="submit" disabled>
+          Book Slot
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </button>
+        <p id="booking-hint" class="hint" aria-live="polite">Select a time slot to continue</p>
+      </div>
+    </form>
+
+    <!-- ========== Success message (shown after sending) ========== -->
+    <div id="booking-success" class="success" hidden>
+      <span class="success-icon" aria-hidden="true">✓</span>
+      <h3>Request received</h3>
+      <p id="booking-summary" class="success-summary"></p>
+      <p>We'll confirm your slot by email or WhatsApp within 24 hours.</p>
+      <form method="dialog">
+        <button class="btn btn--primary" type="submit">Done</button>
+      </form>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  /* ---------- Popup box and backdrop ---------- */
+  .booking {
+    width: min(780px, calc(100% - 32px));
+    max-height: calc(100dvh - 32px);
+    padding: 0;
+    border: 0;
+    border-radius: 24px;
+    background: #ffffff;
+    color: var(--color-bark);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+  }
+  .booking::backdrop {
+    background: rgba(28, 15, 0, 0.6);
+    backdrop-filter: blur(6px);
+  }
+  .booking[open] { animation: pop-in 0.2s ease-out; }
+  @keyframes pop-in {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  }
+  :global(html:has(dialog.booking[open])) { overflow: hidden; }
+
+  .booking-inner {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100dvh - 32px);
+  }
+
+  /* ---------- Header ---------- */
+  .booking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--color-sand);
+  }
+  .teacher { display: flex; align-items: center; gap: 16px; }
+  .avatar {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold));
+    color: var(--color-cream);
+    font-weight: 700;
+    font-size: 1.125rem;
+  }
+  .teacher-name {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-ink);
+  }
+  .teacher-meta { font-weight: 400; font-size: 0.875rem; line-height: 1.43; }
+
+  .header-actions { display: flex; align-items: center; gap: 12px; }
+  .meet-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    border: 1px solid rgba(184, 134, 11, 0.3);
+    border-radius: var(--radius-pill);
+    font-weight: 500;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+  .close {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--color-ink);
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  .close:hover { background: var(--color-sand); }
+
+  /* ---------- Form area (scrolls inside the popup) ---------- */
+  .booking-form { overflow-y: auto; }
+  .booking-form[hidden] { display: none; }
+
+  .picker {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--color-sand);
+  }
+
+  /* ---------- Calendar ---------- */
+  .calendar {
+    padding: 24px 28px;
+    border-right: 1px solid var(--color-sand);
+  }
+  .cal-head { display: flex; justify-content: space-between; align-items: center; }
+  .cal-month {
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .cal-nav { display: flex; gap: 4px; }
+  .icon-btn {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+  .icon-btn:hover:not(:disabled) { background: var(--color-sand); }
+  .icon-btn:disabled { color: #d4c4a8; cursor: default; }
+
+  .cal-weekdays,
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+  }
+  .cal-weekdays {
+    margin-top: 20px;
+    padding-block: 4px;
+    font-weight: 500;
+    font-size: 0.75rem;
+    text-align: center;
+  }
+  .cal-grid { row-gap: 4px; margin-top: 8px; }
+
+  /* The day buttons are created by JavaScript, so they need :global() (see explanation) */
+  .cal-grid :global(button) {
+    justify-self: center;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--color-ink);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.15s;
+  }
+  .cal-grid :global(button:hover:not(:disabled)) { background: var(--color-sand); }
+  .cal-grid :global(button:disabled) { color: #d4c4a8; cursor: default; }
+  .cal-grid :global(button[aria-pressed="true"]) {
+    background: var(--color-gold);
+    color: var(--color-cream);
+    font-weight: 700;
+  }
+
+  /* ---------- Time slots ---------- */
+  .slots { padding: 24px 28px; }
+  .tz {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .slot-day {
+    margin-top: 16px;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-ink);
+  }
+  .slot-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 260px;
+    margin-top: 16px;
+    padding-right: 4px;
+    overflow-y: auto;
+  }
+  .slot-list :global(button) {
+    flex-shrink: 0;
+    padding: 12px;
+    border: 1.5px solid #e8ddd0;
+    border-radius: var(--radius-card);
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: border-color 0.15s, background-color 0.15s;
+  }
+  .slot-list :global(button:hover) { border-color: var(--color-gold); }
+  .slot-list :global(button[aria-pressed="true"]) {
+    border-color: var(--color-gold);
+    background: var(--color-butter);
+    font-weight: 600;
+  }
+  .slot-list :global(.slot-empty) {
+    font-size: 0.875rem;
+    color: rgba(92, 61, 30, 0.7);
+  }
+
+  /* ---------- Your details ---------- */
+  .details { padding: 24px 28px; }
+  .details-title {
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .fields {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .field label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--color-ink);
+  }
+  .optional {
+    padding: 2px 8px;
+    border: 1px solid #d4c4a8;
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    font-size: 0.625rem;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+    color: var(--color-bark);
+  }
+  .field input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid #e8ddd0;
+    border-radius: var(--radius-card);
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-size: 0.875rem;
+  }
+  .field input::placeholder { color: rgba(28, 15, 0, 0.4); }
+  .field input:focus { outline: none; border-color: var(--color-gold); }
+
+  .submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 56px;
+    margin-top: 24px;
+    border: 0;
+    border-radius: var(--radius-card);
+    background: var(--color-gold);
+    color: var(--color-cream);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  .submit:hover:not(:disabled) { background: #a0750a; }
+  .submit:disabled { background: #d4c4a8; cursor: not-allowed; }
+  .hint {
+    margin-top: 8px;
+    font-size: 0.75rem;
+    text-align: center;
+  }
+
+  /* ---------- Success message ---------- */
+  .success {
+    display: grid;
+    justify-items: center;
+    gap: 12px;
+    padding: 56px 28px;
+    text-align: center;
+  }
+  .success[hidden] { display: none; }
+  .success-icon {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-forest);
+    color: var(--color-cream);
+    font-size: 1.5rem;
+  }
+  .success h3 { font-size: 1.75rem; }
+  .success-summary { font-weight: 500; color: var(--color-ink); }
+  .success form { margin-top: 12px; }
+
+  /* ---------- Phone ---------- */
+  @media (max-width: 640px) {
+    .booking-header { align-items: flex-start; padding: 20px; }
+    .avatar { width: 44px; height: 44px; font-size: 1rem; }
+    .meet-badge { display: none; }
+
+    .picker { grid-template-columns: 1fr; }
+    .calendar {
+      padding: 20px;
+      border-right: 0;
+      border-bottom: 1px solid var(--color-sand);
+    }
+    .slots,
+    .details { padding: 20px; }
+
+    /* Time slots as a compact 3-column grid instead of a long list */
+    .slot-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      max-height: none;
+      padding-right: 0;
+    }
+    .slot-list :global(button) { padding: 10px 4px; font-size: 0.8125rem; }
+    .slot-list :global(.slot-empty) { grid-column: 1 / -1; }
+  }
+</style>
+
+<script>
+  // ============ SETTINGS: confirm these with the client ============
+  const TIME_SLOTS = ["7:00 AM", "8:30 AM", "10:00 AM", "11:30 AM", "2:00 PM", "4:00 PM", "5:30 PM"];
+  const CLOSED_WEEKDAYS: number[] = [];  // 0 = Sunday … 6 = Saturday. Example: [0] closes Sundays
+  const MIN_DAYS_AHEAD = 1;              // earliest bookable day: 1 = tomorrow
+  const MONTHS_SHOWN = 3;                // this month + the next 2
+  const DEFAULT_PROGRAMME = "General consultation";
+  const SESSION_MINUTES = 45;            // length of a consultation, used for the calendar event
+  // ================================================================
+
+  const dialog = document.getElementById("booking-modal") as HTMLDialogElement | null;
+  const form = document.getElementById("booking-form") as HTMLFormElement | null;
+
+  if (dialog && form) {
+    const monthLabel = document.getElementById("cal-month") as HTMLElement;
+    const grid = document.getElementById("cal-grid") as HTMLElement;
+    const prevBtn = document.getElementById("cal-prev") as HTMLButtonElement;
+    const nextBtn = document.getElementById("cal-next") as HTMLButtonElement;
+    const slotDay = document.getElementById("slot-day") as HTMLElement;
+    const slotList = document.getElementById("slot-list") as HTMLElement;
+    const submitBtn = document.getElementById("booking-submit") as HTMLButtonElement;
+    const hint = document.getElementById("booking-hint") as HTMLElement;
+    const meta = document.getElementById("booking-meta") as HTMLElement;
+    const programmeInput = document.getElementById("booking-programme") as HTMLInputElement;
+    const dateInput = document.getElementById("booking-date") as HTMLInputElement;
+    const timeInput = document.getElementById("booking-time") as HTMLInputElement;
+    const success = document.getElementById("booking-success") as HTMLElement;
+    const summary = document.getElementById("booking-summary") as HTMLElement;
+
+        const startInput = document.getElementById("booking-start") as HTMLInputElement;
+    const endInput = document.getElementById("booking-end") as HTMLInputElement;
+
+    // Turns a day + "7:00 AM" into "2026-09-25T07:00:00+05:30" (India time)
+    const toIndiaTime = (date: Date, time: string, addMinutes = 0) => {
+      const [clock, period] = time.split(" ");
+      let [hours, minutes] = clock.split(":").map(Number);
+      if (period === "PM" && hours !== 12) hours += 12;
+      if (period === "AM" && hours === 12) hours = 0;
+
+      const total = hours * 60 + minutes + addMinutes;
+      const pad = (n: number) => String(n).padStart(2, "0");
+      return (
+        `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` +
+        `T${pad(Math.floor(total / 60))}:${pad(total % 60)}:00+05:30`
+      );
+    };
+
+    // ---------- Date helpers ----------
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const firstBookable = new Date(today);
+    firstBookable.setDate(today.getDate() + MIN_DAYS_AHEAD);
+
+    // Months counted as one number (year × 12 + month) makes comparing easy
+    const monthNumber = (year: number, month: number) => year * 12 + month;
+    const firstMonth = monthNumber(today.getFullYear(), today.getMonth());
+    const lastMonth = firstMonth + MONTHS_SHOWN - 1;
+
+    const isBookable = (date: Date) =>
+      date >= firstBookable &&
+      !CLOSED_WEEKDAYS.includes(date.getDay()) &&
+      monthNumber(date.getFullYear(), date.getMonth()) <= lastMonth;
+
+    const longDate = (date: Date) =>
+      date.toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    const shortDate = (date: Date) =>
+      date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+
+    const findFirstAvailable = () => {
+      const date = new Date(firstBookable);
+      for (let i = 0; i < 120; i++) {
+        if (isBookable(date)) return date;
+        date.setDate(date.getDate() + 1);
+      }
+      return null;
+    };
+
+    // ---------- State: what the visitor has chosen ----------
+    let viewYear = today.getFullYear();
+    let viewMonth = today.getMonth();
+    let selectedDate: Date | null = null;
+    let selectedTime: string | null = null;
+
+    // ---------- Drawing the calendar ----------
+    const renderCalendar = () => {
+      monthLabel.textContent = new Date(viewYear, viewMonth, 1)
+        .toLocaleDateString("en-US", { month: "long", year: "numeric" });
+
+      grid.replaceChildren();
+
+      // Empty cells before the 1st, so it lands under the right weekday
+      const offset = new Date(viewYear, viewMonth, 1).getDay();
+      for (let i = 0; i < offset; i++) grid.append(document.createElement("span"));
+
+      const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(viewYear, viewMonth, day);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = String(day);
+        button.setAttribute("aria-label", longDate(date));
+        button.disabled = !isBookable(date);
+        button.setAttribute(
+          "aria-pressed",
+          String(selectedDate !== null && date.getTime() === selectedDate.getTime())
+        );
+        button.addEventListener("click", () => selectDate(date));
+        grid.append(button);
+      }
+
+      const current = monthNumber(viewYear, viewMonth);
+      prevBtn.disabled = current <= firstMonth;
+      nextBtn.disabled = current >= lastMonth;
+    };
+
+    // ---------- Drawing the time slots ----------
+    const renderSlots = () => {
+      slotList.replaceChildren();
+
+      if (!selectedDate) {
+        slotDay.textContent = "Choose a date";
+        const message = document.createElement("p");
+        message.className = "slot-empty";
+        message.textContent = "Pick a day on the calendar to see available times.";
+        slotList.append(message);
+        return;
+      }
+
+      slotDay.textContent = shortDate(selectedDate);
+      const day = selectedDate;   // remember the day for the click handlers below
+      TIME_SLOTS.forEach((time) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = time;
+        button.setAttribute("aria-pressed", String(time === selectedTime));
+        button.addEventListener("click", () => {
+          selectedTime = time;
+          timeInput.value = `${time} (India time)`;
+          startInput.value = toIndiaTime(day, time);
+          endInput.value = toIndiaTime(day, time, SESSION_MINUTES);
+          renderSlots();
+          updateSubmit();
+        });
+        slotList.append(button);
+      });
+    };
+
+    // ---------- Enabling the button and updating the hint ----------
+    const updateSubmit = () => {
+      submitBtn.disabled = !(selectedDate && selectedTime);
+      if (!selectedDate) hint.textContent = "Select a date to continue";
+      else if (!selectedTime) hint.textContent = "Select a time slot to continue";
+      else hint.textContent = `${shortDate(selectedDate)} at ${selectedTime} (India time)`;
+    };
+
+    const selectDate = (date: Date) => {
+      selectedDate = date;
+      selectedTime = null;
+      dateInput.value = longDate(date);
+      timeInput.value = "";
+      startInput.value = "";
+      endInput.value = "";
+      renderCalendar();
+      renderSlots();
+      updateSubmit();
+    };
+
+    // ---------- Reset to a fresh form (used at start and after a booking) ----------
+    const reset = () => {
+      form.reset();
+      form.hidden = false;
+      success.hidden = true;
+      selectedTime = null;
+      selectedDate = null;
+      const first = findFirstAvailable();
+      if (first) {
+        viewYear = first.getFullYear();
+        viewMonth = first.getMonth();
+        selectDate(first);
+      } else {
+        renderCalendar();
+        renderSlots();
+        updateSubmit();
+      }
+    };
+
+    prevBtn.addEventListener("click", () => {
+      viewMonth -= 1;
+      if (viewMonth < 0) { viewMonth = 11; viewYear -= 1; }
+      renderCalendar();
+    });
+    nextBtn.addEventListener("click", () => {
+      viewMonth += 1;
+      if (viewMonth > 11) { viewMonth = 0; viewYear += 1; }
+      renderCalendar();
+    });
+
+    // ---------- Opening the popup from any "Book a Slot" link ----------
+    document.addEventListener("click", (event) => {
+      const link = (event.target as Element).closest('a[href="#book"]');
+      if (!link) return;
+      event.preventDefault();
+
+      // Work out which programme the visitor clicked on (if any)
+      const cardTitle = link.closest(".card")?.querySelector("h3")?.textContent?.trim();
+      let programme = DEFAULT_PROGRAMME;
+      if (cardTitle) programme = cardTitle;
+      else if (link.closest("#numerology")) programme = "Numerology consultation";
+
+      programmeInput.value = programme;
+      meta.textContent =
+        programme === DEFAULT_PROGRAMME
+          ? "Retreat Consultation · 45 min · Free Consultation"
+          : `${programme} · 45 min · Free Consultation`;
+
+      dialog.showModal();
+    });
+
+    // Close when clicking the dark area outside the box
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    // After a successful booking, start fresh next time
+    dialog.addEventListener("close", () => {
+      if (!success.hidden) reset();
+    });
+
+    // ---------- Sending the request ----------
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const date = selectedDate;
+      const time = selectedTime;
+      if (!date || !time) return;
+
+      submitBtn.disabled = true;
+      hint.textContent = "Sending your request…";
+
+      try {
+        if (import.meta.env.DEV) {
+          // On your computer there's no Netlify, so we pretend it worked
+          await new Promise((resolve) => setTimeout(resolve, 600));
+        } else {
+          const body = new URLSearchParams();
+          new FormData(form).forEach((value, key) => body.append(key, String(value)));
+          const response = await fetch("/", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: body.toString(),
+          });
+          if (!response.ok) throw new Error(`Status ${response.status}`);
+        }
+
+        summary.textContent = `${longDate(date)} at ${time} (India time) · ${programmeInput.value}`;
+        form.hidden = true;
+        success.hidden = false;
+      } catch {
+        hint.textContent = "Sorry, something went wrong. Please try again, or message us on WhatsApp.";
+        submitBtn.disabled = false;
+      }
+    });
+
+    reset();
+  }
+</script>
