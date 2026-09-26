@@ -1,0 +1,38 @@
+---
+// Every page uses this layout, so fonts, global CSS and SEO tags are set up once.
+import "@fontsource/dm-serif-display/400.css";
+import "@fontsource/dm-serif-display/400-italic.css";
+import "@fontsource/outfit/300.css";
+import "@fontsource/outfit/500.css";
+import "@fontsource/outfit/600.css";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Visva Ved | Yoga, Meditation & Numerology",
+  description = "Time-tested Vedic practices, retreats and 1:1 sessions for body, breath and mind.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <!-- Link previews on WhatsApp, LinkedIn, etc. Add the image in step 5. -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

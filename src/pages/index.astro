@@ -1,11 +1,25 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<BaseLayout>
+  <!-- Temporary page to check that fonts, colors and buttons work.
+       From step 4 on, each section gets its own component. -->
+  <main>
+    <section class="section">
+      <div class="container">
+        <p class="eyebrow">Our Philosophy</p>
+        <h2>Where Ancient Wisdom Meets the Living Breath</h2>
+        <p style="max-width: 60ch; margin-top: 24px;">
+          VISVA VED — "the knowledge of all" — draws from the Vedic understanding
+          that well-being is not the absence of suffering but the fullness of presence.
+        </p>
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-top: 32px;">
+          <a class="btn btn--primary" href="#">View All Courses</a>
+          <a class="btn btn--outline" href="#">Read Stories</a>
+          <a class="btn btn--gold" href="#">Book a Slot</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
