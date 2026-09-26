@@ -1,0 +1,216 @@
+---
+import { Image } from "astro:assets";
+import logo from "../assets/images/logo.png";
+
+// Footer columns. "#" means the page doesn't exist yet: update once the client decides.
+const columns = [
+  {
+    title: "Programs",
+    links: [
+      { label: "Happiness Program", href: "#programs" },
+      { label: "Sahaj Samadhi", href: "#programs" },
+      { label: "Sri Sri Yoga", href: "#programs" },
+      { label: "Silent Sadhana", href: "#programs" },
+      { label: "Corporate Wellness", href: "#programs" },
+      { label: "Teacher Training", href: "#programs" },
+    ],
+  },
+  {
+    title: "Retreats",
+    links: [
+      { label: "Weekend Reset", href: "#" },
+      { label: "7-Day Sadhana", href: "#programs" },
+      { label: "Sacred Journey", href: "#" },
+      { label: "International Centres", href: "#" },
+      { label: "Find a Centre", href: "#" },
+    ],
+  },
+  {
+    title: "Connect",
+    links: [
+      { label: "About Us", href: "#about" },
+      { label: "Our Teachers", href: "#" },
+      { label: "Dr. Mayuri – Numerology", href: "#numerology" },
+      { label: "Contact", href: "#numerology" },
+      { label: "Press & Media", href: "#" },
+    ],
+  },
+];
+
+// Social media: replace "#" with the client's real profile links
+const socials = [
+  { letter: "I", label: "Instagram", href: "#" },
+  { letter: "F", label: "Facebook", href: "#" },
+  { letter: "Y", label: "YouTube", href: "#" },
+];
+
+const legal = [
+  { label: "Privacy Policy", href: "#" },
+  { label: "Terms of Service", href: "#" },
+  { label: "Cookie Settings", href: "#" },
+];
+
+// Always shows the current year, so the footer never looks out of date
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <!-- Brand column -->
+      <div class="brand">
+        <Image src={logo} alt="Visva Ved" width={148} height={112} />
+        <p class="tagline">
+          Embracing your highest self through breath, meditation, and the wisdom of the ages.
+        </p>
+        <ul class="socials">
+          {socials.map((s) => (
+            <li>
+              <a href={s.href} aria-label={s.label}>{s.letter}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Link columns -->
+      {columns.map((col) => (
+        <nav aria-label={col.title}>
+          <h2 class="footer-title">{col.title}</h2>
+          <ul class="footer-links">
+            {col.links.map((link) => (
+              <li><a href={link.href}>{link.label}</a></li>
+            ))}
+          </ul>
+        </nav>
+      ))}
+    </div>
+
+    <div class="footer-bottom">
+      <p>© {year} VISVA VED. All rights reserved.</p>
+      <ul class="legal">
+        {legal.map((link) => (
+          <li><a href={link.href}>{link.label}</a></li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding: 64px 0 32px;
+    background: var(--color-ink);
+  }
+
+  /* ---------- Top: 4 columns ---------- */
+  .footer-top {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid rgba(184, 134, 11, 0.15);
+  }
+
+  .brand :global(img) {
+    width: 74px;
+    height: 56px;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+  .tagline {
+    max-width: 290px;
+    margin-top: 16px;
+    font-size: 0.875rem;
+    line-height: 1.625;
+    color: rgba(249, 244, 236, 0.55);
+  }
+
+  .socials {
+    display: flex;
+    gap: 16px;
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+  }
+  .socials a {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(184, 134, 11, 0.15);
+    color: var(--color-gold-light);
+    font-weight: 700;
+    font-size: 0.75rem;
+    transition: background-color 0.2s;
+  }
+  .socials a:hover { background: rgba(184, 134, 11, 0.35); }
+
+  /* Column headings: small gold labels, not the big serif headings */
+  .footer-title {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.75rem;
+    line-height: 1.33;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-gold-light);
+  }
+  .footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 0;
+    list-style: none;
+  }
+  .footer-links a {
+    font-weight: 400;
+    font-size: 0.875rem;
+    line-height: 1.43;
+    color: rgba(249, 244, 236, 0.55);
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--color-gold-light); }
+
+  /* ---------- Bottom row ---------- */
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding-top: 32px;
+    font-size: 0.75rem;
+    color: rgba(249, 244, 236, 0.3);
+  }
+  .legal {
+    display: flex;
+    gap: 24px;
+    padding: 0;
+    list-style: none;
+  }
+  .legal a { transition: color 0.2s; }
+  .legal a:hover { color: var(--color-gold-light); }
+
+  /* ---------- Tablet: brand on top, 3 link columns below ---------- */
+  @media (max-width: 900px) {
+    .footer-top { grid-template-columns: repeat(3, 1fr); }
+    .brand { grid-column: 1 / -1; }   /* spans the full width */
+  }
+
+  /* ---------- Phone: 2 columns, bottom row stacked ---------- */
+  @media (max-width: 560px) {
+    .footer-top {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px 24px;
+    }
+    .footer-bottom {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .legal {
+      flex-wrap: wrap;
+      gap: 8px 20px;
+    }
+  }
+</style>
