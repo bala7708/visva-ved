@@ -1,11 +1,6 @@
 ---
-// When the client sends the ashram photo:
-//   1. Put it in src/assets/images/ as philosophy.jpg
-//   2. Uncomment these two lines:
-// import { Image } from "astro:assets";
-// import photo from "../assets/images/philosophy.jpg";
-//   3. Replace the "PHOTO GOES HERE" comment below with:
-// <Image src={photo} alt="Ashram in a forested mountain setting" widths={[480, 800, 1216]} sizes="(max-width: 900px) 100vw, 608px" />
+import { Image } from "astro:assets";
+import photo from "../assets/images/philosophy.jpg";
 ---
 
 <section id="about" class="section">
@@ -33,12 +28,25 @@
       </div>
     </div>
 
-    <!-- Right column: image card with lotus badge -->
+    <!-- Right column: photo, lotus badge and quote card -->
     <div class="philosophy-media">
       <div class="media-card">
-        <!-- PHOTO GOES HERE -->
+        <Image
+          src={photo}
+          alt="An ashram with temple domes surrounded by forest"
+          widths={[480, 800, 1216]}
+          sizes="(max-width: 900px) 100vw, 608px"
+        />
       </div>
+
       <span class="badge" aria-hidden="true">🪷</span>
+
+      <div class="quote-card">
+        <p class="quote-title">"Breath is life."</p>
+        <p class="quote-text">
+          The Sudarshan Kriya™ is researched at Yale &amp; Harvard for its clinical efficacy.
+        </p>
+      </div>
     </div>
   </div>
 </section>
@@ -59,7 +67,7 @@
     margin-top: 24px;
     line-height: 1.625;
   }
-  .lead + .lead { margin-top: 20px; }  /* the second paragraph sits a bit closer */
+  .lead + .lead { margin-top: 20px; }
 
   .actions {
     display: flex;
@@ -68,29 +76,19 @@
     margin-top: 32px;
   }
 
-  /* ---------- Image card ---------- */
+  /* ---------- Photo ---------- */
   .philosophy-media { position: relative; }
 
   .media-card {
-    position: relative;
-    height: 760px;
+    height: 490px;                 /* about the same height as the text column */
     border-radius: var(--radius-card);
-    overflow: hidden;              /* keeps the photo inside the rounded corners */
-    background: var(--color-butter);
+    overflow: hidden;
+    background: var(--color-butter);   /* shows while the photo loads */
   }
-  /* Used once the photo is added */
   .media-card :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
-  }
-  /* The soft white fade at the top of the card, from Figma */
-  .media-card::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(176deg, #ffffff 3%, rgba(255, 255, 255, 0) 50%);
-    pointer-events: none;
   }
 
   /* Gold circle with the lotus, overlapping the top-right corner */
@@ -108,16 +106,51 @@
     box-shadow: 0 8px 20px rgba(28, 15, 0, 0.15);
   }
 
-  /* ---------- Tablet and mobile: stack the columns ---------- */
+  /* ---------- Quote card, overlapping the bottom-left corner ---------- */
+  .quote-card {
+    position: absolute;
+    left: -24px;
+    bottom: -24px;
+    width: min(290px, 70%);
+    padding: 24px;
+    background: var(--color-sand);
+    border: 1px solid rgba(184, 134, 11, 0.2);
+    border-radius: var(--radius-card);
+    box-shadow: 0 12px 32px rgba(28, 15, 0, 0.08);
+  }
+  .quote-title {
+    font-family: var(--font-display);
+    font-size: 1.375rem;           /* 22px */
+    line-height: 1.3;
+    color: var(--color-ink);
+  }
+  .quote-text {
+    margin-top: 8px;
+    font-weight: 400;
+    font-size: 0.8125rem;          /* 13px */
+    line-height: 1.6;
+  }
+
+  /* ---------- Tablet and phone: stack the columns ---------- */
   @media (max-width: 900px) {
     .philosophy {
       grid-template-columns: 1fr;
       gap: 48px;
     }
     .media-card { height: 440px; }
-    .badge { right: 16px; }       /* keep the badge on screen on narrow phones */
+    .badge { right: 16px; }
+    /* Keep the quote card inside the screen, overlapping the photo's bottom edge */
+    .quote-card {
+      left: 16px;
+      bottom: -32px;
+    }
+    .philosophy-media { margin-bottom: 32px; }   /* room for the overlapping card */
   }
   @media (max-width: 600px) {
     .media-card { height: 340px; }
+    .quote-card {
+      width: calc(100% - 32px);
+      padding: 20px;
+    }
   }
 </style>
