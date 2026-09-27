@@ -1,0 +1,6 @@
+[build]
+  command = "npm run build"   # how to build the site
+  publish = "dist"            # the folder with the finished site
+
+[build.environment]
+  NODE_VERSION = "22"         # Astro 7 needs a recent Node version
