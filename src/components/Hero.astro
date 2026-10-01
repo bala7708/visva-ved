@@ -1,12 +1,11 @@
 ---
-// The Image component optimises the photo automatically
 import { Image } from "astro:assets";
-import heroImage from "../assets/images/hero.jpg";
+import heroImage from "../assets/images/hero-home.jpg";
 ---
 
 <section class="hero">
-  <!-- Background photo. alt="" because it's decorative: screen readers skip it -->
-  <div class="hero-bg">
+  <!-- Background: photo at 45% on deep green, plus a green gradient -->
+  <div class="hero-bg" aria-hidden="true">
     <Image
       src={heroImage}
       alt=""
@@ -18,85 +17,96 @@ import heroImage from "../assets/images/hero.jpg";
   </div>
 
   <div class="hero-content">
+    <p class="eyebrow">Rig Veda 10.191.2</p>
+
     <h1>
-      <span>Embrace</span>
-      <em>Your Highest</em>
-      <span>Self</span>
+      <span>Living in Harmony</span>
+      <span>with the Universe</span>
     </h1>
 
-    <p class="hero-text">
-      Ancient breathwork, meditation and yoga held within the stillness of nature.
-      Proven practices. Lasting transformation.
+    <p class="sanskrit" lang="sa-Latn">
+      Saṃgacchadhvaṃ saṃvadadhvaṃ saṃ vo manāṃsi jānatām
     </p>
+    <p class="translation">May we all move together · speak in harmony · be of one mind</p>
 
     <div class="hero-actions">
-      <a class="btn hero-btn hero-btn--solid" href="#programs">Explore Courses</a>
-      <a class="btn hero-btn hero-btn--ghost" href="#about">Our Philosophy</a>
+      <a class="btn btn--saffron hero-btn" href="#seeking">
+        Find Your Path <span aria-hidden="true">→</span>
+      </a>
+      <a class="btn btn--ghost-light hero-btn" href="#paths">
+        Explore Sessions <span aria-hidden="true">→</span>
+      </a>
     </div>
   </div>
 
-  <a class="scroll-hint" href="#about" aria-label="Scroll to the next section">
-    <span class="scroll-label">Scroll</span>
-    <span class="scroll-line"></span>
-  </a>
+  <!-- Thin gold line at the bottom -->
+  <span class="hero-line" aria-hidden="true"></span>
 </section>
 
 <style>
   .hero {
     position: relative;
     display: grid;
-    place-items: center;          /* centers the text both ways */
-    min-height: calc(100svh - 80px);  /* fills the screen below the header */
-    padding: 96px var(--gutter) 140px;
+    place-items: center;
+    min-height: 758px;              /* the height in Figma */
+    padding: 96px var(--gutter) 120px;
     overflow: hidden;
+    background: var(--color-forest);
     text-align: center;
   }
 
-  /* ---------- Background photo ---------- */
+  /* ---------- Background ---------- */
   .hero-bg {
     position: absolute;
-    inset: 0;                     /* stretches to all four edges */
-    z-index: -1;
+    inset: 0;
   }
   .hero-bg :global(img) {
     width: 100%;
     height: 100%;
-    object-fit: cover;            /* fills the space without stretching */
+    object-fit: cover;
+    opacity: 0.45;                  /* the photo shows through the green at 45% */
   }
-  /* Dark layer over the photo so the text is easy to read */
+  /* Green gradient on top: lighter at the top-left, darker at the bottom */
   .hero-bg::after {
     content: "";
     position: absolute;
     inset: 0;
     background: linear-gradient(
-      to bottom,
-      rgba(28, 15, 0, 0.25) 0%,
-      rgba(28, 15, 0, 0.45) 60%,
-      rgba(28, 15, 0, 0.65) 100%
+      170deg,
+      rgba(26, 46, 27, 0.55) 8%,
+      rgba(26, 46, 27, 0.8) 92%
     );
   }
 
   /* ---------- Text ---------- */
-  .hero-content { max-width: 896px; }
+  .hero-content {
+    position: relative;             /* sits above the background */
+    max-width: 780px;
+  }
 
   h1 {
-    font-size: clamp(3.5rem, 8vw, 6.5rem);   /* 104px on desktop */
-    line-height: 1.05;
-    color: var(--color-cream);
+    margin-top: 20px;
+    font-weight: 500;
+    font-size: clamp(2.25rem, 5vw, 4.2rem);   /* 67px on desktop */
+    line-height: 1.15;
+    color: #ffffff;
   }
-  h1 span,
-  h1 em { display: block; }                 /* each part on its own line */
-  h1 em {
-    font-style: italic;
-    color: var(--color-gold-light);
-  }
+  h1 span { display: block; }
 
-  .hero-text {
-    max-width: 576px;
-    margin: 24px auto 0;
-    font-size: 1.125rem;                     /* 18px */
-    line-height: 1.625;
-    color: rgba(249, 244, 236, 0.82);
+  .sanskrit {
+    margin-top: 24px;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(1rem, 1.6vw, 1.15rem);   /* 18.4px on desktop */
+    line-height: 1.75;
+    color: rgba(255, 255, 255, 0.75);
+  }
+  .translation {
+    margin-top: 12px;
+    font-family: var(--font-ui);
+    font-size: 0.85rem;                       /* 13.6px */
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.55);
   }
 
   /* ---------- Buttons ---------- */
@@ -107,66 +117,26 @@ import heroImage from "../assets/images/hero.jpg";
     gap: 16px;
     margin-top: 40px;
   }
-  .hero-btn {
-    padding: 16px 32px;
-    font-size: 1rem;
-    color: var(--color-cream);
-  }
-  .hero-btn--solid { background: var(--color-gold); }
-  .hero-btn--solid:hover { background: #a0750a; }
-  .hero-btn--ghost { border-color: rgba(212, 168, 64, 0.6); }
-  .hero-btn--ghost:hover {
-    border-color: var(--color-gold-light);
-    background: rgba(212, 168, 64, 0.12);
-  }
 
-  /* ---------- "Scroll" hint at the bottom ---------- */
-  .scroll-hint {
+  /* ---------- Gold line ---------- */
+  .hero-line {
     position: absolute;
-    bottom: 40px;
     left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-  }
-  .scroll-label {
-    font-size: 0.75rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: rgba(212, 168, 64, 0.7);
-  }
-  .scroll-line {
-    position: relative;
+    bottom: 36px;
     width: 1px;
     height: 48px;
-    overflow: hidden;
-    background: rgba(212, 168, 64, 0.2);
-  }
-  /* A small glowing line that slides down, inviting people to scroll */
-  .scroll-line::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: -24px;
-    width: 1px;
-    height: 24px;
-    background: linear-gradient(to bottom, var(--color-gold-light), transparent);
-    animation: scroll-drip 2s ease-in-out infinite;
-  }
-  @keyframes scroll-drip {
-    to { top: 48px; }
+    background: linear-gradient(to bottom, rgba(196, 147, 58, 0), rgba(196, 147, 58, 0.7));
   }
 
-  /* ---------- Mobile ---------- */
+  /* ---------- Phone ---------- */
   @media (max-width: 600px) {
-    .hero { padding-top: 72px; }
-    .hero-text { font-size: 1rem; }
-    .hero-actions { flex-direction: column; align-items: stretch; }
-  }
-  /* Hide the scroll hint on short screens, where it would overlap the buttons */
-  @media (max-height: 700px) {
-    .scroll-hint { display: none; }
+    .hero {
+      min-height: 620px;
+      padding-top: 72px;
+    }
+    .hero-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
   }
 </style>
