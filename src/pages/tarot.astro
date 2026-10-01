@@ -1,0 +1,59 @@
+---
+import ServicePage from "../components/ServicePage.astro";
+import heroPhoto from "../assets/images/paths/tarot.jpg";
+import introPhoto from "../assets/images/pages/tarot-intro.jpg";
+
+const page = {
+  title: "Tarot | Visva Ved",
+  description: "Tarot is not a prophecy, but a mirror — seventy-eight cards that reflect the many shades of human experience.",
+
+  hero: {
+    eyebrow: "Sacred Reflections",
+    title: "Tarot",
+    subtitle: "Tarot is not a prophecy, but a mirror — seventy-eight cards that reflect the many shades of human experience.",
+    image: heroPhoto,
+  },
+
+  intro: {
+    eyebrow: "A Dialogue with the Cosmos",
+    title: "Seventy-Eight Doorways to Inner Wisdom",
+    paragraphs: [
+      "The 78 cards of the Tarot are divided into the Major Arcana — 22 cards that speak of life's great archetypal journeys — and the Minor Arcana — 56 cards that echo the rhythms of our daily lives: thought, feeling, action, and material circumstance. Each card carries rich symbolism drawn from ancient mystery traditions, alchemy, and Vedic wisdom.",
+      "When you sit with a spread of Tarot cards, you are not consulting a fortune teller. You are entering a dialogue with the deeper currents of your own life. The cards do not dictate fate; they awaken awareness. A spread becomes a sacred space where questions meet reflection.",
+      "Symbols like The Tower or The Star help us recognize patterns, challenges, and hopes. In this way, Tarot becomes a gentle companion on the path of transformation — guiding you back to clarity, balance, and your highest self.",
+    ],
+    image: introPhoto,
+    alt: "A tarot deck on white linen beside a candle and clear crystals",
+    reverse: true,
+    ratio: "4 / 5",
+  },
+
+  core: {
+    eyebrow: "The Major Arcana",
+    title: "Archetypal Journeys",
+    items: [
+      { symbol: "0", name: "New Beginnings", text: "New beginnings, spontaneity, a free spirit leaping into the unknown with complete trust." },
+      { symbol: "II", name: "The High Priestess", text: "Intuition, sacred knowledge, the divine feminine and the mysteries of the unconscious." },
+      { symbol: "IV", name: "The Emperor", text: "Authority, structure, the father archetype establishing order and stability." },
+      { symbol: "X", name: "The Wheel of Fortune", text: "TODO: text from Figma" },
+      { symbol: "XVI", name: "The Tower", text: "TODO: text from Figma" },
+      { symbol: "XVII", name: "The Star", text: "TODO: text from Figma" },
+    ],
+  },
+
+  discover: {
+    eyebrow: "TODO: from Figma",
+    title: "What You Will Discover",
+    items: [
+      { title: "TODO", text: "TODO: the six points from the bottom of the Tarot page" },
+    ],
+    cta: "Book a Tarot Reading",
+    programme: "Tarot Reading",
+  },
+
+  prev: { label: "Numerology", href: "/numerology" },
+  next: { label: "Explore Vastu", href: "/vastu" },
+};
+---
+
+<ServicePage {...page} />

@@ -5,12 +5,25 @@ import Header from "./Header.astro";
 import Footer from "./Footer.astro";
 import BookingModal from "./BookingModal.astro";
 
-// The "form" each page fills in
 interface Props {
   title: string;
   description: string;
-  hero: { eyebrow: string; title: string; subtitle: string; pattern: string[] };
-  intro: { eyebrow: string; title: string; paragraphs: string[]; image: ImageMetadata; alt: string };
+  hero: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    pattern?: string[];
+    image?: ImageMetadata;
+  };
+  intro: {
+    eyebrow: string;
+    title: string;
+    paragraphs: string[];
+    image: ImageMetadata;
+    alt: string;
+    reverse?: boolean;
+    ratio?: string;
+  };
   core: { eyebrow: string; title: string; items: { symbol: string; name: string; text: string }[] };
   discover: {
     eyebrow: string;
@@ -30,11 +43,17 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
   <Header />
 
   <main>
-    <!-- 1. Page hero -->
-    <section class="page-hero">
-      <div class="pattern" aria-hidden="true">
-        {hero.pattern.map((row) => <span>{row}</span>)}
-      </div>
+    <section class:list={["page-hero", { "page-hero--photo": hero.image }]}>
+      {hero.image && (
+        <div class="hero-photo" aria-hidden="true">
+          <Image src={hero.image} alt="" widths={[768, 1280, 1920]} sizes="100vw" loading="eager" fetchpriority="high" />
+        </div>
+      )}
+      {hero.pattern && (
+        <div class="pattern" aria-hidden="true">
+          {hero.pattern.map((row) => <span>{row}</span>)}
+        </div>
+      )}
       <div class="page-hero-content">
         <p class="eyebrow">{hero.eyebrow}</p>
         <h1>{hero.title}</h1>
@@ -43,21 +62,19 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
       </div>
     </section>
 
-    <!-- 2. Introduction -->
     <section class="section">
-      <div class="container intro">
+      <div class:list={["container", "intro", { "intro--reverse": intro.reverse }]}>
         <div class="intro-text">
           <p class="eyebrow">{intro.eyebrow}</p>
           <h2>{intro.title}</h2>
           {intro.paragraphs.map((text) => <p>{text}</p>)}
         </div>
-        <div class="intro-media">
+        <div class="intro-media" style={`--ratio: ${intro.ratio ?? "1"}`}>
           <Image src={intro.image} alt={intro.alt} widths={[480, 960]} sizes="(max-width: 900px) 100vw, 544px" />
         </div>
       </div>
     </section>
 
-    <!-- 3. Core cards -->
     <section id="core" class="section core">
       <div class="container core-inner">
         <p class="eyebrow">{core.eyebrow}</p>
@@ -74,7 +91,6 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
       </div>
     </section>
 
-    <!-- 4. What You Will Discover -->
     <section id="discover" class="section">
       <div class="container discover-inner">
         <p class="eyebrow">{discover.eyebrow}</p>
@@ -93,7 +109,6 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
       </div>
     </section>
 
-    <!-- 5. Page navigation -->
     <nav class="container page-nav" aria-label="More sciences">
       <a href={prev.href}><span aria-hidden="true">←</span> {prev.label}</a>
       <a href={next.href}>{next.label} <span aria-hidden="true">→</span></a>
@@ -117,7 +132,22 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     text-align: center;
   }
 
-  /* Rows of huge, faint symbols in the background */
+  .page-hero--photo {
+    background: #1c2830;
+  }
+
+  .hero-photo {
+    position: absolute;
+    inset: 0;
+  }
+
+  .hero-photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.3;
+  }
+
   .pattern {
     position: absolute;
     inset: 0;
@@ -132,13 +162,16 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     user-select: none;
   }
 
-  .page-hero-content { position: relative; }
+  .page-hero-content {
+    position: relative;
+  }
 
   h1 {
     margin-top: 16px;
     font-size: clamp(2.5rem, 5vw, 3.4rem);
     color: var(--color-cream);
   }
+
   .hero-line {
     display: block;
     width: 40px;
@@ -146,10 +179,12 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     margin: 28px auto;
     background: var(--color-gold);
   }
+
   .hero-subtitle {
     max-width: 640px;
     font-style: italic;
     font-size: 1.1rem;
+    line-height: 1.7;
     color: rgba(245, 239, 226, 0.8);
   }
 
@@ -161,16 +196,25 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     align-items: center;
     max-width: calc(1100px + var(--gutter) * 2);
   }
-  .intro-text h2 { margin-top: 14px; }
+
+  .intro-text h2 {
+    margin-top: 14px;
+  }
+
   .intro-text p:not(.eyebrow) {
     margin-top: 20px;
     font-size: 0.95rem;
     line-height: 1.8;
   }
-  .intro-text h2 + p { margin-top: 32px; }
 
-  /* The photo, with a thin gold frame offset behind it */
-  .intro-media { position: relative; }
+  .intro-text h2 + p {
+    margin-top: 32px;
+  }
+
+  .intro-media {
+    position: relative;
+  }
+
   .intro-media::after {
     content: "";
     position: absolute;
@@ -178,50 +222,71 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     border: 1px solid rgba(201, 168, 76, 0.35);
     z-index: -1;
   }
+
   .intro-media :global(img) {
     width: 100%;
-    aspect-ratio: 1;
+    aspect-ratio: var(--ratio);
     object-fit: cover;
   }
 
+  .intro--reverse .intro-media {
+    order: -1;
+  }
+
+  .intro--reverse .intro-media::after {
+    inset: -12px 12px 12px -12px;
+  }
+
   /* ---------- 3. Core cards ---------- */
-  .core { background: #e8dfca; }
+  .core {
+    background: #e8dfca;
+  }
+
   .core-inner {
     max-width: calc(1100px + var(--gutter) * 2);
     text-align: center;
   }
-  .core-inner h2 { margin-top: 14px; }
+
+  .core-inner h2 {
+    margin-top: 14px;
+  }
 
   .core-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    gap: 16px 24px;
     margin-top: 48px;
     padding: 0;
     list-style: none;
     text-align: left;
   }
+
   .core-card {
     padding: 28px;
     background: #f3ecdf;
     border: 1px solid rgba(201, 168, 76, 0.2);
   }
+
   .core-symbol {
     font-family: var(--font-display);
     font-size: 1.75rem;
+    letter-spacing: 0.1em;
     color: var(--color-gold);
   }
+
   .core-card h3 {
     margin-top: 12px;
     font-size: 0.8rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
+
   .core-card p {
     margin-top: 12px;
+    font-style: italic;
     font-size: 0.875rem;
     line-height: 1.7;
-    color: #7a7d70;
+    color: #8a8d7e;
   }
 
   /* ---------- 4. What You Will Discover ---------- */
@@ -229,7 +294,10 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     max-width: calc(760px + var(--gutter) * 2);
     text-align: center;
   }
-  .discover-inner h2 { margin-top: 14px; }
+
+  .discover-inner h2 {
+    margin-top: 14px;
+  }
 
   .discover-list {
     display: grid;
@@ -240,15 +308,18 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     list-style: none;
     text-align: left;
   }
+
   .discover-list li {
     padding-left: 16px;
     border-left: 2px solid var(--color-gold);
   }
+
   .discover-list h3 {
     font-size: 0.75rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
+
   .discover-list p {
     margin-top: 6px;
     font-size: 0.875rem;
@@ -261,7 +332,10 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     color: #ffffff;
     box-shadow: 0 3px 7px rgba(62, 138, 85, 0.3);
   }
-  .btn--green:hover { background: #33744a; }
+
+  .btn--green:hover {
+    background: #33744a;
+  }
 
   /* ---------- 5. Page navigation ---------- */
   .page-nav {
@@ -274,19 +348,43 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     letter-spacing: 0.15em;
     text-transform: uppercase;
   }
-  .page-nav a { color: #8a8a7a; transition: color 0.2s; }
-  .page-nav a:hover { color: var(--color-saffron-dark); }
+
+  .page-nav a {
+    color: #8a8a7a;
+    transition: color 0.2s;
+  }
+
+  .page-nav a:hover {
+    color: var(--color-saffron-dark);
+  }
 
   /* ---------- Tablet and phone ---------- */
   @media (max-width: 900px) {
-    .intro { grid-template-columns: 1fr; gap: 48px; }
-    .core-grid { grid-template-columns: repeat(2, 1fr); }
-    .pattern { font-size: 4rem; }
+    .intro {
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+    .core-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .pattern {
+      font-size: 4rem;
+    }
   }
+
   @media (max-width: 600px) {
-    .page-hero { min-height: 400px; }
+    .page-hero {
+      min-height: 400px;
+    }
     .core-grid,
-    .discover-list { grid-template-columns: 1fr; }
-    .intro-media::after { inset: 8px -8px -8px 8px; }
+    .discover-list {
+      grid-template-columns: 1fr;
+    }
+    .intro-media::after {
+      inset: 8px -8px -8px 8px;
+    }
+    .intro--reverse .intro-media::after {
+      inset: -8px 8px 8px -8px;
+    }
   }
 </style>
