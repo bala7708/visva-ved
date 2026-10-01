@@ -1,0 +1,113 @@
+---
+// The 12 topics. "icon" is the inside of a 24×24 line icon (SVG paths).
+const topics = [
+  { label: "Stress & Anxiety", icon: `<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>` },
+  { label: "Sleep & Rest", icon: `<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/><path d="M19 3v4"/><path d="M21 5h-4"/>` },
+  { label: "Relationships", icon: `<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>` },
+  { label: "Career & Purpose", icon: `<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>` },
+  { label: "Health & Vitality", icon: `<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/>` },
+  { label: "Confidence", icon: `<circle cx="12" cy="5" r="1"/><path d="m9 20 3-6 3 6"/><path d="m6 8 6 2 6-2"/><path d="M12 10v4"/>` },
+  { label: "Family Harmony", icon: `<path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z"/><path d="M9 21v-6h6v6"/>` },
+  { label: "Spiritual Growth", icon: `<path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/>` },
+  { label: "Grief & Loss", icon: `<path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/>` },
+  { label: "Mental Clarity", icon: `<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>` },
+  { label: "Abundance", icon: `<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/>` },
+  { label: "Life Direction", icon: `<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>` },
+];
+---
+
+<section id="seeking" class="seeking">
+  <div class="container">
+    <p class="eyebrow">Sacred Guidance</p>
+    <h2>What Are You Seeking?</h2>
+    <p class="intro">
+      Numerology, Tarot, and Vastu are not random occult and spiritual practices; they are
+      structured symbolic languages and systems that mirror the Shakti (chi) within us — and
+      around us.
+    </p>
+
+    <ul class="topics">
+      {topics.map((topic) => (
+        <li class="topic">
+          <span class="topic-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                 stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"
+                 set:html={topic.icon} />
+          </span>
+          <span class="topic-label">{topic.label}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .seeking {
+    padding-block: 72px var(--section-pad);
+    text-align: center;
+  }
+
+  h2 {
+    margin-top: 14px;
+    font-size: clamp(1.75rem, 3vw, 2.4rem);
+  }
+
+  .intro {
+    max-width: 660px;
+    margin: 24px auto 0;
+    font-style: italic;
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: #5a6152;
+  }
+
+  /* ---------- The 12 topics ---------- */
+  .topics {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    row-gap: 40px;
+    max-width: 1116px;
+    margin: 72px auto 0;
+    padding: 0;
+    list-style: none;
+  }
+  .topic {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .topic-icon {
+    display: grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: #f6cf45;
+    color: #2b2f22;
+    box-shadow: 0 6px 16px rgba(201, 160, 30, 0.25);
+  }
+
+  .topic-label {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--color-ink);
+  }
+
+  /* ---------- Tablet: 4 per row ---------- */
+  @media (max-width: 900px) {
+    .topics { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  /* ---------- Phone: 3 per row, smaller circles ---------- */
+  @media (max-width: 600px) {
+    .topics {
+      grid-template-columns: repeat(3, 1fr);
+      row-gap: 32px;
+      margin-top: 48px;
+    }
+    .topic-icon { width: 64px; height: 64px; }
+  }
+</style>

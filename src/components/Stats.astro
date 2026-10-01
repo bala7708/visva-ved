@@ -1,0 +1,62 @@
+---
+// Ask the client to confirm these numbers are accurate before launch.
+const stats = [
+  { number: "500+", label: "Lives transformed through sacred guidance" },
+  { number: "3", label: "Ancient sciences — Numerology, Tarot, Vastu" },
+  { number: "3 yrs", label: "Of practice rooted in Vedic wisdom" },
+];
+---
+
+<section class="stats" aria-label="Visva Ved in numbers">
+  <ul class="stats-list">
+    {stats.map((stat) => (
+      <li class="stat">
+        <span class="stat-number">{stat.number}</span>
+        <span class="stat-label">{stat.label}</span>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .stats {
+    padding: 48px var(--gutter);
+    background: linear-gradient(90deg, #bfe2f3, #4cbdeb);
+  }
+
+  .stats-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 920px;
+    margin-inline: auto;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+  }
+
+  .stat-number {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(2.25rem, 4vw, 3rem);
+    line-height: 1.1;
+    color: #1d4a3a;
+  }
+  .stat-label {
+    display: block;
+    margin-top: 10px;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 0.8125rem;
+    color: #24584a;
+  }
+
+  /* ---------- Phone: stacked ---------- */
+  @media (max-width: 700px) {
+    .stats-list {
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+  }
+</style>
