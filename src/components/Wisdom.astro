@@ -1,0 +1,68 @@
+---
+// Testimonials for the slider. Add the other two here once you have them
+// (real, with permission).
+const testimonials = [
+  {
+    quote:
+      "My Numerology session revealed patterns I had been struggling with for years. Within weeks of applying the guidance, my career shifted in ways I never imagined.",
+    name: "Ananya S.",
+    role: "Marketing Director, 38",
+  },
+];
+
+const initials = (name: string) =>
+  name.replace(/\./g, "").split(" ").map((w) => w[0]).join("").toUpperCase();
+
+// Only show the dots when there is more than one testimonial
+const showDots = testimonials.length > 1;
+---
+
+<section id="vedic" class="section section--sand">
+  <div class="container wisdom">
+    <div class="wisdom-text">
+      <p class="eyebrow">Our Approach</p>
+      <h2>Vedic Wisdom for Modern Living</h2>
+
+      <p>
+        At Visva Ved, we see life as a grand play of energies — flowing in countless forms,
+        shapes, and frequencies, as if the cosmos itself wished to watch its own drama unfold.
+      </p>
+      <p>
+        Like the wing-beats of a butterfly far away causing ripples in a distant ocean, our
+        thoughts, feelings and the energies that surround us shape the quality of our lives in
+        imperceptible ways. We live in a modern era where the unexplained fatigue, strained
+        relationships, low confidence, diseases or what we casually call 'bad luck' are
+        increasingly challenging us.
+      </p>
+      <p>
+        Yet the Vedas remind us that our cosmos is designed in perfect harmony — and that nature
+        has always had a way of resetting us, returning us back to our beautiful natural state.
+        The Panch Mahabhutas (five great elements of Earth, water, fire, air, and space) flow
+        through us and around us; with gentle, ancient wisdom we can restore that rhythm.
+      </p>
+    </div>
+
+    <div class="slider" data-slider aria-roledescription="carousel" aria-label="What our clients say">
+      <div class="slides">
+        {testimonials.map((t, i) => (
+          <figure class:list={["slide", { "is-active": i === 0 }]} aria-roledescription="slide" aria-label={`${i + 1} of ${testimonials.length}`}>
+            <span class="avatar" aria-hidden="true">{initials(t.name)}</span>
+            <blockquote><p>"{t.quote}"</p></blockquote>
+            <figcaption>
+              <span class="t-name">{t.name}</span>
+              <span class="t-role">{t.role}</span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+
+      {showDots && (
+        <div class="dots">
+          {testimonials.map((t, i) => (
+            <button type="button" class="dot" data-dot={i} aria-label={`Show testimonial ${i + 1}`} aria-current={i === 0 ? "true" : "false"}></button>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+</section>
