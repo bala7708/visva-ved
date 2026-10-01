@@ -29,6 +29,7 @@ interface Props {
     eyebrow: string;
     title: string;
     items: { title: string; text: string }[];
+    numbered?: boolean;
     cta: string;
     programme: string;
   };
@@ -95,11 +96,16 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
       <div class="container discover-inner">
         <p class="eyebrow">{discover.eyebrow}</p>
         <h2>{discover.title}</h2>
-        <ul class="discover-list">
-          {discover.items.map((item) => (
+        <ul class:list={["discover-list", { "discover-list--steps": discover.numbered }]}>
+          {discover.items.map((item, i) => (
             <li>
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
+              {discover.numbered && (
+                <span class="step-num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+              )}
+              <div>
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </div>
             </li>
           ))}
         </ul>
@@ -109,10 +115,12 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
       </div>
     </section>
 
-    <nav class="container page-nav" aria-label="More sciences">
-      <a href={prev.href}><span aria-hidden="true">←</span> {prev.label}</a>
-      <a href={next.href}>{next.label} <span aria-hidden="true">→</span></a>
-    </nav>
+    <div class="page-nav-wrap">
+      <nav class="container page-nav" aria-label="More sciences">
+        <a class="nav-prev" href={prev.href}><span aria-hidden="true">←</span> {prev.label}</a>
+        <a class="nav-next" href={next.href}>{next.label} <span aria-hidden="true">→</span></a>
+      </nav>
+    </div>
   </main>
 
   <Footer />
@@ -213,14 +221,15 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
 
   .intro-media {
     position: relative;
+    margin: 12px;
   }
 
   .intro-media::after {
     content: "";
     position: absolute;
-    inset: 12px -12px -12px 12px;
+    inset: -12px;
     border: 1px solid rgba(201, 168, 76, 0.35);
-    z-index: -1;
+    pointer-events: none;
   }
 
   .intro-media :global(img) {
@@ -231,10 +240,6 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
 
   .intro--reverse .intro-media {
     order: -1;
-  }
-
-  .intro--reverse .intro-media::after {
-    inset: -12px 12px 12px -12px;
   }
 
   /* ---------- 3. Core cards ---------- */
@@ -291,70 +296,103 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
 
   /* ---------- 4. What You Will Discover ---------- */
   .discover-inner {
-    max-width: calc(760px + var(--gutter) * 2);
+    max-width: calc(1060px + var(--gutter) * 2);
     text-align: center;
   }
 
   .discover-inner h2 {
-    margin-top: 14px;
+    margin-top: 16px;
   }
 
+  /* Default version (Numerology): two columns with a gold line */
   .discover-list {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 28px 32px;
-    margin: 48px 0 40px;
+    gap: 40px 48px;
+    margin: 56px 0 56px;
     padding: 0;
     list-style: none;
     text-align: left;
   }
 
   .discover-list li {
-    padding-left: 16px;
-    border-left: 2px solid var(--color-gold);
+    padding-left: 22px;
+    border-left: 3px solid var(--color-gold);
   }
 
   .discover-list h3 {
-    font-size: 0.75rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
   }
 
   .discover-list p {
-    margin-top: 6px;
-    font-size: 0.875rem;
-    line-height: 1.7;
+    margin-top: 10px;
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  /* Numbered version (Tarot): one column, big faint numbers on the left */
+  .discover-list--steps {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    max-width: 920px;
+    margin-inline: auto;
+  }
+
+  .discover-list--steps li {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    column-gap: 32px;
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .step-num {
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    line-height: 1;
+    text-align: right;
+    color: #dcc995;
   }
 
   .btn--green {
-    border-color: #3e8a55;
-    background: #3e8a55;
+    padding: 16px 36px;
+    border-color: #4f9e62;
+    background: linear-gradient(170deg, #5cae6e, #46955a);
     color: #ffffff;
-    box-shadow: 0 3px 7px rgba(62, 138, 85, 0.3);
+    box-shadow: 0 4px 14px rgba(70, 149, 90, 0.35);
   }
 
   .btn--green:hover {
-    background: #33744a;
+    filter: brightness(1.05);
   }
 
   /* ---------- 5. Page navigation ---------- */
+  .page-nav-wrap {
+    border-top: 1px solid rgba(30, 46, 32, 0.12);
+  }
+
   .page-nav {
     display: flex;
     justify-content: space-between;
-    padding-block: 40px;
-    border-top: 1px solid rgba(30, 46, 32, 0.1);
+    padding-block: 56px;
     font-family: var(--font-display);
-    font-size: 0.7rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
   }
 
-  .page-nav a {
-    color: #8a8a7a;
+  .nav-prev {
+    color: #8a8f80;
     transition: color 0.2s;
   }
 
-  .page-nav a:hover {
+  .nav-next {
+    color: #4f9a63;
+    transition: color 0.2s;
+  }
+
+  .nav-prev:hover,
+  .nav-next:hover {
     color: var(--color-saffron-dark);
   }
 
@@ -380,11 +418,24 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     .discover-list {
       grid-template-columns: 1fr;
     }
-    .intro-media::after {
-      inset: 8px -8px -8px 8px;
+    .discover-list {
+      gap: 28px;
     }
-    .intro--reverse .intro-media::after {
-      inset: -8px 8px 8px -8px;
+    .discover-list--steps li {
+      grid-template-columns: 40px 1fr;
+      column-gap: 16px;
+    }
+    .step-num {
+      font-size: 1.8rem;
+    }
+    .intro-media {
+      margin: 8px;
+    }
+    .intro-media::after {
+      inset: -8px;
+    }
+    .page-nav {
+      font-size: 0.75rem;
     }
   }
 </style>
