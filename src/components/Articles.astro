@@ -1,0 +1,165 @@
+---
+import { Image } from "astro:assets";
+
+// Reused from "Choose Your Path", plus one new photo
+import mistImage from "../assets/images/paths/tarot-online.jpg";
+import fiveElementsImage from "../assets/images/articles/five-elements.jpg";
+import forestImage from "../assets/images/paths/numerology-report.jpg";
+import lotusImage from "../assets/images/paths/numerology.jpg";
+import tarotImage from "../assets/images/paths/tarot.jpg";
+import roomImage from "../assets/images/paths/vastu-shastra.jpg";
+
+// Articles. Add "href" once an article exists, and the card becomes a link.
+const articles = [
+  { area: "a", title: "Why Your Numbers Know You Better Than You Think", image: mistImage, alt: "A woman looking out over a misty landscape" },
+  { area: "b", title: "The Five Elements and Your Daily Energy", image: fiveElementsImage, alt: "A woman sitting on a bench at sunset, facing the mountains" },
+  { area: "c", title: "What the Major Arcana Reveals About Life Transitions", image: forestImage, alt: "Sunlight streaming through a forest" },
+  { area: "d", title: "Brahmasthana — The Sacred Centre of Every Home", image: lotusImage, alt: "A white lotus on dark water" },
+  { area: "e", title: "Karmic Numbers: Reading the Lessons You Chose", image: tarotImage, alt: "Tarot cards beside a deck box and white flowers" },
+  { area: "f", title: "How to Honour the Eight Directions in Modern Spaces", image: roomImage, alt: "A calm, sunlit living room" },
+] as { area: string; title: string; image: ImageMetadata; alt: string; href?: string }[];
+---
+
+<section id="wisdom" class="section">
+  <div class="container articles-inner">
+    <div class="articles-head">
+      <div>
+        <p class="eyebrow">Wisdom</p>
+        <h2>Knowledge Illuminates the Path</h2>
+      </div>
+      <p class="head-quote">"Love plus wisdom is bliss. Love minus wisdom is misery."</p>
+    </div>
+
+    <ul class="articles-grid">
+      {articles.map((a) => {
+        const Tag = a.href ? "a" : "div";
+        return (
+          <li class="article" style={`--area: ${a.area}`}>
+            <Tag class="article-inner" href={a.href}>
+              <Image src={a.image} alt={a.alt} widths={[400, 800]} sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px" />
+              <span class="article-content">
+                <span class="article-label">Wisdom</span>
+                <h3>{a.title}</h3>
+              </span>
+            </Tag>
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .articles-inner { max-width: calc(1096px + var(--gutter) * 2); }
+
+  /* ---------- Heading row: title left, quote right ---------- */
+  .articles-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 32px;
+  }
+  h2 {
+    margin-top: 14px;
+    font-size: clamp(1.75rem, 3vw, 2.4rem);
+  }
+  .head-quote {
+    max-width: 240px;
+    font-style: italic;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: #6b725f;
+  }
+
+  /* ---------- The grid ---------- */
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 238px 357px 240px;
+    grid-template-areas:
+      "a b c"
+      "d b e"
+      "d f .";
+    gap: 8px;
+    margin-top: 40px;
+    padding: 0;
+    list-style: none;
+  }
+  .article { grid-area: var(--area); }
+
+  /* ---------- A card (same look as the "Choose Your Path" cards) ---------- */
+  .article-inner {
+    position: relative;
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    background: var(--color-forest);
+  }
+  .article-inner :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.75;
+    transition: transform 0.6s ease;
+  }
+  a.article-inner:hover :global(img) { transform: scale(1.04); }   /* zoom only when it's a link */
+
+  .article-inner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(26, 46, 27, 0.85) 0%, rgba(26, 46, 27, 0.3) 45%, rgba(26, 46, 27, 0) 70%);
+  }
+
+  .article-content {
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 22px 20px;
+  }
+  .article-label {
+    display: block;
+    font-family: var(--font-ui);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+  }
+  h3 {
+    margin-top: 6px;
+    font-size: 1.05rem;
+    line-height: 1.4;
+    color: #ffffff;
+  }
+
+  /* ---------- Tablet: 2 columns ---------- */
+  @media (max-width: 900px) {
+    .articles-head {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .head-quote { max-width: none; }
+    .articles-grid {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(4, 240px);
+      grid-template-areas:
+        "a b"
+        "d b"
+        "d c"
+        "e f";
+    }
+  }
+
+  /* ---------- Phone: one per row ---------- */
+  @media (max-width: 600px) {
+    .articles-grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: none;
+      grid-template-areas: none;
+      grid-auto-rows: 260px;
+    }
+    .article { grid-area: auto; }
+  }
+</style>

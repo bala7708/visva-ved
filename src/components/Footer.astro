@@ -100,6 +100,7 @@ const year = new Date().getFullYear();
 
     <div class="footer-bottom">
       <p>© {year} Visva Ved — Spiritual Coaching. All rights reserved.</p>
+      <p class="mantra" lang="sa-Latn">Saṃgacchadhvaṃ saṃvadadhvaṃ saṃ vo manāṃsi jānatām</p>
       <ul class="legal">
         {legal.map((link) => (
           <li><a href={link.href}>{link.label}</a></li>
@@ -116,6 +117,12 @@ const year = new Date().getFullYear();
     font-family: var(--font-ui);
   }
 
+  .mantra {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: rgba(201, 168, 76, 0.45);
+  }
+  
   /* ---------- Top: brand + 5 link columns ---------- */
   .footer-top {
     display: grid;
@@ -141,9 +148,9 @@ const year = new Date().getFullYear();
     display: inline-block;
     margin-top: 16px;
     font-size: 0.8125rem;
-    color: rgba(245, 239, 226, 0.85);
+    color: var(--color-gold);
   }
-  .email:hover { color: var(--color-gold); }
+  .email:hover { color: var(--color-cream); }
 
   .socials {
     display: flex;
