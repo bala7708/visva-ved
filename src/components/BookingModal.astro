@@ -674,9 +674,11 @@
       event.preventDefault();
 
       // Work out which programme the visitor clicked on (if any)
+      const fromAttribute = (link as HTMLElement).dataset.programme;
       const cardTitle = link.closest(".card")?.querySelector("h3")?.textContent?.trim();
       let programme = DEFAULT_PROGRAMME;
-      if (cardTitle) programme = cardTitle;
+      if (fromAttribute) programme = fromAttribute;
+      else if (cardTitle) programme = cardTitle;
       else if (link.closest("#numerology")) programme = "Numerology consultation";
 
       programmeInput.value = programme;

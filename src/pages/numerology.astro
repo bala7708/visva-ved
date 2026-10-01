@@ -1,0 +1,66 @@
+---
+import ServicePage from "../components/ServicePage.astro";
+import lotus from "../assets/images/paths/numerology.jpg";
+
+const page = {
+  title: "Numerology | Visva Ved",
+  description: "Numerology is the ancient art of decoding the vibrations hidden in names and birth dates.",
+
+  hero: {
+    eyebrow: "Sacred Codes",
+    title: "Numerology",
+    subtitle: "Numerology is the ancient art of decoding the vibrations hidden in names and birth dates.",
+    pattern: [
+      "3333333333111111111111111",
+      "3333333333333333333333333",
+      "1111111122222222222222222",
+      "3333333333331111111111111",
+    ],
+  },
+
+  intro: {
+    eyebrow: "The Language of Numbers",
+    title: "Living Energies That Shape Your Destiny",
+    paragraphs: [
+      "Numbers are not mere figures; they are living energies that shape personality, destiny, and cycles of life. Every name carries a vibrational signature; every birth date encodes a cosmic blueprint.",
+      "At Visva Ved, we use numerology as a key to self-understanding. Core numbers reveal traits and karmic lessons, while master numbers carry higher spiritual significance. By interpreting these vibrations, we uncover patterns that influence motivation, confidence, and relationships.",
+      "Numerology does not predict your future — it illuminates the energies you carry, guiding you into ideal professions, compatible marriages and new ventures that help you unleash your true potential.",
+    ],
+    image: lotus,
+    alt: "A white lotus flower floating on dark water",
+  },
+
+  core: {
+    eyebrow: "The Numbers",
+    title: "Core Vibrations",
+    items: [
+      { symbol: "LP", name: "Life Path Number", text: "Derived from your birth date — the overarching theme and purpose of your life, the road you are destined to walk." },
+      { symbol: "EN", name: "Expression Number", text: "Derived from your full birth name — your natural talents, abilities, and how you manifest your potential in the world." },
+      { symbol: "SU", name: "Soul Urge Number", text: "The vowels of your name reveal your innermost desires, motivations, and what your heart truly longs for." },
+      { symbol: "11", name: "Master Number 11", text: "The Illuminator — a higher spiritual vibration calling you toward intuition, sensitivity, and enlightenment." },
+      { symbol: "22", name: "Master Number 22", text: "The Master Builder — the most powerful number, carrying the ability to turn lofty vision into tangible reality." },
+      { symbol: "33", name: "Master Number 33", text: "The Master Teacher — embodies compassion, healing, and the sacred responsibility of uplifting humanity." },
+    ],
+  },
+
+  discover: {
+    eyebrow: "In a Numerology Session",
+    title: "What You Will Discover",
+    items: [
+      { title: "Your Life Path Number", text: "The overarching theme and purpose of your life — the road you are destined to walk." },
+      { title: "Your Expression Number", text: "Your natural gifts and talents, and how you manifest your potential in the world." },
+      { title: "Your Soul Urge Number", text: "Your innermost desires and motivators — what truly drives you at the deepest level." },
+      { title: "Karmic Numbers & Lessons", text: "Uncover the patterns and challenges your soul chose to master in this lifetime." },
+      { title: "Personal Year Cycles", text: "Understand the rhythmic phases and transitions that shape your journey — and how to flow with them." },
+      { title: "Ideal Pathways", text: "Align with professions, partnerships, and new ventures that resonate with your vibration." },
+    ],
+    cta: "Book a Numerology Reading",
+    programme: "Numerology Reading",
+  },
+
+  prev: { label: "Back to Home", href: "/" },
+  next: { label: "Explore Tarot", href: "/tarot" },
+};
+---
+
+<ServicePage {...page} />
