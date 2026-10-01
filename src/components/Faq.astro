@@ -1,0 +1,112 @@
+---
+// DRAFT answers: the client must review and approve them before launch.
+const faqs = [
+  {
+    question: "Aren't these just superstitious practices?",
+    answer:
+      "Numerology, Tarot and Vastu are traditional systems of reflection and design rooted in Vedic thought. We use them as tools for self-understanding and more conscious choices, never to create fear or dependency.",
+  },
+  {
+    question: "Do I need any prior spiritual knowledge?",
+    answer:
+      "None at all. Every session starts from the basics and is explained in simple, practical terms. All you need is an open mind and a question you'd like to explore.",
+  },
+  {
+    question: "Will Vastu require major renovations to my home?",
+    answer:
+      "Rarely. Most recommendations are simple adjustments, such as the placement of objects, colours, light and the balance of elements, that work with the space you already have.",
+  },
+  {
+    question: "How soon will I see results?",
+    answer:
+      "Everyone's journey is different. Many people feel greater clarity soon after a session; lasting change grows gradually as the guidance is applied in daily life.",
+  },
+  {
+    question: "Can sessions be done online?",
+    answer:
+      "Yes. Numerology and Tarot sessions take place online via Google Meet. Vastu consultations can be done online using your floor plan.",
+  },
+];
+---
+
+<section id="faq" class="section section--sand">
+  <div class="container faq-inner">
+    <p class="eyebrow">Questions</p>
+    <h2>I Want to Begin, But…</h2>
+
+    <div class="faq-list">
+      {faqs.map((item) => (
+        <details class="faq-item">
+          <summary>
+            <span>{item.question}</span>
+            <span class="faq-icon" aria-hidden="true"></span>
+          </summary>
+          <p class="faq-answer">{item.answer}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-inner {
+    max-width: calc(760px + var(--gutter) * 2);
+    text-align: center;
+  }
+
+  h2 {
+    margin-top: 14px;
+    font-size: clamp(1.75rem, 3vw, 2.4rem);
+  }
+
+  .faq-list {
+    margin-top: 48px;
+    text-align: left;
+  }
+
+  .faq-item { border-bottom: 1px solid rgba(30, 46, 32, 0.15); }
+
+  /* The question row: the part you click */
+  summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    padding: 24px 0;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+    color: var(--color-ink);
+    cursor: pointer;
+    list-style: none;               /* hides the default triangle */
+  }
+  summary::-webkit-details-marker { display: none; }   /* …also in Safari */
+  summary:hover { color: var(--color-saffron-dark); }
+
+  /* A "+" drawn with two thin lines; it turns into "×" when open */
+  .faq-icon {
+    position: relative;
+    flex-shrink: 0;
+    width: 12px;
+    height: 12px;
+    transition: transform 0.25s ease;
+  }
+  .faq-icon::before,
+  .faq-icon::after {
+    content: "";
+    position: absolute;
+    inset: 50% 0 auto;
+    height: 1px;
+    background: var(--color-gold);
+  }
+  .faq-icon::after { transform: rotate(90deg); }
+  .faq-item[open] .faq-icon { transform: rotate(45deg); }
+
+  .faq-answer {
+    max-width: 640px;
+    padding-bottom: 24px;
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: #4f5a45;
+  }
+</style>
