@@ -1,0 +1,58 @@
+---
+import ServicePage from "../components/ServicePage.astro";
+import heroPhoto from "../assets/images/pages/vastu-hero.jpg";
+import introPhoto from "../assets/images/pages/vastu-intro.jpg";
+
+const page = {
+  title: "Vastu Shastra | Visva Ved",
+  description: "Every building is a microcosm of the universe — aligning human life with Earth's geomagnetic field, solar cycles, and the Panch Mahabhutas.",
+
+  hero: {
+    eyebrow: "Sacred Architecture",
+    title: "Vastu Shastra",
+    subtitle: "Every building is a microcosm of the universe — aligning human life with Earth's geomagnetic field, solar cycles, and the Panch Mahadhatus.",
+    image: heroPhoto,
+    tint: "#1e2a20",
+  },
+
+  intro: {
+    eyebrow: "Sthapatya Veda",
+    title: "Your Home as a Cosmic Sanctuary",
+    paragraphs: [
+      "Vastu Shastra is the ancient Indian science of dwelling, rooted in the Sthapatya Veda. It teaches that every building is a microcosm of the universe, aligning human life with Earth's geomagnetic field, solar cycles, and the Panch Mahadhatus (Earth, water, fire, air, and space).",
+      "When spaces are designed in resonance with these forces, they support health, prosperity, vitality and peace. A house aligned with Vastu principles resonates with cosmic energy, while violations can create stress and imbalance, ill health and strained relations.",
+      "At Visva Ved, we approach Vastu not with superstition or fear, but as a gentle language that helps reset the spaces we inhabit. Through small, mindful adjustments — elemental balancing, honouring directions, symbolic yantras, and inviting light and openness — we guide you back into resonance with the cosmos without structural reconstructions.",
+      "This is not about rigid rules, but about living in harmony with the universe, so your home becomes a sanctuary where your highest self can flourish.",
+    ],
+    image: introPhoto,
+    alt: "An ornate temple tower with carved figures against a cloudy sky",
+    ratio: "4 / 5",
+  },
+
+  core: {
+    eyebrow: "The Eight Directions",
+    title: "Ashtadisha",
+    intro: "Each direction is governed by a deity and influences a specific domain of life within your dwelling.",
+    items: [
+      // TODO: the direction cards from the bottom of the Vastu page in Figma
+      { symbol: "N", name: "TODO", text: "TODO: direction cards from Figma" },
+    ],
+  },
+
+  discover: {
+    eyebrow: "TODO: from Figma",
+    title: "TODO: from Figma",
+    items: [
+      // TODO: the points from the bottom of the Vastu page in Figma
+      { title: "TODO", text: "TODO: the points from the bottom of the Vastu page" },
+    ],
+    cta: "Book a Vastu Consultation",
+    programme: "Vastu Consultation",
+  },
+
+  prev: { label: "Tarot", href: "/tarot" },
+  next: { label: "Back to Home", href: "/" },
+};
+---
+
+<ServicePage {...page} />

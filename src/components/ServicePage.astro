@@ -14,6 +14,7 @@ interface Props {
     subtitle: string;
     pattern?: string[];
     image?: ImageMetadata;
+    tint?: string;               // NEW: background colour behind the hero photo
   };
   intro: {
     eyebrow: string;
@@ -24,7 +25,12 @@ interface Props {
     reverse?: boolean;
     ratio?: string;
   };
-  core: { eyebrow: string; title: string; items: { symbol: string; name: string; text: string }[] };
+  core: {
+    eyebrow: string;
+    title: string;
+    intro?: string;              // NEW: optional line under the title
+    items: { symbol: string; name: string; text: string }[];
+  };
   discover: {
     eyebrow: string;
     title: string;
@@ -44,7 +50,10 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
   <Header />
 
   <main>
-    <section class:list={["page-hero", { "page-hero--photo": hero.image }]}>
+    <section
+      class:list={["page-hero", { "page-hero--photo": hero.image }]}
+      style={hero.tint ? `--hero-bg: ${hero.tint}` : undefined}
+    >
       {hero.image && (
         <div class="hero-photo" aria-hidden="true">
           <Image src={hero.image} alt="" widths={[768, 1280, 1920]} sizes="100vw" loading="eager" fetchpriority="high" />
@@ -80,6 +89,7 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
       <div class="container core-inner">
         <p class="eyebrow">{core.eyebrow}</p>
         <h2>{core.title}</h2>
+        {core.intro && <p class="core-intro">{core.intro}</p>}
         <ul class="core-grid">
           {core.items.map((item) => (
             <li class="core-card">
@@ -140,8 +150,9 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     text-align: center;
   }
 
+  /* NEW: each page can set its own background colour (default: blue-grey) */
   .page-hero--photo {
-    background: #1c2830;
+    background: var(--hero-bg, #1c2830);
   }
 
   .hero-photo {
@@ -189,7 +200,7 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
   }
 
   .hero-subtitle {
-    max-width: 640px;
+    max-width: 680px;
     font-style: italic;
     font-size: 1.1rem;
     line-height: 1.7;
@@ -256,6 +267,15 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     margin-top: 14px;
   }
 
+  /* NEW: optional line under the title */
+  .core-intro {
+    max-width: 560px;
+    margin: 20px auto 0;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: #8a8d7e;
+  }
+
   .core-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -304,7 +324,6 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     margin-top: 16px;
   }
 
-  /* Default version (Numerology): two columns with a gold line */
   .discover-list {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -331,7 +350,6 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     line-height: 1.75;
   }
 
-  /* Numbered version (Tarot): one column, big faint numbers on the left */
   .discover-list--steps {
     grid-template-columns: 1fr;
     gap: 40px;
