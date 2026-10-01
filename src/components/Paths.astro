@@ -1,0 +1,202 @@
+---
+import { Image } from "astro:assets";
+
+import numerology from "../assets/images/paths/numerology.jpg";
+import tarot from "../assets/images/paths/tarot.jpg";
+import vastuShastra from "../assets/images/paths/vastu-shastra.jpg";
+import tarotOnline from "../assets/images/paths/tarot-online.jpg";
+import numerologyReport from "../assets/images/paths/numerology-report.jpg";
+import vastuConsultation from "../assets/images/paths/vastu-consultation.jpg";
+
+// "area" places each card in the grid (see grid-template-areas in the CSS).
+// href "#book" opens the booking popup for that service.
+const paths = [
+  {
+    area: "num",
+    label: "Sacred Codes",
+    title: "Numerology",
+    text: "Numerology deciphers the vibrations of numbers, guiding us to recognize karmic lessons, unlock hidden strengths, and align with life's cycles of growth.",
+    href: "/numerology",
+    image: numerology,
+    alt: "A white lotus flower floating on dark water",
+  },
+  {
+    area: "tarot",
+    label: "Sacred Reflections",
+    title: "Tarot",
+    href: "/tarot",
+    image: tarot,
+    alt: "Tarot cards beside a deck box and small white flowers",
+  },
+  {
+    area: "shastra",
+    label: "Sacred Architecture",
+    title: "Vastu Shastra",
+    href: "/vastu",
+    image: vastuShastra,
+    alt: "A calm, sunlit living room with plants and natural materials",
+  },
+  {
+    area: "consult",
+    label: "Eight Directions · Five Elements",
+    title: "Vastu Consultation",
+    text: "Vastu nurtures environments that invite prosperity, serenity, and spiritual grounding.",
+    href: "#book",
+    image: vastuConsultation,
+    alt: "An ornate ancient stone temple at golden hour",
+  },
+  {
+    area: "online",
+    label: "Remote Session",
+    title: "Tarot — Online",
+    href: "#book",
+    image: tarotOnline,
+    alt: "A woman sitting quietly, looking out over a misty landscape",
+  },
+  {
+    area: "report",
+    label: "Written Analysis + Call",
+    title: "Numerology Report",
+    href: "#book",
+    image: numerologyReport,
+    alt: "Sunlight streaming through a green forest",
+  },
+];
+---
+
+<section id="paths" class="section">
+  <div class="container paths-inner">
+    <p class="eyebrow">Sacred Sciences</p>
+    <h2>Choose Your Path to Harmony</h2>
+
+    <ul class="paths-grid">
+      {paths.map((p) => (
+        <li class="card" style={`--area: ${p.area}`}>
+          <a href={p.href} class="card-link">
+            <Image
+              src={p.image}
+              alt={p.alt}
+              widths={[400, 800]}
+              sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px"
+            />
+            <span class="card-content">
+              <span class="card-label">{p.label}</span>
+              <h3>{p.title}</h3>
+              {p.text && <span class="card-text">{p.text}</span>}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .paths-inner { max-width: calc(1096px + var(--gutter) * 2); }
+
+  h2 {
+    margin-top: 14px;
+    font-size: clamp(1.75rem, 3vw, 2.4rem);
+  }
+
+  /* ---------- The grid ---------- */
+  .paths-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 280px 280px 252px;
+    grid-template-areas:
+      "num     tarot   shastra"
+      "num     consult online"
+      "report  consult .";
+    gap: 8px;
+    margin-top: 40px;
+    padding: 0;
+    list-style: none;
+  }
+  .card { grid-area: var(--area); }
+
+  /* ---------- A card ---------- */
+  .card-link {
+    position: relative;
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    background: var(--color-forest);
+  }
+    .card-link :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.75;                /* the deep green background shows through */
+    transition: transform 0.6s ease;
+  }
+  .card-link:hover :global(img) { transform: scale(1.04); }   /* gentle zoom on hover */
+
+  /* Dark fade at the bottom, so the text is readable on any photo */
+    .card-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(26, 46, 27, 0.85) 0%,
+      rgba(26, 46, 27, 0.3) 45%,
+      rgba(26, 46, 27, 0) 70%
+    );
+  }
+
+  .card-content {
+    position: absolute;
+    z-index: 1;                   /* above the dark fade */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 22px 24px;
+  }
+  .card-label {
+    font-family: var(--font-ui);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+  }
+  h3 {
+    margin-top: 6px;
+    font-size: 1.1rem;
+    color: #ffffff;
+  }
+  .card-text {
+    max-width: 240px;
+    margin-top: 12px;
+    font-style: italic;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  /* ---------- Tablet: 2 columns ---------- */
+  @media (max-width: 900px) {
+    .paths-grid {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(4, 240px);
+      grid-template-areas:
+        "num     tarot"
+        "num     shastra"
+        "consult online"
+        "consult report";
+    }
+  }
+
+  /* ---------- Phone: one card per row ---------- */
+  @media (max-width: 600px) {
+    .paths-grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: none;
+      grid-template-areas: none;
+      grid-auto-rows: 280px;
+    }
+    .card { grid-area: auto; }    /* ignore the map: cards simply follow each other */
+  }
+</style>
