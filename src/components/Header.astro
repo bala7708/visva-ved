@@ -2,33 +2,40 @@
 import { Image } from "astro:assets";
 import logo from "../assets/images/logo.png";
 
-// ① The data: the navigation links. Edit this list to change the menu.
+// Navigation links. Edit this list to change the menu.
 const links = [
-  { label: "About", href: "#about" },
-  { label: "Programs", href: "#programs" },
-  { label: "1:1 Session", href: "#session" },
-  { label: "Numerology", href: "#numerology" },
-  { label: "Spiritual wellness", href: "#wellness" },
+  { label: "Home", href: "/" },
+  { label: "Numerology", href: "/numerology" },
+  { label: "Tarot", href: "/tarot" },
+  { label: "Vastu", href: "/vastu" },
+  { label: "Wisdom", href: "/#wisdom" },
 ];
+
+// Which page are we on? "/numerology/" and "/numerology" both become "/numerology"
+const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
+const isActive = (href: string) => href === currentPath;
 ---
 
-<!-- ② The HTML: what appears on the page -->
 <header class="site-header">
   <div class="header-inner">
-    <a href="/" class="logo" aria-label="Visva Ved, back to top">
-      <Image src={logo} alt="Visva Ved" width={126} height={96} />
+    <a href="/" class="logo" aria-label="Visva Ved, home">
+      <Image src={logo} alt="Visva Ved" width={120} height={92} />
     </a>
 
     <nav id="site-nav" class="nav" aria-label="Main">
       <ul>
         {links.map((link) => (
-          <li><a href={link.href}>{link.label}</a></li>
+          <li>
+            <a href={link.href} aria-current={isActive(link.href) ? "page" : undefined}>
+              {link.label}
+            </a>
+          </li>
         ))}
       </ul>
-      <a class="btn btn--gold nav-cta" href="#book">Book a Slot</a>
+      <a class="btn btn--saffron nav-cta" href="#book">Book a Session</a>
     </nav>
 
-    <a class="btn btn--gold header-cta" href="#book">Book a Slot</a>
+    <a class="btn btn--saffron header-cta" href="#book">Book a Session</a>
 
     <button class="menu-toggle" type="button" aria-expanded="false"
             aria-controls="site-nav" aria-label="Open menu">
@@ -37,53 +44,55 @@ const links = [
   </div>
 </header>
 
-<!-- ③ The styles: only apply to this component -->
 <style>
   .site-header {
-    position: sticky;          /* stays at the top while you scroll */
+    position: sticky;
     top: 0;
     z-index: 50;
-    background: var(--color-cream);
-    border-bottom: 1px solid rgba(28, 15, 0, 0.06);
+    background: var(--color-page);
+    border-bottom: 1px solid rgba(30, 46, 32, 0.08);
   }
 
   .header-inner {
     position: relative;
     display: grid;
-    grid-template-columns: 1fr auto 1fr;   /* keeps the links exactly centered */
+    grid-template-columns: 1fr auto 1fr;    /* keeps the links exactly centered */
     align-items: center;
-    height: 80px;
+    height: 72px;
     max-width: 1512px;
     margin-inline: auto;
     padding-inline: 40px;
   }
 
   .logo { justify-self: start; }
-  /* :global() is needed because <Image> is a component */
-  .logo :global(img) { width: 63px; height: 48px; object-fit: contain; }
+  .logo :global(img) {
+    width: 60px;
+    height: 46px;
+    object-fit: contain;
+  }
 
   .nav { display: flex; align-items: center; }
   .nav ul {
     display: flex;
-    gap: 32px;
-    list-style: none;
+    gap: 36px;
     padding: 0;
+    list-style: none;
   }
   .nav ul a {
+    font-family: var(--font-ui);
     font-weight: 500;
-    font-size: 0.875rem;
-    letter-spacing: 0.025em;
+    font-size: 0.8125rem;                   /* 13px */
     color: var(--color-ink);
     transition: color 0.2s;
   }
-  .nav ul a:hover { color: var(--color-gold); }
+  .nav ul a:hover { color: var(--color-saffron-dark); }
+  .nav ul a[aria-current="page"] { color: var(--color-saffron-dark); }
 
   .header-cta {
     justify-self: end;
-    padding: 10px 20px;
-    color: var(--color-cream);   /* the Figma design uses cream text here */
+    padding: 9px 20px;
   }
-  .nav-cta { display: none; }    /* only shown inside the mobile menu */
+  .nav-cta { display: none; }               /* only inside the mobile menu */
 
   /* ☰ button: hidden on desktop */
   .menu-toggle {
@@ -95,18 +104,16 @@ const links = [
     width: 44px;
     height: 44px;
     padding: 10px;
-    background: none;
     border: 0;
+    background: none;
     cursor: pointer;
   }
   .menu-toggle span {
     display: block;
     height: 2px;
     background: var(--color-ink);
-    border-radius: 2px;
     transition: transform 0.25s, opacity 0.25s;
   }
-  /* Turns the ☰ into an ✕ when the menu is open */
   .menu-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
   .menu-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
   .menu-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
@@ -115,7 +122,7 @@ const links = [
   @media (max-width: 900px) {
     .header-inner {
       grid-template-columns: 1fr auto;
-      height: 72px;
+      height: 64px;
       padding-inline: var(--gutter);
     }
     .header-cta { display: none; }
@@ -131,18 +138,17 @@ const links = [
       align-items: flex-start;
       gap: 24px;
       padding: 24px var(--gutter) 32px;
-      background: var(--color-cream);
-      border-bottom: 1px solid rgba(28, 15, 0, 0.08);
-      box-shadow: 0 12px 24px rgba(28, 15, 0, 0.06);
+      background: var(--color-page);
+      border-bottom: 1px solid rgba(30, 46, 32, 0.08);
+      box-shadow: 0 12px 24px rgba(30, 46, 32, 0.06);
     }
     .nav.is-open { display: flex; }
     .nav ul { flex-direction: column; gap: 20px; }
-    .nav ul a { font-size: 1.125rem; }
-    .nav-cta { display: inline-flex; color: var(--color-cream); }
+    .nav ul a { font-size: 1rem; }
+    .nav-cta { display: inline-flex; }
   }
 </style>
 
-<!-- ④ The JavaScript: opens and closes the mobile menu -->
 <script>
   const toggle = document.querySelector<HTMLButtonElement>(".menu-toggle");
   const nav = document.getElementById("site-nav");
@@ -158,7 +164,6 @@ const links = [
       setOpen(toggle.getAttribute("aria-expanded") !== "true");
     });
 
-    // Close the menu after tapping a link, or when pressing Escape
     nav.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => setOpen(false)));
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") setOpen(false);

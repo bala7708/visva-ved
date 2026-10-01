@@ -2,55 +2,68 @@
 import { Image } from "astro:assets";
 import logo from "../assets/images/logo.png";
 
-// Footer columns. "#" means the page doesn't exist yet: update once the client decides.
+// Footer columns. "#" = page or link not decided yet (ask the client).
 const columns = [
   {
-    title: "Programs",
+    title: "Sacred Sciences",
     links: [
-      { label: "Happiness Program", href: "#programs" },
-      { label: "Sahaj Samadhi", href: "#programs" },
-      { label: "Sri Sri Yoga", href: "#programs" },
-      { label: "Silent Sadhana", href: "#programs" },
-      { label: "Corporate Wellness", href: "#programs" },
-      { label: "Teacher Training", href: "#programs" },
+      { label: "Numerology Overview", href: "/numerology" },
+      { label: "Core Numbers", href: "/numerology#core" },
+      { label: "Name & Birth Analysis", href: "/numerology#discover" },
+      { label: "Master Numbers", href: "/numerology#core" },
     ],
   },
   {
-    title: "Retreats",
+    title: "Tarot",
     links: [
-      { label: "Weekend Reset", href: "#" },
-      { label: "7-Day Sadhana", href: "#programs" },
-      { label: "Sacred Journey", href: "#" },
-      { label: "International Centres", href: "#" },
-      { label: "Find a Centre", href: "#" },
+      { label: "What is Tarot?", href: "/tarot" },
+      { label: "Major Arcana", href: "/tarot#core" },
+      { label: "Book a Reading", href: "#book" },
+      { label: "Online Sessions", href: "#book" },
     ],
   },
   {
-    title: "Connect",
+    title: "Vastu Shastra",
     links: [
-      { label: "About Us", href: "#about" },
-      { label: "Our Teachers", href: "#" },
-      { label: "Dr. Mayuri – Numerology", href: "#numerology" },
-      { label: "Contact", href: "#numerology" },
-      { label: "Press & Media", href: "#" },
+      { label: "What is Vastu?", href: "/vastu" },
+      { label: "The 8 Directions", href: "/vastu#core" },
+      { label: "Home Consultation", href: "#book" },
+      { label: "Elemental Mapping", href: "/vastu#discover" },
+    ],
+  },
+  {
+    title: "Wisdom",
+    links: [
+      { label: "Articles", href: "/#wisdom" },
+      { label: "Panch Mahabhutas", href: "#" },
+      { label: "Vedic Philosophy", href: "/#vedic" },
+      { label: "FAQ", href: "/#faq" },
+    ],
+  },
+  {
+    title: "About",
+    links: [
+      { label: "Our Approach", href: "/#vedic" },
+      { label: "Our Story", href: "#" },
+      { label: "Testimonials", href: "/#vedic" },
+      { label: "Contact Us", href: "mailto:hello@visvaved.com" },
     ],
   },
 ];
 
-// Social media: replace "#" with the client's real profile links
 const socials = [
-  { letter: "I", label: "Instagram", href: "#" },
-  { letter: "F", label: "Facebook", href: "#" },
-  { letter: "Y", label: "YouTube", href: "#" },
+  { label: "Instagram", href: "#" },
+  { label: "Facebook", href: "#" },
+  { label: "YouTube", href: "#" },
 ];
 
 const legal = [
   { label: "Privacy Policy", href: "#" },
-  { label: "Terms of Service", href: "#" },
-  { label: "Cookie Settings", href: "#" },
+  { label: "Terms of Use", href: "#" },
+  { label: "Cookie Policy", href: "#" },
 ];
 
-// Always shows the current year, so the footer never looks out of date
+const email = "hello@visvaved.com";   // confirm with the client
 const year = new Date().getFullYear();
 ---
 
@@ -59,15 +72,15 @@ const year = new Date().getFullYear();
     <div class="footer-top">
       <!-- Brand column -->
       <div class="brand">
-        <Image src={logo} alt="Visva Ved" width={148} height={112} />
-        <p class="tagline">
-          Embracing your highest self through breath, meditation, and the wisdom of the ages.
+        <Image src={logo} alt="Visva Ved" width={140} height={108} />
+        <p class="brand-text">
+          Rooted in timeless Vedic wisdom. Guiding you back to harmony through
+          Numerology, Tarot, and Vastu Shastra.
         </p>
+        <a class="email" href={`mailto:${email}`}>✉ {email}</a>
         <ul class="socials">
           {socials.map((s) => (
-            <li>
-              <a href={s.href} aria-label={s.label}>{s.letter}</a>
-            </li>
+            <li><a href={s.href}>{s.label}</a></li>
           ))}
         </ul>
       </div>
@@ -86,7 +99,7 @@ const year = new Date().getFullYear();
     </div>
 
     <div class="footer-bottom">
-      <p>© {year} VISVA VED. All rights reserved.</p>
+      <p>© {year} Visva Ved — Spiritual Coaching. All rights reserved.</p>
       <ul class="legal">
         {legal.map((link) => (
           <li><a href={link.href}>{link.label}</a></li>
@@ -98,63 +111,58 @@ const year = new Date().getFullYear();
 
 <style>
   .site-footer {
-    padding: 64px 0 32px;
-    background: var(--color-ink);
+    padding: 64px 0 28px;
+    background: var(--color-forest);
+    font-family: var(--font-ui);
   }
 
-  /* ---------- Top: 4 columns ---------- */
+  /* ---------- Top: brand + 5 link columns ---------- */
   .footer-top {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 40px;
+    grid-template-columns: 1.6fr repeat(5, 1fr);
+    gap: 32px;
     padding-bottom: 48px;
-    border-bottom: 1px solid rgba(184, 134, 11, 0.15);
+    border-bottom: 1px solid rgba(201, 168, 76, 0.15);
   }
 
   .brand :global(img) {
-    width: 74px;
-    height: 56px;
+    width: 70px;
+    height: 54px;
     object-fit: contain;
-    border-radius: 8px;
   }
-  .tagline {
-    max-width: 290px;
+  .brand-text {
+    max-width: 260px;
     margin-top: 16px;
-    font-size: 0.875rem;
-    line-height: 1.625;
-    color: rgba(249, 244, 236, 0.55);
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    color: rgba(245, 239, 226, 0.7);
   }
+  .email {
+    display: inline-block;
+    margin-top: 16px;
+    font-size: 0.8125rem;
+    color: rgba(245, 239, 226, 0.85);
+  }
+  .email:hover { color: var(--color-gold); }
 
   .socials {
     display: flex;
     gap: 16px;
-    margin-top: 20px;
+    margin-top: 12px;
     padding: 0;
     list-style: none;
-  }
-  .socials a {
-    display: grid;
-    place-items: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: rgba(184, 134, 11, 0.15);
-    color: var(--color-gold-light);
-    font-weight: 700;
     font-size: 0.75rem;
-    transition: background-color 0.2s;
   }
-  .socials a:hover { background: rgba(184, 134, 11, 0.35); }
+  .socials a { color: rgba(245, 239, 226, 0.6); transition: color 0.2s; }
+  .socials a:hover { color: var(--color-gold); }
 
-  /* Column headings: small gold labels, not the big serif headings */
+  /* Column headings: small gold Cinzel capitals */
   .footer-title {
-    font-family: var(--font-body);
-    font-weight: 600;
-    font-size: 0.75rem;
-    line-height: 1.33;
-    letter-spacing: 0.1em;
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--color-gold-light);
+    color: var(--color-gold);
   }
   .footer-links {
     display: flex;
@@ -165,13 +173,11 @@ const year = new Date().getFullYear();
     list-style: none;
   }
   .footer-links a {
-    font-weight: 400;
-    font-size: 0.875rem;
-    line-height: 1.43;
-    color: rgba(249, 244, 236, 0.55);
+    font-size: 0.8125rem;
+    color: rgba(245, 239, 226, 0.6);
     transition: color 0.2s;
   }
-  .footer-links a:hover { color: var(--color-gold-light); }
+  .footer-links a:hover { color: var(--color-gold); }
 
   /* ---------- Bottom row ---------- */
   .footer-bottom {
@@ -179,9 +185,9 @@ const year = new Date().getFullYear();
     justify-content: space-between;
     align-items: center;
     gap: 16px;
-    padding-top: 32px;
+    padding-top: 24px;
     font-size: 0.75rem;
-    color: rgba(249, 244, 236, 0.3);
+    color: rgba(245, 239, 226, 0.45);
   }
   .legal {
     display: flex;
@@ -189,28 +195,24 @@ const year = new Date().getFullYear();
     padding: 0;
     list-style: none;
   }
-  .legal a { transition: color 0.2s; }
-  .legal a:hover { color: var(--color-gold-light); }
+  .legal a:hover { color: var(--color-gold); }
 
-  /* ---------- Tablet: brand on top, 3 link columns below ---------- */
-  @media (max-width: 900px) {
+  /* ---------- Tablet: brand on top, 3 columns ---------- */
+  @media (max-width: 1024px) {
     .footer-top { grid-template-columns: repeat(3, 1fr); }
-    .brand { grid-column: 1 / -1; }   /* spans the full width */
+    .brand { grid-column: 1 / -1; }
   }
 
   /* ---------- Phone: 2 columns, bottom row stacked ---------- */
-  @media (max-width: 560px) {
+  @media (max-width: 600px) {
     .footer-top {
       grid-template-columns: repeat(2, 1fr);
-      gap: 32px 24px;
+      gap: 32px 20px;
     }
     .footer-bottom {
       flex-direction: column;
       align-items: flex-start;
     }
-    .legal {
-      flex-wrap: wrap;
-      gap: 8px 20px;
-    }
+    .legal { flex-wrap: wrap; gap: 8px 20px; }
   }
 </style>
