@@ -116,3 +116,31 @@ h3 { font-size: 1.25rem; }
   border-color: var(--color-saffron);
   background: linear-gradient(169deg, var(--color-saffron), var(--color-saffron-dark));
   color: #ffffff;
+  box-shadow: 0 3px 7px rgba(232, 160, 32, 0.3);
+  /* Same gentle, slow easing as the "Choose Your Path" cards */
+  transition: transform 0.6s ease, box-shadow 0.6s ease, filter 0.6s ease;
+}
+
+/* Hover (mouse) and keyboard focus: grow slightly, lift, warmer glow */
+.btn--saffron:hover,
+.btn--saffron:focus-visible {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 10px 22px rgba(232, 160, 32, 0.38);
+  filter: brightness(1.05);
+}
+
+/* The arrow slides a little to the right */
+.btn--saffron span[aria-hidden="true"] {
+  display: inline-block;          /* needed so the arrow can move */
+  transition: transform 0.6s ease;
+}
+.btn--saffron:hover span[aria-hidden="true"],
+.btn--saffron:focus-visible span[aria-hidden="true"] {
+  transform: translateX(4px);
+}
+
+/* Pressing the button: settles back down, so the click feels responsive */
+.btn--saffron:active {
+  transform: translateY(0) scale(1.01);
+  transition-duration: 0.1s;
+}

@@ -5,6 +5,15 @@ import Header from "./Header.astro";
 import Footer from "./Footer.astro";
 import BookingModal from "./BookingModal.astro";
 
+interface CoreItem {
+  symbol?: string;     // big gold symbol, e.g. "LP" or "XVI"
+  icon?: string;       // OR a small line icon (SVG paths)
+  name: string;
+  subtitle?: string;   // optional italic line, e.g. a deity
+  text: string;
+  color?: string;      // optional accent colour for icon and name
+}
+
 interface Props {
   title: string;
   description: string;
@@ -14,7 +23,7 @@ interface Props {
     subtitle: string;
     pattern?: string[];
     image?: ImageMetadata;
-    tint?: string;               // NEW: background colour behind the hero photo
+    tint?: string;
   };
   intro: {
     eyebrow: string;
@@ -28,16 +37,19 @@ interface Props {
   core: {
     eyebrow: string;
     title: string;
-    intro?: string;              // NEW: optional line under the title
-    items: { symbol: string; name: string; text: string }[];
+    intro?: string;
+    variant?: "directions";   // 4 columns, icons, colours (Vastu)
+    items: CoreItem[];
   };
   discover: {
     eyebrow: string;
     title: string;
     items: { title: string; text: string }[];
-    numbered?: boolean;
+    numbered?: boolean;       // numbered steps (Tarot)
+    rows?: boolean;           // boxed rows (Vastu)
     cta: string;
-    programme: string;
+    programme?: string;       // for the booking popup
+    href?: string;            // OR a normal link instead of the booking popup
   };
   prev: { label: string; href: string };
   next: { label: string; href: string };
@@ -50,6 +62,7 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
   <Header />
 
   <main>
+    <!-- 1. Page hero -->
     <section
       class:list={["page-hero", { "page-hero--photo": hero.image }]}
       style={hero.tint ? `--hero-bg: ${hero.tint}` : undefined}
@@ -72,6 +85,7 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
       </div>
     </section>
 
+    <!-- 2. Introduction -->
     <section class="section">
       <div class:list={["container", "intro", { "intro--reverse": intro.reverse }]}>
         <div class="intro-text">
@@ -85,28 +99,39 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
       </div>
     </section>
 
+    <!-- 3. Core cards -->
     <section id="core" class="section core">
       <div class="container core-inner">
         <p class="eyebrow">{core.eyebrow}</p>
         <h2>{core.title}</h2>
         {core.intro && <p class="core-intro">{core.intro}</p>}
-        <ul class="core-grid">
+        <ul class:list={["core-grid", { "core-grid--directions": core.variant === "directions" }]}>
           {core.items.map((item) => (
-            <li class="core-card">
-              <span class="core-symbol">{item.symbol}</span>
+            <li class="core-card" style={item.color ? `--accent: ${item.color}` : undefined}>
+              {item.icon && (
+                <svg class="core-icon" viewBox="0 0 24 24" width="24" height="24" fill="none"
+                     stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"
+                     aria-hidden="true" set:html={item.icon} />
+              )}
+              {item.symbol && <span class="core-symbol">{item.symbol}</span>}
               <h3>{item.name}</h3>
-              <p>{item.text}</p>
+              {item.subtitle && <p class="core-subtitle">{item.subtitle}</p>}
+              <p class="core-text">{item.text}</p>
             </li>
           ))}
         </ul>
       </div>
     </section>
 
+    <!-- 4. What You Will Discover -->
     <section id="discover" class="section">
       <div class="container discover-inner">
         <p class="eyebrow">{discover.eyebrow}</p>
         <h2>{discover.title}</h2>
-        <ul class:list={["discover-list", { "discover-list--steps": discover.numbered }]}>
+        <ul class:list={[
+          "discover-list",
+          { "discover-list--steps": discover.numbered, "discover-list--rows": discover.rows },
+        ]}>
           {discover.items.map((item, i) => (
             <li>
               {discover.numbered && (
@@ -119,12 +144,20 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
             </li>
           ))}
         </ul>
-        <a class="btn btn--green" href="#book" data-programme={discover.programme}>
-          {discover.cta} <span aria-hidden="true">→</span>
-        </a>
+
+        {discover.href ? (
+          <a class="btn btn--green" href={discover.href}>
+            {discover.cta} <span aria-hidden="true">→</span>
+          </a>
+        ) : (
+          <a class="btn btn--green" href="#book" data-programme={discover.programme}>
+            {discover.cta} <span aria-hidden="true">→</span>
+          </a>
+        )}
       </div>
     </section>
 
+    <!-- 5. Page navigation -->
     <div class="page-nav-wrap">
       <nav class="container page-nav" aria-label="More sciences">
         <a class="nav-prev" href={prev.href}><span aria-hidden="true">←</span> {prev.label}</a>
@@ -150,7 +183,6 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     text-align: center;
   }
 
-  /* NEW: each page can set its own background colour (default: blue-grey) */
   .page-hero--photo {
     background: var(--hero-bg, #1c2830);
   }
@@ -267,7 +299,6 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     margin-top: 14px;
   }
 
-  /* NEW: optional line under the title */
   .core-intro {
     max-width: 560px;
     margin: 20px auto 0;
@@ -306,12 +337,48 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     text-transform: uppercase;
   }
 
-  .core-card p {
+  .core-text {
     margin-top: 12px;
     font-style: italic;
     font-size: 0.875rem;
     line-height: 1.7;
     color: #8a8d7e;
+  }
+
+  /* Directions version (Vastu): 4 columns, coloured icon and name, deity in italics */
+  .core-grid--directions {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+
+  .core-grid--directions .core-card {
+    padding: 24px;
+  }
+
+  .core-icon {
+    color: var(--accent, var(--color-gold));
+  }
+
+  .core-grid--directions h3 {
+    margin-top: 16px;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--accent, var(--color-gold));
+  }
+
+  .core-subtitle {
+    margin-top: 4px;
+    font-style: italic;
+    font-size: 0.8rem;
+    color: #8a8d7e;
+  }
+
+  .core-grid--directions .core-text {
+    margin-top: 14px;
+    font-family: var(--font-ui);
+    font-style: normal;
+    font-size: 0.8rem;
+    color: var(--color-ink);
   }
 
   /* ---------- 4. What You Will Discover ---------- */
@@ -324,6 +391,7 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     margin-top: 16px;
   }
 
+  /* Default version (Numerology): two columns with a gold line */
   .discover-list {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -350,6 +418,7 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     line-height: 1.75;
   }
 
+  /* Numbered version (Tarot): one column, big faint numbers */
   .discover-list--steps {
     grid-template-columns: 1fr;
     gap: 40px;
@@ -371,6 +440,38 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     line-height: 1;
     text-align: right;
     color: #dcc995;
+  }
+
+  /* Rows version (Vastu): boxed rows, label left, text right */
+  .discover-list--rows {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    max-width: 776px;
+    margin: 48px auto 20px;
+  }
+
+  .discover-list--rows li {
+    padding: 22px 24px;
+    border: 1px solid #ddd2bd;
+    background: #fcfaf5;
+  }
+
+  /* The inner <div> "disappears" so the title and text sit side by side */
+  .discover-list--rows li > div {
+    display: grid;
+    grid-template-columns: 104px 1fr;
+    align-items: center;
+    column-gap: 24px;
+  }
+
+  .discover-list--rows h3 {
+    font-size: 0.8rem;
+    color: var(--color-gold);
+  }
+
+  .discover-list--rows p {
+    margin-top: 0;
+    font-size: 0.9rem;
   }
 
   .btn--green {
@@ -420,7 +521,8 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
       grid-template-columns: 1fr;
       gap: 48px;
     }
-    .core-grid {
+    .core-grid,
+    .core-grid--directions {
       grid-template-columns: repeat(2, 1fr);
     }
     .pattern {
@@ -436,12 +538,25 @@ const { title, description, hero, intro, core, discover, prev, next } = Astro.pr
     .discover-list {
       grid-template-columns: 1fr;
     }
+    .core-grid--directions {
+      grid-template-columns: repeat(2, 1fr);   /* 2 small cards per row still fit */
+    }
+    .core-grid--directions .core-card {
+      padding: 18px;
+    }
     .discover-list {
       gap: 28px;
     }
     .discover-list--steps li {
       grid-template-columns: 40px 1fr;
       column-gap: 16px;
+    }
+    .discover-list--rows {
+      gap: 12px;
+    }
+    .discover-list--rows li > div {
+      grid-template-columns: 1fr;
+      row-gap: 6px;
     }
     .step-num {
       font-size: 1.8rem;
