@@ -30,12 +30,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         <ul class="stats">
           <li><span class="stat-label">Today</span><span class="stat-value" id="stat-today">–</span></li>
           <li><span class="stat-label">Upcoming confirmed</span><span class="stat-value" id="stat-upcoming">–</span></li>
-          <li><span class="stat-label">Awaiting payment</span><span class="stat-value" id="stat-pending">–</span></li>
+          <li><span class="stat-label">Payments to verify</span><span class="stat-value" id="stat-pending">–</span></li>
           <li><span class="stat-label">Revenue this month</span><span class="stat-value" id="stat-revenue">–</span></li>
         </ul>
 
         <div class="filters" role="group" aria-label="Filter bookings">
           <button type="button" data-filter="upcoming" aria-pressed="true">Upcoming</button>
+          <button type="button" data-filter="verify" aria-pressed="false">To verify</button>
           <button type="button" data-filter="pending" aria-pressed="false">Awaiting payment</button>
           <button type="button" data-filter="past" aria-pressed="false">Past</button>
           <button type="button" data-filter="cancelled" aria-pressed="false">Cancelled</button>
@@ -73,6 +74,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 <script>
   import { formatTime } from "../config/booking.mjs";
 
+  type Status = "pending" | "expired" | "verifying" | "confirmed" | "rejected" | "cancelled";
   type Booking = {
     key: string;
     date: string;
@@ -83,9 +85,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     programme: string;
     amount: number;
     orderId: string;
-    status: "pending" | "expired" | "confirmed" | "cancelled";
+    utr: string | null;
+    status: Status;
     confirmedBy: string | null;
   };
+  type Action = "confirm" | "reject" | "cancel";
 
   const API = "/.netlify/functions";
   const loginView = document.getElementById("login-view") as HTMLElement;
@@ -101,20 +105,21 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   let filter = "upcoming";
   let autoRefresh: number | undefined;
 
-  // Today's date in India as "2026-10-02", and this month as "2026-10"
   const today = () => new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
   const rupees = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
   const prettyDate = (date: string) =>
     new Date(`${date}T00:00:00`).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
 
-  const statusLabels: Record<Booking["status"], string> = {
+  const statusLabels: Record<Status, string> = {
     pending: "Awaiting payment",
     expired: "Expired",
+    verifying: "Verify payment",
     confirmed: "Confirmed",
+    rejected: "Payment rejected",
     cancelled: "Cancelled",
   };
 
-  // ---------- Switching between login and dashboard ----------
+  // ---------- Login / dashboard ----------
   const showLogin = () => {
     dashboardView.hidden = true;
     loginView.hidden = false;
@@ -126,7 +131,6 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     dashboardView.hidden = false;
   };
 
-  // ---------- Loading the bookings ----------
   async function load() {
     const response = await fetch(`${API}/admin-bookings`);
     if (response.status === 401) return showLogin();
@@ -140,7 +144,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     renderList();
   }
 
-  // ---------- The four figures at the top ----------
+  // ---------- Figures ----------
   function renderStats() {
     const t = today();
     const month = t.slice(0, 7);
@@ -151,29 +155,32 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     (document.getElementById("stat-upcoming") as HTMLElement).textContent =
       String(confirmed.filter((b) => b.date >= t).length);
     (document.getElementById("stat-pending") as HTMLElement).textContent =
-      String(bookings.filter((b) => b.status === "pending").length);
+      String(bookings.filter((b) => b.status === "verifying").length);
     (document.getElementById("stat-revenue") as HTMLElement).textContent =
       rupees.format(confirmed.filter((b) => b.date.startsWith(month)).reduce((sum, b) => sum + b.amount, 0));
   }
 
-  // ---------- The list ----------
+  // ---------- List ----------
   function visibleBookings() {
     const t = today();
     switch (filter) {
       case "upcoming":
-        return bookings.filter((b) => b.date >= t && (b.status === "confirmed" || b.status === "pending"));
+        return bookings.filter(
+          (b) => b.date >= t && ["confirmed", "verifying", "pending"].includes(b.status)
+        );
+      case "verify":
+        return bookings.filter((b) => b.status === "verifying");
       case "pending":
         return bookings.filter((b) => b.status === "pending");
       case "past":
         return bookings.filter((b) => b.date < t && b.status === "confirmed").reverse();
       case "cancelled":
-        return bookings.filter((b) => b.status === "cancelled");
+        return bookings.filter((b) => b.status === "cancelled" || b.status === "rejected");
       default:
         return bookings;
     }
   }
 
-  // Creates a table cell with a label (the label is shown on phones)
   function cell(label: string, ...children: (Node | string)[]) {
     const td = document.createElement("td");
     td.dataset.label = label;
@@ -184,14 +191,15 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   function element(tag: string, className: string, text: string) {
     const el = document.createElement(tag);
     el.className = className;
-    el.textContent = text;       // textContent: visitor-typed names are shown as plain text, never as code
+    el.textContent = text;   // plain text only, never code
     return el;
   }
 
-  function actionButton(label: string, kind: "confirm" | "cancel", booking: Booking) {
-    const button = element("button", `act act--${kind}`, label) as HTMLButtonElement;
+  function actionButton(label: string, action: Action, booking: Booking) {
+    const style = action === "confirm" ? "confirm" : "cancel";
+    const button = element("button", `act act--${style}`, label) as HTMLButtonElement;
     button.type = "button";
-    button.addEventListener("click", () => updateBooking(booking, kind));
+    button.addEventListener("click", () => updateBooking(booking, action));
     return button;
   }
 
@@ -204,20 +212,21 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       const tr = document.createElement("tr");
 
       const client = document.createElement("div");
-      client.append(
-        element("span", "client-name", b.name),
-        element("span", "client-detail", b.email),
-      );
+      client.append(element("span", "client-name", b.name), element("span", "client-detail", b.email));
       if (b.whatsapp) client.append(element("span", "client-detail", `WhatsApp: ${b.whatsapp}`));
 
-      const badge = element("span", `badge badge--${b.status}`, statusLabels[b.status]);
-      const statusCell = cell("Status", badge);
-      if (b.confirmedBy === "admin") statusCell.append(element("span", "client-detail", "manually"));
+      const statusCell = cell("Status", element("span", `badge badge--${b.status}`, statusLabels[b.status]));
+      if (b.utr) statusCell.append(element("span", "utr", `UTR: ${b.utr}`));
+      if (b.confirmedBy === "admin") statusCell.append(element("span", "client-detail", "confirmed manually"));
 
       const actions = document.createElement("div");
       actions.className = "row-actions";
-      if (b.status === "pending" || b.status === "expired") actions.append(actionButton("Confirm", "confirm", b));
-      if (b.status !== "cancelled") actions.append(actionButton("Cancel", "cancel", b));
+      if (b.status === "verifying") {
+        actions.append(actionButton("Accept", "confirm", b), actionButton("Reject", "reject", b));
+      } else {
+        if (b.status === "pending" || b.status === "expired") actions.append(actionButton("Confirm", "confirm", b));
+        if (b.status === "confirmed" || b.status === "pending") actions.append(actionButton("Cancel", "cancel", b));
+      }
 
       tr.append(
         cell("Date", prettyDate(b.date)),
@@ -232,13 +241,19 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     }
   }
 
-  // ---------- Confirm / cancel ----------
-  async function updateBooking(booking: Booking, action: "confirm" | "cancel") {
-    const question =
-      action === "confirm"
-        ? `Confirm the booking of ${booking.name} on ${prettyDate(booking.date)} at ${formatTime(booking.time)}?`
-        : `Cancel the booking of ${booking.name}? The slot becomes available again.`;
-    if (!window.confirm(question)) return;
+  // ---------- Accept / reject / confirm / cancel ----------
+  async function updateBooking(booking: Booking, action: Action) {
+    const when = `${prettyDate(booking.date)} at ${formatTime(booking.time)}`;
+    const questions: Record<Action, string> = {
+      confirm: booking.utr
+        ? `Accept the payment of ${rupees.format(booking.amount)} from ${booking.name}?\n\n` +
+          `Please check first that UTR ${booking.utr} appears in your bank or UPI app with this amount.`
+        : `Confirm the booking of ${booking.name} on ${when}?`,
+      reject: `Reject the payment from ${booking.name} (UTR ${booking.utr})?\n\n` +
+        `Do this only if you can't find the payment. The slot becomes available again.`,
+      cancel: `Cancel the booking of ${booking.name} on ${when}? The slot becomes available again.`,
+    };
+    if (!window.confirm(questions[action])) return;
 
     const response = await fetch(`${API}/admin-update`, {
       method: "POST",
@@ -265,7 +280,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     if (response.ok) {
       passwordInput.value = "";
       await load();
-      autoRefresh = window.setInterval(load, 60_000);   // refresh every minute
+      autoRefresh = window.setInterval(load, 60_000);
     } else {
       loginError.textContent = "Incorrect password.";
     }
@@ -286,7 +301,6 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     });
   });
 
-  // On page load: already logged in? Show the dashboard. Otherwise, the login form.
   load().then(() => {
     if (!dashboardView.hidden) autoRefresh = window.setInterval(load, 60_000);
   });
@@ -465,7 +479,15 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   .admin-app .badge--confirmed { background: #e3f1e6; color: #2f6b3f; }
   .admin-app .badge--pending { background: #fdf1d9; color: #8a5a00; }
   .admin-app .badge--expired { background: #eeeeea; color: #666666; }
-  .admin-app .badge--cancelled { background: #fbe4e2; color: #9b2c22; }
+  .admin-app .badge--verifying { background: #e3edf7; color: #1f4e79; }
+  .admin-app .badge--rejected { background: #fbe4e2; color: #9b2c22; }
+  .admin-app .utr {
+    display: block;
+    margin-top: 6px;
+    font-family: ui-monospace, Consolas, monospace;   /* easy to compare digit by digit */
+    font-size: 0.8rem;
+    color: var(--color-ink);
+  }
 
   .admin-app .row-actions {
     display: flex;

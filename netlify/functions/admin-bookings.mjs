@@ -28,6 +28,7 @@ export default async (req) => {
         programme: b.programme,
         amount: b.amount,
         orderId: b.orderId,
+        utr: b.utr ?? null,
         status,
         confirmedBy: b.confirmedBy ?? null,
         createdAt: b.createdAt,
