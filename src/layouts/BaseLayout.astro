@@ -12,11 +12,13 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
+  noindex?: boolean;
 }
 
 const {
   title = "Visva Ved | Numerology, Tarot & Vastu",
   description = "Vedic guidance through Numerology, Tarot and Vastu Shastra. Living in harmony with the universe.",
+  noindex = false,
 } = Astro.props;
 ---
 
@@ -27,6 +29,7 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
     <!-- Link previews on WhatsApp, LinkedIn, etc. Add the image in step 5. -->

@@ -1,6 +1,6 @@
 ---
-// The booking popup. Every link with href="#book" opens it.
-// Settings (time slots, closed days…) are at the top of the <script> below.
+// The booking popup: calendar → details → payment (QR, countdown) → confirmed.
+// Settings (time slots, prices…) live in src/config/booking.mjs.
 ---
 
 <dialog id="booking-modal" class="booking" aria-labelledby="booking-title">
@@ -11,10 +11,9 @@
         <span class="avatar" aria-hidden="true">VV</span>
         <div>
           <h2 id="booking-title" class="teacher-name">Visva Ved Teacher</h2>
-          <p id="booking-meta" class="teacher-meta">Retreat Consultation · 45 min · Free Consultation</p>
+          <p id="booking-meta" class="teacher-meta">Healing Consultation · 45 min</p>
         </div>
       </div>
-
       <div class="header-actions">
         <span class="meet-badge">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -28,51 +27,29 @@
           <button class="close" type="submit" aria-label="Close booking">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M18 6 6 18" />
-              <path d="m6 6 12 12" />
+              <path d="M18 6 6 18" /><path d="m6 6 12 12" />
             </svg>
           </button>
         </form>
       </div>
     </header>
 
-    <!-- ========== Booking form ========== -->
-    <form
-      id="booking-form"
-      class="booking-form"
-      name="booking"
-      method="POST"
-      data-netlify="true"
-      netlify-honeypot="bot-field"
-    >
-      <!-- Hidden fields, filled in by the script -->
-      <input type="hidden" name="form-name" value="booking" />
-      <input type="hidden" name="programme" id="booking-programme" value="General consultation" />
-      <input type="hidden" name="date" id="booking-date" />
-      <input type="hidden" name="time" id="booking-time" />
-      <input type="hidden" name="start" id="booking-start" />
-      <input type="hidden" name="end" id="booking-end" />
-      <p class="sr-only" aria-hidden="true">
-        <label>Don't fill this in: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
-      </p>
+    <!-- ========== 1. Choose a time and enter details ========== -->
+    <form id="booking-form" class="booking-form">
+      <input type="hidden" id="booking-programme" value="Healing Consultation" />
 
       <div class="picker">
-        <!-- Calendar -->
         <div class="calendar">
           <div class="cal-head">
             <p id="cal-month" class="cal-month" aria-live="polite"></p>
             <div class="cal-nav">
               <button type="button" id="cal-prev" class="icon-btn" aria-label="Previous month">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="m15 18-6-6 6-6" />
-                </svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
               </button>
               <button type="button" id="cal-next" class="icon-btn" aria-label="Next month">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="m9 18 6-6-6-6" />
-                </svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
               </button>
             </div>
           </div>
@@ -82,14 +59,11 @@
           <div id="cal-grid" class="cal-grid"></div>
         </div>
 
-        <!-- Time slots -->
         <div class="slots">
           <p class="tz">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
-              <path d="M2 12h20" />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" />
             </svg>
             Asia / Kolkata
           </p>
@@ -98,52 +72,77 @@
         </div>
       </div>
 
-      <!-- Your details -->
       <div class="details">
         <p class="details-title">Your Details</p>
-
         <div class="fields">
           <div class="field">
             <label for="booking-name">Your Name</label>
-            <input id="booking-name" name="name" type="text" autocomplete="name" placeholder="Priya Sharma" required />
+            <input id="booking-name" type="text" autocomplete="name" placeholder="Priya Sharma" required />
           </div>
           <div class="field">
             <label for="booking-email">Your Email</label>
-            <input id="booking-email" name="email" type="email" autocomplete="email" placeholder="priya@gmail.com" required />
+            <input id="booking-email" type="email" autocomplete="email" placeholder="priya@gmail.com" required />
           </div>
           <div class="field">
             <label for="booking-phone">WhatsApp Number <span class="optional">Optional</span></label>
-            <input id="booking-phone" name="whatsapp" type="tel" autocomplete="tel" placeholder="+91 98765-43210" />
+            <input id="booking-phone" type="tel" autocomplete="tel" placeholder="+91 98765 43210" />
+            <label class="consent">
+              <input type="checkbox" id="booking-optin" />
+              <span>Send me booking updates on WhatsApp</span>
+            </label>
           </div>
         </div>
 
         <button type="submit" id="booking-submit" class="submit" disabled>
-          Book Slot
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="5" y1="12" x2="19" y2="12" />
-            <polyline points="12 5 19 12 12 19" />
+          Continue to Payment
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
           </svg>
         </button>
-        <p id="booking-hint" class="hint" aria-live="polite">Select a time slot to continue</p>
+        <p id="booking-hint" class="hint" aria-live="polite">Select a date and time to continue</p>
       </div>
     </form>
 
-    <!-- ========== Success message (shown after sending) ========== -->
-    <div id="booking-success" class="success" hidden>
-      <span class="success-icon" aria-hidden="true">✓</span>
-      <h3>Request received</h3>
-      <p id="booking-summary" class="success-summary"></p>
-      <p>We'll confirm your slot by email or WhatsApp within 24 hours.</p>
-      <form method="dialog">
-        <button class="btn btn--primary" type="submit">Done</button>
-      </form>
-    </div>
+    <!-- ========== 2. Payment ========== -->
+    <section id="pay-view" class="pay-view" hidden>
+      <p class="pay-eyebrow">Complete your payment</p>
+      <p id="pay-amount" class="pay-amount"></p>
+      <p id="pay-summary" class="pay-summary"></p>
+
+      <img id="pay-qr" class="pay-qr" alt="UPI QR code for this payment" width="220" height="220" />
+      <p class="pay-scan">Scan with any UPI app: Google Pay, PhonePe, Paytm, BHIM…</p>
+
+      <a id="pay-intent" class="btn btn--saffron pay-app-btn" href="#">Pay with UPI app</a>
+
+      <p class="pay-timer">Your slot is held for <strong id="pay-countdown">15:00</strong></p>
+      <p id="pay-status" class="pay-status" aria-live="polite">Waiting for payment…</p>
+
+      <button id="mock-pay-btn" class="mock-btn" type="button" hidden>Simulate payment (test mode)</button>
+      <button id="pay-back" class="link-btn" type="button">Choose a different time</button>
+    </section>
+
+    <!-- ========== 3a. Confirmed ========== -->
+    <section id="done-view" class="result" hidden>
+      <span class="result-icon result-icon--ok" aria-hidden="true">✓</span>
+      <h3>Booking confirmed</h3>
+      <p id="done-summary" class="result-summary"></p>
+      <p>Thank you. Your payment has been received, and we look forward to seeing you.</p>
+      <form method="dialog"><button class="btn btn--saffron" type="submit">Done</button></form>
+    </section>
+
+    <!-- ========== 3b. Time ran out ========== -->
+    <section id="expired-view" class="result" hidden>
+      <span class="result-icon result-icon--wait" aria-hidden="true">⏱</span>
+      <h3>Time ran out</h3>
+      <p>The 15 minutes to complete your payment have passed, so the slot was released. No payment was taken.</p>
+      <button id="expired-retry" class="btn btn--saffron" type="button">Choose another time</button>
+    </section>
   </div>
 </dialog>
 
 <style>
-  /* ---------- Popup box and backdrop ---------- */
+  /* ---------- Popup box ---------- */
   .booking {
     width: min(780px, calc(100% - 32px));
     max-height: calc(100dvh - 32px);
@@ -151,12 +150,12 @@
     border: 0;
     border-radius: 24px;
     background: #ffffff;
-    color: var(--color-bark);
+    color: var(--color-text);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     overflow: hidden;
   }
   .booking::backdrop {
-    background: rgba(28, 15, 0, 0.6);
+    background: rgba(26, 46, 27, 0.6);
     backdrop-filter: blur(6px);
   }
   .booking[open] { animation: pop-in 0.2s ease-out; }
@@ -170,6 +169,11 @@
     flex-direction: column;
     max-height: calc(100dvh - 32px);
   }
+
+  /* Any part with the "hidden" attribute is fully hidden */
+  .booking-form[hidden],
+  .pay-view[hidden],
+  .result[hidden] { display: none; }
 
   /* ---------- Header ---------- */
   .booking-header {
@@ -188,29 +192,32 @@
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold));
-    color: var(--color-cream);
+    background: linear-gradient(135deg, var(--color-gold), #a8872f);
+    color: #ffffff;
+    font-family: var(--font-ui);
     font-weight: 700;
     font-size: 1.125rem;
   }
   .teacher-name {
-    font-family: var(--font-body);
+    font-family: var(--font-ui);
     font-weight: 600;
     font-size: 1rem;
     line-height: 1.5;
     color: var(--color-ink);
   }
-  .teacher-meta { font-weight: 400; font-size: 0.875rem; line-height: 1.43; }
-
+  .teacher-meta {
+    font-family: var(--font-ui);
+    font-size: 0.875rem;
+  }
   .header-actions { display: flex; align-items: center; gap: 12px; }
   .meet-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 6px 16px;
-    border: 1px solid rgba(184, 134, 11, 0.3);
-    border-radius: var(--radius-pill);
-    font-weight: 500;
+    border: 1px solid rgba(201, 168, 76, 0.4);
+    border-radius: 999px;
+    font-family: var(--font-ui);
     font-size: 0.75rem;
     white-space: nowrap;
   }
@@ -224,21 +231,16 @@
     background: none;
     color: var(--color-ink);
     cursor: pointer;
-    transition: background-color 0.2s;
   }
   .close:hover { background: var(--color-sand); }
 
-  /* ---------- Form area (scrolls inside the popup) ---------- */
-  .booking-form { overflow-y: auto; }
-  .booking-form[hidden] { display: none; }
-
+  /* ---------- Calendar and slots ---------- */
+  .booking-form { overflow-y: auto; font-family: var(--font-ui); }
   .picker {
     display: grid;
     grid-template-columns: 1fr 1fr;
     border-bottom: 1px solid var(--color-sand);
   }
-
-  /* ---------- Calendar ---------- */
   .calendar {
     padding: 24px 28px;
     border-right: 1px solid var(--color-sand);
@@ -279,8 +281,6 @@
     text-align: center;
   }
   .cal-grid { row-gap: 4px; margin-top: 8px; }
-
-  /* The day buttons are created by JavaScript, so they need :global() (see explanation) */
   .cal-grid :global(button) {
     justify-self: center;
     width: 36px;
@@ -291,17 +291,15 @@
     color: var(--color-ink);
     font-size: 0.875rem;
     cursor: pointer;
-    transition: background-color 0.15s;
   }
   .cal-grid :global(button:hover:not(:disabled)) { background: var(--color-sand); }
   .cal-grid :global(button:disabled) { color: #d4c4a8; cursor: default; }
   .cal-grid :global(button[aria-pressed="true"]) {
-    background: var(--color-gold);
-    color: var(--color-cream);
+    background: var(--color-saffron);
+    color: #ffffff;
     font-weight: 700;
   }
 
-  /* ---------- Time slots ---------- */
   .slots { padding: 24px 28px; }
   .tz {
     display: flex;
@@ -315,7 +313,6 @@
   .slot-day {
     margin-top: 16px;
     font-weight: 600;
-    font-size: 1rem;
     color: var(--color-ink);
   }
   .slot-list {
@@ -331,25 +328,32 @@
     flex-shrink: 0;
     padding: 12px;
     border: 1.5px solid #e8ddd0;
-    border-radius: var(--radius-card);
-    background: var(--color-cream);
+    border-radius: 12px;
+    background: #fbf8f2;
     color: var(--color-ink);
     font-size: 0.875rem;
     cursor: pointer;
-    transition: border-color 0.15s, background-color 0.15s;
   }
-  .slot-list :global(button:hover) { border-color: var(--color-gold); }
+  .slot-list :global(button:hover:not(:disabled)) { border-color: var(--color-saffron); }
   .slot-list :global(button[aria-pressed="true"]) {
-    border-color: var(--color-gold);
-    background: var(--color-butter);
+    border-color: var(--color-saffron);
+    background: #fdf1d9;
     font-weight: 600;
+  }
+  /* Taken times: crossed out and not clickable */
+  .slot-list :global(button:disabled) {
+    border-color: #efe9de;
+    background: #f5f2ec;
+    color: #b9b2a3;
+    text-decoration: line-through;
+    cursor: not-allowed;
   }
   .slot-list :global(.slot-empty) {
     font-size: 0.875rem;
-    color: rgba(92, 61, 30, 0.7);
+    color: #8a8d7e;
   }
 
-  /* ---------- Your details ---------- */
+  /* ---------- Details ---------- */
   .details { padding: 24px 28px; }
   .details-title {
     font-weight: 700;
@@ -376,24 +380,38 @@
   .optional {
     padding: 2px 8px;
     border: 1px solid #d4c4a8;
-    border-radius: var(--radius-pill);
+    border-radius: 999px;
     font-weight: 600;
     font-size: 0.625rem;
-    letter-spacing: 0.025em;
     text-transform: uppercase;
-    color: var(--color-bark);
   }
   .field input {
     width: 100%;
     padding: 12px 16px;
     border: 1.5px solid #e8ddd0;
-    border-radius: var(--radius-card);
-    background: var(--color-cream);
+    border-radius: 12px;
+    background: #fbf8f2;
     color: var(--color-ink);
     font-size: 0.875rem;
   }
-  .field input::placeholder { color: rgba(28, 15, 0, 0.4); }
-  .field input:focus { outline: none; border-color: var(--color-gold); }
+  .field input:focus { outline: none; border-color: var(--color-saffron); }
+  .field .consent {
+    align-items: flex-start;
+    gap: 10px;
+    margin: 10px 0 0;
+    font-weight: 400;
+    font-size: 0.8125rem;
+    color: var(--color-text);
+    cursor: pointer;
+  }
+  .field .consent input {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    padding: 0;
+    accent-color: var(--color-saffron);
+  }
 
   .submit {
     display: flex;
@@ -404,15 +422,13 @@
     height: 56px;
     margin-top: 24px;
     border: 0;
-    border-radius: var(--radius-card);
-    background: var(--color-gold);
-    color: var(--color-cream);
+    border-radius: 12px;
+    background: linear-gradient(169deg, var(--color-saffron), var(--color-saffron-dark));
+    color: #ffffff;
     font-weight: 600;
     font-size: 1rem;
     cursor: pointer;
-    transition: background-color 0.2s;
   }
-  .submit:hover:not(:disabled) { background: #a0750a; }
   .submit:disabled { background: #d4c4a8; cursor: not-allowed; }
   .hint {
     margin-top: 8px;
@@ -420,45 +436,100 @@
     text-align: center;
   }
 
-  /* ---------- Success message ---------- */
-  .success {
+  /* ---------- Payment ---------- */
+  .pay-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 32px 28px 36px;
+    overflow-y: auto;
+    font-family: var(--font-ui);
+    text-align: center;
+  }
+  .pay-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #a8872f;
+  }
+  .pay-amount {
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    line-height: 1.1;
+    color: var(--color-ink);
+  }
+  .pay-summary { max-width: 420px; font-size: 0.9rem; }
+  .pay-qr {
+    width: 220px;
+    height: 220px;
+    margin-top: 8px;
+    padding: 8px;
+    border: 1px solid #e8ddd0;
+    background: #ffffff;
+  }
+  .pay-scan { font-size: 0.8rem; color: #8a8d7e; }
+  /* The "Pay with UPI app" button only makes sense on phones */
+  @media (hover: hover) and (pointer: fine) {
+    .pay-app-btn { display: none; }
+  }
+  .pay-timer { margin-top: 8px; font-size: 0.875rem; }
+  .pay-timer strong {
+    font-variant-numeric: tabular-nums;   /* digits all the same width, so the timer doesn't wobble */
+    color: var(--color-saffron-dark);
+  }
+  .pay-status { font-size: 0.85rem; color: #6b725f; }
+  .mock-btn {
+    padding: 8px 14px;
+    border: 1px dashed var(--color-gold);
+    background: #fff8e6;
+    color: var(--color-ink);
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+  .mock-btn[hidden] { display: none; }
+  .link-btn {
+    border: 0;
+    background: none;
+    color: #6b725f;
+    font-size: 0.8rem;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  /* ---------- Results ---------- */
+  .result {
     display: grid;
     justify-items: center;
     gap: 12px;
     padding: 56px 28px;
+    font-family: var(--font-ui);
     text-align: center;
   }
-  .success[hidden] { display: none; }
-  .success-icon {
+  .result h3 { font-size: 1.6rem; }
+  .result p { max-width: 420px; }
+  .result-summary { font-weight: 500; color: var(--color-ink); }
+  .result-icon {
     display: grid;
     place-items: center;
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: var(--color-forest);
-    color: var(--color-cream);
+    color: #ffffff;
     font-size: 1.5rem;
   }
-  .success h3 { font-size: 1.75rem; }
-  .success-summary { font-weight: 500; color: var(--color-ink); }
-  .success form { margin-top: 12px; }
+  .result-icon--ok { background: #46955a; }
+  .result-icon--wait { background: var(--color-gold); }
+  .result .btn { margin-top: 12px; }
 
   /* ---------- Phone ---------- */
   @media (max-width: 640px) {
     .booking-header { align-items: flex-start; padding: 20px; }
     .avatar { width: 44px; height: 44px; font-size: 1rem; }
     .meet-badge { display: none; }
-
     .picker { grid-template-columns: 1fr; }
-    .calendar {
-      padding: 20px;
-      border-right: 0;
-      border-bottom: 1px solid var(--color-sand);
-    }
-    .slots,
-    .details { padding: 20px; }
-
-    /* Time slots as a compact 3-column grid instead of a long list */
+    .calendar { padding: 20px; border-right: 0; border-bottom: 1px solid var(--color-sand); }
+    .slots, .details { padding: 20px; }
     .slot-list {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -471,96 +542,128 @@
 </style>
 
 <script>
-  // ============ SETTINGS: confirm these with the client ============
-  const TIME_SLOTS = ["7:00 AM", "8:30 AM", "10:00 AM", "11:30 AM", "2:00 PM", "4:00 PM", "5:30 PM"];
-  const CLOSED_WEEKDAYS: number[] = [];  // 0 = Sunday … 6 = Saturday. Example: [0] closes Sundays
-  const MIN_DAYS_AHEAD = 1;              // earliest bookable day: 1 = tomorrow
-  const MONTHS_SHOWN = 3;                // this month + the next 2
-  const DEFAULT_PROGRAMME = "General consultation";
-  const SESSION_MINUTES = 45;            // length of a consultation, used for the calendar event
-  // ================================================================
+  import QRCode from "qrcode";
+  import {
+    TIME_SLOTS,
+    CLOSED_WEEKDAYS,
+    MIN_DAYS_AHEAD,
+    MONTHS_SHOWN,
+    DEFAULT_PROGRAMME,
+    formatTime,
+  } from "../config/booking.mjs";
+
+  const API = "/.netlify/functions";
+
+  type Hold = {
+    date: string;
+    time: string;
+    amount: number;
+    expiresAt: number;
+    holdToken: string;
+    orderId: string;
+    qrData: string;
+    intentUrl: string;
+    programme: string;
+  };
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
   const dialog = document.getElementById("booking-modal") as HTMLDialogElement | null;
-  const form = document.getElementById("booking-form") as HTMLFormElement | null;
 
-  if (dialog && form) {
-    const monthLabel = document.getElementById("cal-month") as HTMLElement;
-    const grid = document.getElementById("cal-grid") as HTMLElement;
-    const prevBtn = document.getElementById("cal-prev") as HTMLButtonElement;
-    const nextBtn = document.getElementById("cal-next") as HTMLButtonElement;
-    const slotDay = document.getElementById("slot-day") as HTMLElement;
-    const slotList = document.getElementById("slot-list") as HTMLElement;
-    const submitBtn = document.getElementById("booking-submit") as HTMLButtonElement;
-    const hint = document.getElementById("booking-hint") as HTMLElement;
-    const meta = document.getElementById("booking-meta") as HTMLElement;
-    const programmeInput = document.getElementById("booking-programme") as HTMLInputElement;
-    const dateInput = document.getElementById("booking-date") as HTMLInputElement;
-    const timeInput = document.getElementById("booking-time") as HTMLInputElement;
-    const success = document.getElementById("booking-success") as HTMLElement;
-    const summary = document.getElementById("booking-summary") as HTMLElement;
+  if (dialog) {
+    const form = $<HTMLFormElement>("booking-form");
+    const payView = $<HTMLElement>("pay-view");
+    const doneView = $<HTMLElement>("done-view");
+    const expiredView = $<HTMLElement>("expired-view");
 
-        const startInput = document.getElementById("booking-start") as HTMLInputElement;
-    const endInput = document.getElementById("booking-end") as HTMLInputElement;
+    const monthLabel = $<HTMLElement>("cal-month");
+    const grid = $<HTMLElement>("cal-grid");
+    const prevBtn = $<HTMLButtonElement>("cal-prev");
+    const nextBtn = $<HTMLButtonElement>("cal-next");
+    const slotDay = $<HTMLElement>("slot-day");
+    const slotList = $<HTMLElement>("slot-list");
+    const submitBtn = $<HTMLButtonElement>("booking-submit");
+    const hint = $<HTMLElement>("booking-hint");
+    const meta = $<HTMLElement>("booking-meta");
+    const programmeInput = $<HTMLInputElement>("booking-programme");
+    const nameInput = $<HTMLInputElement>("booking-name");
+    const emailInput = $<HTMLInputElement>("booking-email");
+    const phoneInput = $<HTMLInputElement>("booking-phone");
+    const optIn = $<HTMLInputElement>("booking-optin");
 
-    // Turns a day + "7:00 AM" into "2026-09-25T07:00:00+05:30" (India time)
-    const toIndiaTime = (date: Date, time: string, addMinutes = 0) => {
-      const [clock, period] = time.split(" ");
-      let [hours, minutes] = clock.split(":").map(Number);
-      if (period === "PM" && hours !== 12) hours += 12;
-      if (period === "AM" && hours === 12) hours = 0;
-
-      const total = hours * 60 + minutes + addMinutes;
-      const pad = (n: number) => String(n).padStart(2, "0");
-      return (
-        `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` +
-        `T${pad(Math.floor(total / 60))}:${pad(total % 60)}:00+05:30`
-      );
-    };
+    const payAmount = $<HTMLElement>("pay-amount");
+    const paySummary = $<HTMLElement>("pay-summary");
+    const payQr = $<HTMLImageElement>("pay-qr");
+    const payIntent = $<HTMLAnchorElement>("pay-intent");
+    const payCountdown = $<HTMLElement>("pay-countdown");
+    const payStatus = $<HTMLElement>("pay-status");
+    const mockPayBtn = $<HTMLButtonElement>("mock-pay-btn");
+    const doneSummary = $<HTMLElement>("done-summary");
 
     // ---------- Date helpers ----------
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const firstBookable = new Date(today);
     firstBookable.setDate(today.getDate() + MIN_DAYS_AHEAD);
-
-    // Months counted as one number (year × 12 + month) makes comparing easy
-    const monthNumber = (year: number, month: number) => year * 12 + month;
+    const monthNumber = (y: number, m: number) => y * 12 + m;
     const firstMonth = monthNumber(today.getFullYear(), today.getMonth());
     const lastMonth = firstMonth + MONTHS_SHOWN - 1;
 
-    const isBookable = (date: Date) =>
-      date >= firstBookable &&
-      !CLOSED_WEEKDAYS.includes(date.getDay()) &&
-      monthNumber(date.getFullYear(), date.getMonth()) <= lastMonth;
+    const isBookable = (d: Date) =>
+      d >= firstBookable &&
+      !CLOSED_WEEKDAYS.includes(d.getDay()) &&
+      monthNumber(d.getFullYear(), d.getMonth()) <= lastMonth;
 
-    const longDate = (date: Date) =>
-      date.toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-    const shortDate = (date: Date) =>
-      date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const isoDate = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const longDate = (d: Date) =>
+      d.toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    const shortDate = (d: Date) => d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+    const fromIso = (iso: string) => new Date(`${iso}T00:00:00`);
 
     const findFirstAvailable = () => {
-      const date = new Date(firstBookable);
+      const d = new Date(firstBookable);
       for (let i = 0; i < 120; i++) {
-        if (isBookable(date)) return date;
-        date.setDate(date.getDate() + 1);
+        if (isBookable(d)) return d;
+        d.setDate(d.getDate() + 1);
       }
       return null;
     };
 
-    // ---------- State: what the visitor has chosen ----------
+    // "98765 43210" → "+919876543210"
+    const toWhatsAppNumber = (raw: string) => {
+      const trimmed = raw.trim();
+      if (trimmed.startsWith("+")) return "+" + trimmed.replace(/\D/g, "");
+      const digits = trimmed.replace(/\D/g, "").replace(/^0+/, "");
+      if (digits.length === 10) return "+91" + digits;
+      return digits ? "+" + digits : "";
+    };
+
+    // ---------- State ----------
     let viewYear = today.getFullYear();
     let viewMonth = today.getMonth();
     let selectedDate: Date | null = null;
     let selectedTime: string | null = null;
+    let takenTimes: string[] = [];
+    let loadingSlots = false;
+    let currentHold: Hold | null = null;
+    let pollTimer: number | undefined;
+    let countdownTimer: number | undefined;
 
-    // ---------- Drawing the calendar ----------
+    // ---------- Switching views ----------
+    const show = (view: "form" | "pay" | "done" | "expired") => {
+      form.hidden = view !== "form";
+      payView.hidden = view !== "pay";
+      doneView.hidden = view !== "done";
+      expiredView.hidden = view !== "expired";
+    };
+
+    // ---------- Calendar ----------
     const renderCalendar = () => {
       monthLabel.textContent = new Date(viewYear, viewMonth, 1)
         .toLocaleDateString("en-US", { month: "long", year: "numeric" });
-
       grid.replaceChildren();
 
-      // Empty cells before the 1st, so it lands under the right weekday
       const offset = new Date(viewYear, viewMonth, 1).getDay();
       for (let i = 0; i < offset; i++) grid.append(document.createElement("span"));
 
@@ -572,10 +675,7 @@
         button.textContent = String(day);
         button.setAttribute("aria-label", longDate(date));
         button.disabled = !isBookable(date);
-        button.setAttribute(
-          "aria-pressed",
-          String(selectedDate !== null && date.getTime() === selectedDate.getTime())
-        );
+        button.setAttribute("aria-pressed", String(selectedDate?.getTime() === date.getTime()));
         button.addEventListener("click", () => selectDate(date));
         grid.append(button);
       }
@@ -585,74 +685,65 @@
       nextBtn.disabled = current >= lastMonth;
     };
 
-    // ---------- Drawing the time slots ----------
+    // ---------- Time slots (taken ones crossed out) ----------
     const renderSlots = () => {
       slotList.replaceChildren();
 
-      if (!selectedDate) {
-        slotDay.textContent = "Choose a date";
+      if (!selectedDate || loadingSlots) {
+        slotDay.textContent = selectedDate ? shortDate(selectedDate) : "Choose a date";
         const message = document.createElement("p");
         message.className = "slot-empty";
-        message.textContent = "Pick a day on the calendar to see available times.";
+        message.textContent = selectedDate ? "Checking available times…" : "Pick a day to see available times.";
         slotList.append(message);
         return;
       }
 
       slotDay.textContent = shortDate(selectedDate);
-      const day = selectedDate;   // remember the day for the click handlers below
-      TIME_SLOTS.forEach((time) => {
+      for (const time of TIME_SLOTS) {
+        const isTaken = takenTimes.includes(time);
         const button = document.createElement("button");
         button.type = "button";
-        button.textContent = time;
+        button.textContent = formatTime(time);
+        button.disabled = isTaken;
+        if (isTaken) button.setAttribute("aria-label", `${formatTime(time)}, not available`);
         button.setAttribute("aria-pressed", String(time === selectedTime));
         button.addEventListener("click", () => {
           selectedTime = time;
-          timeInput.value = `${time} (India time)`;
-          startInput.value = toIndiaTime(day, time);
-          endInput.value = toIndiaTime(day, time, SESSION_MINUTES);
           renderSlots();
           updateSubmit();
         });
         slotList.append(button);
-      });
+      }
     };
 
-    // ---------- Enabling the button and updating the hint ----------
     const updateSubmit = () => {
       submitBtn.disabled = !(selectedDate && selectedTime);
       if (!selectedDate) hint.textContent = "Select a date to continue";
       else if (!selectedTime) hint.textContent = "Select a time slot to continue";
-      else hint.textContent = `${shortDate(selectedDate)} at ${selectedTime} (India time)`;
+      else hint.textContent = `${shortDate(selectedDate)} at ${formatTime(selectedTime)} (India time)`;
     };
 
-    const selectDate = (date: Date) => {
+    // Asks the server which times are taken on the chosen day
+    const selectDate = async (date: Date) => {
       selectedDate = date;
       selectedTime = null;
-      dateInput.value = longDate(date);
-      timeInput.value = "";
-      startInput.value = "";
-      endInput.value = "";
+      takenTimes = [];
+      loadingSlots = true;
       renderCalendar();
       renderSlots();
       updateSubmit();
-    };
 
-    // ---------- Reset to a fresh form (used at start and after a booking) ----------
-    const reset = () => {
-      form.reset();
-      form.hidden = false;
-      success.hidden = true;
-      selectedTime = null;
-      selectedDate = null;
-      const first = findFirstAvailable();
-      if (first) {
-        viewYear = first.getFullYear();
-        viewMonth = first.getMonth();
-        selectDate(first);
-      } else {
-        renderCalendar();
+      try {
+        const response = await fetch(`${API}/availability?date=${isoDate(date)}`);
+        if (response.ok) takenTimes = (await response.json()).taken ?? [];
+      } catch {
+        // If checking fails, the server still double-checks when booking
+      }
+
+      // Only show the result if the visitor hasn't picked another day meanwhile
+      if (selectedDate === date) {
+        loadingSlots = false;
         renderSlots();
-        updateSubmit();
       }
     };
 
@@ -667,73 +758,203 @@
       renderCalendar();
     });
 
-    // ---------- Opening the popup from any "Book a Slot" link ----------
+    optIn.addEventListener("change", () => { phoneInput.required = optIn.checked; });
+
+    // ---------- Back to the start ----------
+    const resetToForm = () => {
+      stopTimers();
+      currentHold = null;
+      show("form");
+      submitBtn.disabled = true;
+      const first = selectedDate ?? findFirstAvailable();
+      if (first) {
+        viewYear = first.getFullYear();
+        viewMonth = first.getMonth();
+        selectDate(first);
+      }
+    };
+
+    // ---------- 1 → 2: hold the slot and show the payment ----------
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!selectedDate || !selectedTime) return;
+
+      submitBtn.disabled = true;
+      hint.textContent = "Reserving your slot…";
+
+      try {
+        const response = await fetch(`${API}/hold-slot`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            date: isoDate(selectedDate),
+            time: selectedTime,
+            name: nameInput.value,
+            email: emailInput.value,
+            whatsapp: optIn.checked ? toWhatsAppNumber(phoneInput.value) : phoneInput.value,
+            whatsappOptIn: optIn.checked,
+            programme: programmeInput.value,
+          }),
+        });
+        const data = await response.json();
+
+        if (response.status === 409) {
+          // Someone else just took this slot: show the updated times
+          hint.textContent = data.error;
+          await selectDate(selectedDate);
+          return;
+        }
+        if (!response.ok) {
+          hint.textContent = data.error ?? "Something went wrong. Please try again.";
+          submitBtn.disabled = false;
+          return;
+        }
+
+        currentHold = { ...data, programme: programmeInput.value };
+        await showPayment();
+      } catch {
+        hint.textContent = "Connection problem. Please try again.";
+        submitBtn.disabled = false;
+      }
+    });
+
+    // ---------- 2. Payment screen ----------
+    const showPayment = async () => {
+      if (!currentHold) return;
+      const hold = currentHold;
+
+      payAmount.textContent = `₹${hold.amount}`;
+      paySummary.textContent =
+        `${hold.programme} · ${longDate(fromIso(hold.date))} at ${formatTime(hold.time)} (India time)`;
+      payQr.src = await QRCode.toDataURL(hold.qrData, {
+        width: 440,
+        margin: 1,
+        color: { dark: "#1e2e20", light: "#ffffff" },
+      });
+      payIntent.href = hold.intentUrl;
+      payStatus.textContent = "Waiting for payment…";
+      mockPayBtn.hidden = !import.meta.env.DEV;   // test button only on your computer
+
+      show("pay");
+      startTimers();
+    };
+
+    const startTimers = () => {
+      stopTimers();
+      tickCountdown();
+      countdownTimer = window.setInterval(tickCountdown, 1000);
+      pollTimer = window.setInterval(checkStatus, 3000);
+    };
+
+    const stopTimers = () => {
+      window.clearInterval(countdownTimer);
+      window.clearInterval(pollTimer);
+    };
+
+    const tickCountdown = () => {
+      if (!currentHold) return;
+      const remaining = Math.max(0, currentHold.expiresAt - Date.now());
+      const minutes = Math.floor(remaining / 60000);
+      const seconds = Math.floor((remaining % 60000) / 1000);
+      payCountdown.textContent = `${minutes}:${pad(seconds)}`;
+      if (remaining === 0) checkStatus();   // let the server have the final word
+    };
+
+    // Asks the server: is it paid yet?
+    const checkStatus = async () => {
+      if (!currentHold) return;
+      const hold = currentHold;
+      try {
+        const response = await fetch(
+          `${API}/booking-status?date=${hold.date}&time=${hold.time}&token=${hold.holdToken}`
+        );
+        if (!response.ok) return;
+        const { status } = await response.json();
+
+        if (status === "confirmed") {
+          stopTimers();
+          doneSummary.textContent =
+            `${hold.programme} · ${longDate(fromIso(hold.date))} at ${formatTime(hold.time)} (India time)`;
+          currentHold = null;
+          show("done");
+        } else if (status === "expired") {
+          stopTimers();
+          currentHold = null;
+          show("expired");
+        }
+      } catch {
+        // Network hiccup: simply try again at the next check
+      }
+    };
+
+    // Test mode only: pretend the payment arrived
+    mockPayBtn.addEventListener("click", async () => {
+      if (!currentHold) return;
+      payStatus.textContent = "Simulating payment…";
+      await fetch(`${API}/mock-pay`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: currentHold.orderId }),
+      });
+      await checkStatus();
+    });
+
+    $<HTMLButtonElement>("pay-back").addEventListener("click", () => {
+      if (window.confirm("Choose a different time? This slot will be released automatically within 15 minutes.")) {
+        resetToForm();
+      }
+    });
+    $<HTMLButtonElement>("expired-retry").addEventListener("click", resetToForm);
+
+    // ---------- Opening the popup from any "Book" link ----------
     document.addEventListener("click", (event) => {
       const link = (event.target as Element).closest('a[href="#book"]');
       if (!link) return;
       event.preventDefault();
 
-      // Work out which programme the visitor clicked on (if any)
+      // Which programme was clicked?
       const fromAttribute = (link as HTMLElement).dataset.programme;
       const cardTitle = link.closest(".card")?.querySelector("h3")?.textContent?.trim();
       let programme = DEFAULT_PROGRAMME;
       if (fromAttribute) programme = fromAttribute;
       else if (cardTitle) programme = cardTitle;
-      else if (link.closest("#numerology")) programme = "Numerology consultation";
-
       programmeInput.value = programme;
-      meta.textContent =
-        programme === DEFAULT_PROGRAMME
-          ? "Retreat Consultation · 45 min · Free Consultation"
-          : `${programme} · 45 min · Free Consultation`;
+      meta.textContent = `${programme} · 45 min`;
 
       dialog.showModal();
+
+      // Still paying for an earlier slot? Go back to that payment
+      if (currentHold && Date.now() < currentHold.expiresAt) {
+        show("pay");
+        startTimers();
+      } else if (form.hidden) {
+        resetToForm();
+      }
     });
 
-    // Close when clicking the dark area outside the box
     dialog.addEventListener("click", (event) => {
       if (event.target === dialog) dialog.close();
     });
 
-    // After a successful booking, start fresh next time
+    // Pause the checking while the popup is closed (it resumes when reopened)
     dialog.addEventListener("close", () => {
-      if (!success.hidden) reset();
-    });
-
-    // ---------- Sending the request ----------
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const date = selectedDate;
-      const time = selectedTime;
-      if (!date || !time) return;
-
-      submitBtn.disabled = true;
-      hint.textContent = "Sending your request…";
-
-      try {
-        if (import.meta.env.DEV) {
-          // On your computer there's no Netlify, so we pretend it worked
-          await new Promise((resolve) => setTimeout(resolve, 600));
-        } else {
-          const body = new URLSearchParams();
-          new FormData(form).forEach((value, key) => body.append(key, String(value)));
-          const response = await fetch("/", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: body.toString(),
-          });
-          if (!response.ok) throw new Error(`Status ${response.status}`);
-        }
-
-        summary.textContent = `${longDate(date)} at ${time} (India time) · ${programmeInput.value}`;
-        form.hidden = true;
-        success.hidden = false;
-      } catch {
-        hint.textContent = "Sorry, something went wrong. Please try again, or message us on WhatsApp.";
-        submitBtn.disabled = false;
+      stopTimers();
+      if (!doneView.hidden || !expiredView.hidden) {
+        form.reset();
+        phoneInput.required = false;
+        show("form");
       }
     });
 
-    reset();
+    // ---------- Start ----------
+    const first = findFirstAvailable();
+    if (first) {
+      viewYear = first.getFullYear();
+      viewMonth = first.getMonth();
+      selectDate(first);
+    } else {
+      renderCalendar();
+      renderSlots();
+    }
   }
 </script>

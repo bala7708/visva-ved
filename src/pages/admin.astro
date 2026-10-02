@@ -1,0 +1,525 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Admin | Visva Ved" noindex>
+  <div class="admin-app">
+    <!-- ========== Login ========== -->
+    <section id="login-view" class="login" hidden>
+      <form id="login-form" class="login-card">
+        <p class="eyebrow">Visva Ved</p>
+        <h1>Admin</h1>
+        <label for="admin-password">Password</label>
+        <input id="admin-password" type="password" autocomplete="current-password" required />
+        <button class="btn btn--saffron" type="submit">Log in</button>
+        <p id="login-error" class="login-error" role="alert"></p>
+      </form>
+    </section>
+
+    <!-- ========== Dashboard ========== -->
+    <section id="dashboard-view" hidden>
+      <header class="topbar">
+        <p class="brand">Visva Ved <span>· Bookings</span></p>
+        <div class="topbar-actions">
+          <button id="refresh-btn" class="topbar-btn" type="button">Refresh</button>
+          <button id="logout-btn" class="topbar-btn" type="button">Log out</button>
+        </div>
+      </header>
+
+      <main class="dash">
+        <ul class="stats">
+          <li><span class="stat-label">Today</span><span class="stat-value" id="stat-today">–</span></li>
+          <li><span class="stat-label">Upcoming confirmed</span><span class="stat-value" id="stat-upcoming">–</span></li>
+          <li><span class="stat-label">Awaiting payment</span><span class="stat-value" id="stat-pending">–</span></li>
+          <li><span class="stat-label">Revenue this month</span><span class="stat-value" id="stat-revenue">–</span></li>
+        </ul>
+
+        <div class="filters" role="group" aria-label="Filter bookings">
+          <button type="button" data-filter="upcoming" aria-pressed="true">Upcoming</button>
+          <button type="button" data-filter="pending" aria-pressed="false">Awaiting payment</button>
+          <button type="button" data-filter="past" aria-pressed="false">Past</button>
+          <button type="button" data-filter="cancelled" aria-pressed="false">Cancelled</button>
+          <button type="button" data-filter="all" aria-pressed="false">All</button>
+        </div>
+
+        <p id="list-message" class="list-message" role="status"></p>
+
+        <div class="table-wrap">
+          <table class="bookings">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Client</th>
+                <th>Programme</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody id="bookings-body"></tbody>
+          </table>
+        </div>
+
+        <p class="note">
+          Cancelling frees the slot but does not refund the payment. Refunds for online payments
+          are made in the PhonePe dashboard.
+        </p>
+      </main>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import { formatTime } from "../config/booking.mjs";
+
+  type Booking = {
+    key: string;
+    date: string;
+    time: string;
+    name: string;
+    email: string;
+    whatsapp: string;
+    programme: string;
+    amount: number;
+    orderId: string;
+    status: "pending" | "expired" | "confirmed" | "cancelled";
+    confirmedBy: string | null;
+  };
+
+  const API = "/.netlify/functions";
+  const loginView = document.getElementById("login-view") as HTMLElement;
+  const dashboardView = document.getElementById("dashboard-view") as HTMLElement;
+  const loginForm = document.getElementById("login-form") as HTMLFormElement;
+  const passwordInput = document.getElementById("admin-password") as HTMLInputElement;
+  const loginError = document.getElementById("login-error") as HTMLElement;
+  const tbody = document.getElementById("bookings-body") as HTMLElement;
+  const listMessage = document.getElementById("list-message") as HTMLElement;
+  const filterButtons = document.querySelectorAll<HTMLButtonElement>("[data-filter]");
+
+  let bookings: Booking[] = [];
+  let filter = "upcoming";
+  let autoRefresh: number | undefined;
+
+  // Today's date in India as "2026-10-02", and this month as "2026-10"
+  const today = () => new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+  const rupees = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
+  const prettyDate = (date: string) =>
+    new Date(`${date}T00:00:00`).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+
+  const statusLabels: Record<Booking["status"], string> = {
+    pending: "Awaiting payment",
+    expired: "Expired",
+    confirmed: "Confirmed",
+    cancelled: "Cancelled",
+  };
+
+  // ---------- Switching between login and dashboard ----------
+  const showLogin = () => {
+    dashboardView.hidden = true;
+    loginView.hidden = false;
+    window.clearInterval(autoRefresh);
+    passwordInput.focus();
+  };
+  const showDashboard = () => {
+    loginView.hidden = true;
+    dashboardView.hidden = false;
+  };
+
+  // ---------- Loading the bookings ----------
+  async function load() {
+    const response = await fetch(`${API}/admin-bookings`);
+    if (response.status === 401) return showLogin();
+    if (!response.ok) {
+      listMessage.textContent = "Could not load bookings. Please try again.";
+      return;
+    }
+    bookings = (await response.json()).bookings;
+    showDashboard();
+    renderStats();
+    renderList();
+  }
+
+  // ---------- The four figures at the top ----------
+  function renderStats() {
+    const t = today();
+    const month = t.slice(0, 7);
+    const confirmed = bookings.filter((b) => b.status === "confirmed");
+
+    (document.getElementById("stat-today") as HTMLElement).textContent =
+      String(confirmed.filter((b) => b.date === t).length);
+    (document.getElementById("stat-upcoming") as HTMLElement).textContent =
+      String(confirmed.filter((b) => b.date >= t).length);
+    (document.getElementById("stat-pending") as HTMLElement).textContent =
+      String(bookings.filter((b) => b.status === "pending").length);
+    (document.getElementById("stat-revenue") as HTMLElement).textContent =
+      rupees.format(confirmed.filter((b) => b.date.startsWith(month)).reduce((sum, b) => sum + b.amount, 0));
+  }
+
+  // ---------- The list ----------
+  function visibleBookings() {
+    const t = today();
+    switch (filter) {
+      case "upcoming":
+        return bookings.filter((b) => b.date >= t && (b.status === "confirmed" || b.status === "pending"));
+      case "pending":
+        return bookings.filter((b) => b.status === "pending");
+      case "past":
+        return bookings.filter((b) => b.date < t && b.status === "confirmed").reverse();
+      case "cancelled":
+        return bookings.filter((b) => b.status === "cancelled");
+      default:
+        return bookings;
+    }
+  }
+
+  // Creates a table cell with a label (the label is shown on phones)
+  function cell(label: string, ...children: (Node | string)[]) {
+    const td = document.createElement("td");
+    td.dataset.label = label;
+    td.append(...children);
+    return td;
+  }
+
+  function element(tag: string, className: string, text: string) {
+    const el = document.createElement(tag);
+    el.className = className;
+    el.textContent = text;       // textContent: visitor-typed names are shown as plain text, never as code
+    return el;
+  }
+
+  function actionButton(label: string, kind: "confirm" | "cancel", booking: Booking) {
+    const button = element("button", `act act--${kind}`, label) as HTMLButtonElement;
+    button.type = "button";
+    button.addEventListener("click", () => updateBooking(booking, kind));
+    return button;
+  }
+
+  function renderList() {
+    const list = visibleBookings();
+    tbody.replaceChildren();
+    listMessage.textContent = list.length === 0 ? "No bookings here yet." : "";
+
+    for (const b of list) {
+      const tr = document.createElement("tr");
+
+      const client = document.createElement("div");
+      client.append(
+        element("span", "client-name", b.name),
+        element("span", "client-detail", b.email),
+      );
+      if (b.whatsapp) client.append(element("span", "client-detail", `WhatsApp: ${b.whatsapp}`));
+
+      const badge = element("span", `badge badge--${b.status}`, statusLabels[b.status]);
+      const statusCell = cell("Status", badge);
+      if (b.confirmedBy === "admin") statusCell.append(element("span", "client-detail", "manually"));
+
+      const actions = document.createElement("div");
+      actions.className = "row-actions";
+      if (b.status === "pending" || b.status === "expired") actions.append(actionButton("Confirm", "confirm", b));
+      if (b.status !== "cancelled") actions.append(actionButton("Cancel", "cancel", b));
+
+      tr.append(
+        cell("Date", prettyDate(b.date)),
+        cell("Time", formatTime(b.time)),
+        cell("Client", client),
+        cell("Programme", b.programme),
+        cell("Amount", rupees.format(b.amount)),
+        statusCell,
+        cell("Actions", actions),
+      );
+      tbody.append(tr);
+    }
+  }
+
+  // ---------- Confirm / cancel ----------
+  async function updateBooking(booking: Booking, action: "confirm" | "cancel") {
+    const question =
+      action === "confirm"
+        ? `Confirm the booking of ${booking.name} on ${prettyDate(booking.date)} at ${formatTime(booking.time)}?`
+        : `Cancel the booking of ${booking.name}? The slot becomes available again.`;
+    if (!window.confirm(question)) return;
+
+    const response = await fetch(`${API}/admin-update`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: booking.key, action }),
+    });
+    if (response.status === 401) return showLogin();
+    if (!response.ok) {
+      const { error } = await response.json();
+      window.alert(error ?? "Something went wrong.");
+    }
+    await load();
+  }
+
+  // ---------- Events ----------
+  loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    loginError.textContent = "";
+    const response = await fetch(`${API}/admin-login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: passwordInput.value }),
+    });
+    if (response.ok) {
+      passwordInput.value = "";
+      await load();
+      autoRefresh = window.setInterval(load, 60_000);   // refresh every minute
+    } else {
+      loginError.textContent = "Incorrect password.";
+    }
+  });
+
+  document.getElementById("logout-btn")?.addEventListener("click", async () => {
+    await fetch(`${API}/admin-logout`, { method: "POST" });
+    showLogin();
+  });
+
+  document.getElementById("refresh-btn")?.addEventListener("click", load);
+
+  filterButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      filter = button.dataset.filter ?? "upcoming";
+      filterButtons.forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
+      renderList();
+    });
+  });
+
+  // On page load: already logged in? Show the dashboard. Otherwise, the login form.
+  load().then(() => {
+    if (!dashboardView.hidden) autoRefresh = window.setInterval(load, 60_000);
+  });
+</script>
+
+<style is:global>
+  /* All admin styles start with .admin-app, so they can't affect the public website */
+  .admin-app [hidden] { display: none !important; }
+
+  .admin-app {
+    min-height: 100vh;
+    font-family: var(--font-ui);
+    color: var(--color-ink);
+  }
+
+  /* ---------- Login ---------- */
+  .admin-app .login {
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    padding: 24px;
+    background: var(--color-forest);
+  }
+  .admin-app .login-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: min(380px, 100%);
+    padding: 40px 32px;
+    background: var(--color-page);
+    border-top: 3px solid var(--color-gold);
+  }
+  .admin-app .login-card h1 {
+    margin-bottom: 12px;
+    font-size: 2rem;
+  }
+  .admin-app .login-card label { font-size: 0.8rem; }
+  .admin-app .login-card input {
+    padding: 12px 14px;
+    border: 1px solid #d8ccb3;
+    background: #ffffff;
+  }
+  .admin-app .login-card input:focus { outline: none; border-color: var(--color-gold); }
+  .admin-app .login-error {
+    min-height: 1.2em;
+    font-size: 0.85rem;
+    color: #b3261e;
+  }
+
+  /* ---------- Top bar ---------- */
+  .admin-app .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 32px;
+    background: var(--color-forest);
+  }
+  .admin-app .brand {
+    font-family: var(--font-display);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+  }
+  .admin-app .brand span { color: rgba(245, 239, 226, 0.7); }
+  .admin-app .topbar-actions { display: flex; gap: 8px; }
+  .admin-app .topbar-btn {
+    padding: 6px 14px;
+    border: 1px solid rgba(245, 239, 226, 0.3);
+    background: none;
+    color: var(--color-cream);
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+  .admin-app .topbar-btn:hover { border-color: var(--color-gold); color: var(--color-gold); }
+
+  /* ---------- Dashboard ---------- */
+  .admin-app .dash {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+  }
+
+  .admin-app .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding: 0;
+    list-style: none;
+  }
+  .admin-app .stats li {
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #ece2cf;
+    border-top: 3px solid var(--color-gold);
+  }
+  .admin-app .stat-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8a8d7e;
+  }
+  .admin-app .stat-value {
+    display: block;
+    margin-top: 8px;
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+  }
+
+  .admin-app .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 32px 0 16px;
+  }
+  .admin-app .filters button {
+    padding: 8px 16px;
+    border: 1px solid #d8ccb3;
+    background: transparent;
+    color: var(--color-ink);
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+  .admin-app .filters button[aria-pressed="true"] {
+    border-color: var(--color-forest);
+    background: var(--color-forest);
+    color: var(--color-cream);
+  }
+
+  .admin-app .list-message {
+    margin: 16px 0;
+    color: #8a8d7e;
+  }
+
+  /* ---------- Table ---------- */
+  .admin-app .table-wrap {
+    overflow-x: auto;
+    background: #ffffff;
+    border: 1px solid #ece2cf;
+  }
+  .admin-app .bookings {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  .admin-app .bookings th {
+    padding: 12px 16px;
+    background: #f6f1e6;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-align: left;
+    text-transform: uppercase;
+    color: #6b725f;
+  }
+  .admin-app .bookings td {
+    padding: 14px 16px;
+    border-top: 1px solid #f0e8d7;
+    vertical-align: top;
+  }
+  .admin-app .client-name { display: block; font-weight: 500; }
+  .admin-app .client-detail {
+    display: block;
+    font-size: 0.78rem;
+    color: #8a8d7e;
+  }
+
+  .admin-app .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .admin-app .badge--confirmed { background: #e3f1e6; color: #2f6b3f; }
+  .admin-app .badge--pending { background: #fdf1d9; color: #8a5a00; }
+  .admin-app .badge--expired { background: #eeeeea; color: #666666; }
+  .admin-app .badge--cancelled { background: #fbe4e2; color: #9b2c22; }
+
+  .admin-app .row-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .admin-app .act {
+    padding: 6px 12px;
+    border: 1px solid;
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+  .admin-app .act--confirm { border-color: #46955a; background: #46955a; color: #ffffff; }
+  .admin-app .act--confirm:hover { background: #3a7f4b; }
+  .admin-app .act--cancel { border-color: #e6b8b3; background: transparent; color: #9b2c22; }
+  .admin-app .act--cancel:hover { background: #fbe4e2; }
+
+  .admin-app .note {
+    margin-top: 16px;
+    font-size: 0.8rem;
+    color: #8a8d7e;
+  }
+
+  /* ---------- Phone: figures in 2×2, table becomes cards ---------- */
+  @media (max-width: 720px) {
+    .admin-app .topbar { padding: 14px 16px; }
+    .admin-app .stats { grid-template-columns: repeat(2, 1fr); }
+    .admin-app .bookings thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+    .admin-app .bookings tr {
+      display: block;
+      padding: 8px 0;
+      border-top: 1px solid #ece2cf;
+    }
+    .admin-app .bookings td {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 6px 16px;
+      border: 0;
+      text-align: right;
+    }
+    .admin-app .bookings td::before {
+      content: attr(data-label);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #8a8d7e;
+    }
+    .admin-app .row-actions { justify-content: flex-end; }
+  }
+</style>
