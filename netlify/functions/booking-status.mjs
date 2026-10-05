@@ -1,5 +1,6 @@
 import { store, slotKey, json } from "../lib/bookings.mjs";
 import { getPaymentState } from "../lib/payments.mjs";
+import { onBookingConfirmed } from "../lib/on-confirmed.mjs";
 
 // GET /.netlify/functions/booking-status?date=…&time=…&token=…
 // Answers: "pending", "verifying", "confirmed" or "expired".
@@ -26,7 +27,8 @@ export default async (req) => {
 
     if (state === "COMPLETED") {
       const updated = { ...booking, status: "confirmed", paidAt: Date.now() };
-      await bookings.setJSON(key, updated, { onlyIfMatch: saved.etag });
+      const result = await bookings.setJSON(key, updated, { onlyIfMatch: saved.etag });
+      if (result?.modified) await onBookingConfirmed(key);   // calendar, email, WhatsApp
       return json({ status: "confirmed" });
     }
 

@@ -29,6 +29,8 @@ export default async (req) => {
         amount: b.amount,
         orderId: b.orderId,
         utr: b.utr ?? null,
+        meetLink: b.meetLink ?? null,
+        notifyWarnings: b.notifyWarnings ?? [],
         status,
         confirmedBy: b.confirmedBy ?? null,
         createdAt: b.createdAt,

@@ -63,8 +63,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         </div>
 
         <p class="note">
-          Cancelling frees the slot but does not refund the payment. Refunds for online payments
-          are made in the PhonePe dashboard.
+          Cancelling frees the slot but does not refund the payment, and does not delete the
+          Google Calendar event. Refunds and calendar changes are made directly in UPI / Google Calendar.
         </p>
       </main>
     </section>
@@ -86,10 +86,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     amount: number;
     orderId: string;
     utr: string | null;
+    meetLink: string | null;
+    notifyWarnings: string[];
     status: Status;
     confirmedBy: string | null;
   };
-  type Action = "confirm" | "reject" | "cancel";
+  type Action = "confirm" | "reject" | "cancel" | "notify";
 
   const API = "/.netlify/functions";
   const loginView = document.getElementById("login-view") as HTMLElement;
@@ -165,9 +167,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     const t = today();
     switch (filter) {
       case "upcoming":
-        return bookings.filter(
-          (b) => b.date >= t && ["confirmed", "verifying", "pending"].includes(b.status)
-        );
+        return bookings.filter((b) => b.date >= t && ["confirmed", "verifying", "pending"].includes(b.status));
       case "verify":
         return bookings.filter((b) => b.status === "verifying");
       case "pending":
@@ -196,10 +196,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   }
 
   function actionButton(label: string, action: Action, booking: Booking) {
-    const style = action === "confirm" ? "confirm" : "cancel";
+    const style = action === "confirm" || action === "notify" ? "confirm" : "cancel";
     const button = element("button", `act act--${style}`, label) as HTMLButtonElement;
     button.type = "button";
-    button.addEventListener("click", () => updateBooking(booking, action));
+    button.addEventListener("click", () => updateBooking(booking, action, button));
     return button;
   }
 
@@ -211,20 +211,36 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     for (const b of list) {
       const tr = document.createElement("tr");
 
+      // Client
       const client = document.createElement("div");
       client.append(element("span", "client-name", b.name), element("span", "client-detail", b.email));
       if (b.whatsapp) client.append(element("span", "client-detail", `WhatsApp: ${b.whatsapp}`));
 
+      // Status, UTR, Meet link, warnings
       const statusCell = cell("Status", element("span", `badge badge--${b.status}`, statusLabels[b.status]));
       if (b.utr) statusCell.append(element("span", "utr", `UTR: ${b.utr}`));
       if (b.confirmedBy === "admin") statusCell.append(element("span", "client-detail", "confirmed manually"));
+      if (b.meetLink) {
+        const link = document.createElement("a");
+        link.href = b.meetLink;
+        link.target = "_blank";
+        link.rel = "noopener";
+        link.className = "meet-link";
+        link.textContent = "Google Meet link ↗";
+        statusCell.append(link);
+      }
+      for (const warning of b.notifyWarnings ?? []) {
+        statusCell.append(element("span", "warn", `⚠ ${warning}`));
+      }
 
+      // Actions
       const actions = document.createElement("div");
       actions.className = "row-actions";
       if (b.status === "verifying") {
         actions.append(actionButton("Accept", "confirm", b), actionButton("Reject", "reject", b));
       } else {
         if (b.status === "pending" || b.status === "expired") actions.append(actionButton("Confirm", "confirm", b));
+        if (b.status === "confirmed" && !b.meetLink) actions.append(actionButton("Send invite", "notify", b));
         if (b.status === "confirmed" || b.status === "pending") actions.append(actionButton("Cancel", "cancel", b));
       }
 
@@ -241,8 +257,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     }
   }
 
-  // ---------- Accept / reject / confirm / cancel ----------
-  async function updateBooking(booking: Booking, action: Action) {
+  // ---------- Accept / reject / confirm / cancel / send invite ----------
+  async function updateBooking(booking: Booking, action: Action, button: HTMLButtonElement) {
     const when = `${prettyDate(booking.date)} at ${formatTime(booking.time)}`;
     const questions: Record<Action, string> = {
       confirm: booking.utr
@@ -252,8 +268,14 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       reject: `Reject the payment from ${booking.name} (UTR ${booking.utr})?\n\n` +
         `Do this only if you can't find the payment. The slot becomes available again.`,
       cancel: `Cancel the booking of ${booking.name} on ${when}? The slot becomes available again.`,
+      notify: `Create the calendar event and Meet link for ${booking.name}, and send the confirmation?`,
     };
     if (!window.confirm(questions[action])) return;
+
+    // Calendar + email + WhatsApp can take a few seconds: show that something is happening
+    const originalLabel = button.textContent;
+    button.disabled = true;
+    button.textContent = "Working…";
 
     const response = await fetch(`${API}/admin-update`, {
       method: "POST",
@@ -261,10 +283,16 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       body: JSON.stringify({ key: booking.key, action }),
     });
     if (response.status === 401) return showLogin();
+
+    const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const { error } = await response.json();
-      window.alert(error ?? "Something went wrong.");
+      window.alert(data.error ?? "Something went wrong.");
+    } else if (data.warnings?.length) {
+      window.alert(`Saved, but some notifications need attention:\n\n• ${data.warnings.join("\n• ")}`);
     }
+
+    button.disabled = false;
+    button.textContent = originalLabel;
     await load();
   }
 
@@ -333,10 +361,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     background: var(--color-page);
     border-top: 3px solid var(--color-gold);
   }
-  .admin-app .login-card h1 {
-    margin-bottom: 12px;
-    font-size: 2rem;
-  }
+  .admin-app .login-card h1 { margin-bottom: 12px; font-size: 2rem; }
   .admin-app .login-card label { font-size: 0.8rem; }
   .admin-app .login-card input {
     padding: 12px 14px;
@@ -344,11 +369,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     background: #ffffff;
   }
   .admin-app .login-card input:focus { outline: none; border-color: var(--color-gold); }
-  .admin-app .login-error {
-    min-height: 1.2em;
-    font-size: 0.85rem;
-    color: #b3261e;
-  }
+  .admin-app .login-error { min-height: 1.2em; font-size: 0.85rem; color: #b3261e; }
 
   /* ---------- Top bar ---------- */
   .admin-app .topbar {
@@ -378,11 +399,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   .admin-app .topbar-btn:hover { border-color: var(--color-gold); color: var(--color-gold); }
 
   /* ---------- Dashboard ---------- */
-  .admin-app .dash {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 32px 24px 64px;
-  }
+  .admin-app .dash { max-width: 1200px; margin: 0 auto; padding: 32px 24px 64px; }
 
   .admin-app .stats {
     display: grid;
@@ -410,12 +427,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     font-size: 1.8rem;
   }
 
-  .admin-app .filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 32px 0 16px;
-  }
+  .admin-app .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 32px 0 16px; }
   .admin-app .filters button {
     padding: 8px 16px;
     border: 1px solid #d8ccb3;
@@ -430,22 +442,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     color: var(--color-cream);
   }
 
-  .admin-app .list-message {
-    margin: 16px 0;
-    color: #8a8d7e;
-  }
+  .admin-app .list-message { margin: 16px 0; color: #8a8d7e; }
 
   /* ---------- Table ---------- */
-  .admin-app .table-wrap {
-    overflow-x: auto;
-    background: #ffffff;
-    border: 1px solid #ece2cf;
-  }
-  .admin-app .bookings {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.875rem;
-  }
+  .admin-app .table-wrap { overflow-x: auto; background: #ffffff; border: 1px solid #ece2cf; }
+  .admin-app .bookings { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
   .admin-app .bookings th {
     padding: 12px 16px;
     background: #f6f1e6;
@@ -456,17 +457,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     text-transform: uppercase;
     color: #6b725f;
   }
-  .admin-app .bookings td {
-    padding: 14px 16px;
-    border-top: 1px solid #f0e8d7;
-    vertical-align: top;
-  }
+  .admin-app .bookings td { padding: 14px 16px; border-top: 1px solid #f0e8d7; vertical-align: top; }
   .admin-app .client-name { display: block; font-weight: 500; }
-  .admin-app .client-detail {
-    display: block;
-    font-size: 0.78rem;
-    color: #8a8d7e;
-  }
+  .admin-app .client-detail { display: block; font-size: 0.78rem; color: #8a8d7e; }
 
   .admin-app .badge {
     display: inline-block;
@@ -480,38 +473,30 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   .admin-app .badge--pending { background: #fdf1d9; color: #8a5a00; }
   .admin-app .badge--expired { background: #eeeeea; color: #666666; }
   .admin-app .badge--verifying { background: #e3edf7; color: #1f4e79; }
-  .admin-app .badge--rejected { background: #fbe4e2; color: #9b2c22; }
+  .admin-app .badge--rejected,
+  .admin-app .badge--cancelled { background: #fbe4e2; color: #9b2c22; }
+
   .admin-app .utr {
     display: block;
     margin-top: 6px;
-    font-family: ui-monospace, Consolas, monospace;   /* easy to compare digit by digit */
+    font-family: ui-monospace, Consolas, monospace;
     font-size: 0.8rem;
     color: var(--color-ink);
   }
+  .admin-app .meet-link { display: block; margin-top: 6px; font-size: 0.8rem; color: #1a73e8; }
+  .admin-app .warn { display: block; margin-top: 4px; font-size: 0.75rem; color: #8a5a00; }
 
-  .admin-app .row-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-  }
-  .admin-app .act {
-    padding: 6px 12px;
-    border: 1px solid;
-    font-size: 0.75rem;
-    cursor: pointer;
-  }
+  .admin-app .row-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+  .admin-app .act { padding: 6px 12px; border: 1px solid; font-size: 0.75rem; cursor: pointer; }
+  .admin-app .act:disabled { opacity: 0.6; cursor: wait; }
   .admin-app .act--confirm { border-color: #46955a; background: #46955a; color: #ffffff; }
   .admin-app .act--confirm:hover { background: #3a7f4b; }
   .admin-app .act--cancel { border-color: #e6b8b3; background: transparent; color: #9b2c22; }
   .admin-app .act--cancel:hover { background: #fbe4e2; }
 
-  .admin-app .note {
-    margin-top: 16px;
-    font-size: 0.8rem;
-    color: #8a8d7e;
-  }
+  .admin-app .note { margin-top: 16px; font-size: 0.8rem; color: #8a8d7e; }
 
-  /* ---------- Phone: figures in 2×2, table becomes cards ---------- */
+  /* ---------- Phone ---------- */
   @media (max-width: 720px) {
     .admin-app .topbar { padding: 14px 16px; }
     .admin-app .stats { grid-template-columns: repeat(2, 1fr); }
@@ -522,11 +507,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       overflow: hidden;
       clip: rect(0 0 0 0);
     }
-    .admin-app .bookings tr {
-      display: block;
-      padding: 8px 0;
-      border-top: 1px solid #ece2cf;
-    }
+    .admin-app .bookings tr { display: block; padding: 8px 0; border-top: 1px solid #ece2cf; }
     .admin-app .bookings td {
       display: flex;
       justify-content: space-between;
@@ -542,6 +523,5 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       text-transform: uppercase;
       color: #8a8d7e;
     }
-    .admin-app .row-actions { justify-content: flex-end; }
   }
 </style>
