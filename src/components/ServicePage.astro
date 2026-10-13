@@ -23,9 +23,9 @@ interface Props {
     subtitle: string;
     pattern?: string[];
     image?: ImageMetadata;
-    tint?: string;               // a colour OR a gradient behind the hero
-    opacity?: number;            // NEW: how strongly the photo shows (default 0.3)
-    shade?: boolean;             // NEW: darken the bottom of the photo
+    tint?: string;
+    opacity?: number;
+    shade?: boolean;
   };
   intro: {
     eyebrow: string;
@@ -35,7 +35,7 @@ interface Props {
     alt: string;
     reverse?: boolean;
     ratio?: string;
-    badge?: string;              // NEW: round badge on the photo, e.g. "XVII" (also switches to the arched frame)
+    badge?: string;
   };
   rooted?: {
     title: string;
@@ -46,7 +46,7 @@ interface Props {
     eyebrow?: string;
     title: string;
     intro?: string;
-    variant?: "directions" | "talks" | "energy";   // NEW: "energy" = centred cards (Tarot)
+    variant?: "directions" | "talks" | "energy" | "elements";   // NEW: "elements" (Vastu)
     items: CoreItem[];
   };
   discover?: {
@@ -139,7 +139,11 @@ const heroStyle = [
       class:list={[
         "section",
         "core",
-        { "core--talks": core.variant === "talks", "core--energy": core.variant === "energy" },
+        {
+          "core--talks": core.variant === "talks",
+          "core--energy": core.variant === "energy",
+          "core--elements": core.variant === "elements",
+        },
       ]}
     >
       <div class="container core-inner">
@@ -152,6 +156,7 @@ const heroStyle = [
             "core-grid--directions": core.variant === "directions",
             "core-grid--talks": core.variant === "talks",
             "core-grid--energy": core.variant === "energy",
+            "core-grid--elements": core.variant === "elements",
           },
         ]}>
           {core.items.map((item) => (
@@ -256,7 +261,6 @@ const heroStyle = [
     object-fit: cover;
     opacity: var(--hero-opacity, 0.3);
   }
-  /* NEW: darker towards the bottom, so the text stays readable on a bright photo */
   .page-hero--shade::after {
     content: "";
     position: absolute;
@@ -331,15 +335,12 @@ const heroStyle = [
   }
   .intro--reverse .intro-media { order: -1; }
 
-  /* NEW: arched frame behind the photo (Tarot) */
   .intro-media--arch { max-width: 446px; justify-self: center; }
   .intro-media--arch::after {
     inset: -24px -10px 10px 14px;
     border-radius: 999px 999px 0 0 / 160px 160px 0 0;
     z-index: -1;
   }
-
-  /* NEW: round badge on the photo's corner, e.g. "XVII" */
   .intro-badge {
     position: absolute;
     left: -28px;
@@ -427,7 +428,7 @@ const heroStyle = [
     white-space: pre-line;
   }
 
-  /* Directions version (Vastu) */
+  /* Directions version */
   .core-grid--directions { grid-template-columns: repeat(4, 1fr); gap: 14px; }
   .core-grid--directions .core-card { padding: 24px; }
   .core-icon { color: var(--accent, var(--color-gold)); }
@@ -478,7 +479,7 @@ const heroStyle = [
     color: #7a8e7b;
   }
 
-  /* NEW: Energy version (Tarot): centred titles and text, wider first column */
+  /* Energy version (Tarot) */
   .core--energy { background: #f7f1e1; }
   .core--energy .core-inner { max-width: 652px; }
   .core--energy .core-inner h2 { color: #5c3d1e; }
@@ -512,6 +513,50 @@ const heroStyle = [
     font-size: 11.5px;
     line-height: 1.6;
     color: #8a8d7e;
+  }
+
+  /* NEW: Elements version (Vastu): gold title, small subtitle, question below */
+  .core--elements { background: #f7f1e1; }
+  .core--elements .core-inner { max-width: 652px; }
+  .core--elements .core-inner h2 { color: #5c3d1e; }
+  .core-grid--elements {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 40px;
+  }
+  .core-grid--elements .core-card {
+    min-height: 142px;
+    padding: 30px 16px 26px;
+    background: #ffffff;
+    border: 1px solid #e3dccb;
+  }
+  .core-grid--elements h3 {
+    margin-top: 0;
+    font-family: "Cinzel", serif;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 1.25;
+    letter-spacing: 0;
+    text-transform: none;
+    color: #c9a84c;
+  }
+  .core-grid--elements .core-subtitle {
+    margin-top: 8px;
+    font-family: "Cinzel", serif;
+    font-style: normal;
+    font-size: 9.5px;
+    line-height: 1.5;
+    letter-spacing: 0.08em;
+    color: #2b2f22;
+  }
+  .core-grid--elements .core-text {
+    margin-top: 22px;
+    font-family: "Cinzel", serif;
+    font-style: normal;
+    font-size: 9px;
+    line-height: 1.6;
+    letter-spacing: 0.06em;
+    color: #a8925a;
   }
 
   /* ---------- 5. What You Will Discover ---------- */
@@ -652,7 +697,8 @@ const heroStyle = [
     .core-grid--directions { grid-template-columns: repeat(2, 1fr); }
     .core-grid--directions .core-card { padding: 18px; }
     .core-grid--talks .core-card { min-height: 0; padding: 24px; }
-    .core-grid--energy { grid-template-columns: 1fr; }
+    .core-grid--energy,
+    .core-grid--elements { grid-template-columns: 1fr; }
     .discover-list { gap: 28px; }
     .discover-list--steps li { grid-template-columns: 40px 1fr; column-gap: 16px; }
     .discover-list--rows { gap: 12px; }

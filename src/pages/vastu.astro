@@ -3,18 +3,6 @@ import ServicePage from "../components/ServicePage.astro";
 import heroPhoto from "../assets/images/pages/vastu-hero.jpg";
 import introPhoto from "../assets/images/pages/vastu-intro.jpg";
 
-// Line icons for the eight directions (inside of a 24×24 SVG)
-const icons = {
-  north: `<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>`,
-  northeast: `<path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0l1.58 6.14a2 2 0 0 0 1.44 1.44l6.14 1.58a.5.5 0 0 1 0 .96l-6.14 1.58a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0z"/>`,
-  east: `<path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/>`,
-  southeast: `<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>`,
-  south: `<path d="m8 3 4 8 5-5 5 15H2L8 3z"/>`,
-  southwest: `<circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/>`,
-  west: `<path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>`,
-  northwest: `<path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>`,
-};
-
 const page = {
   title: "Vastu Shastra | Visva Ved",
   description: "Every building is a microcosm of the universe — aligning human life with Earth's geomagnetic field, solar cycles, and the five great elements.",
@@ -24,57 +12,65 @@ const page = {
     title: "Vastu Shastra",
     subtitle: "Every building is a microcosm of the universe — aligning human life with Earth's geomagnetic field, solar cycles, and the Panch Mahadhatus.",
     image: heroPhoto,
-    tint: "#1e2a20",
+    tint: "#2b2414",
+    opacity: 0.75,
+    shade: true,
   },
 
   intro: {
     eyebrow: "Sthapatya Veda",
     title: "Your Home as a Cosmic Sanctuary",
     paragraphs: [
-      "Vastu Shastra is the ancient Indian science of dwelling, rooted in the Sthapatya Veda. It teaches that every building is a microcosm of the universe, aligning human life with Earth's geomagnetic field, solar cycles, and the Panch Mahadhatus (Earth, water, fire, air, and space).",
-      "When spaces are designed in resonance with these forces, they support health, prosperity, vitality and peace. A house aligned with Vastu principles resonates with cosmic energy, while violations can create stress and imbalance, ill health and strained relations.",
-      "At Visva Ved, we approach Vastu not with superstition or fear, but as a gentle language that helps reset the spaces we inhabit. Through small, mindful adjustments — elemental balancing, honouring directions, symbolic yantras, and inviting light and openness — we guide you back into resonance with the cosmos without structural reconstructions.",
-      "This is not about rigid rules, but about living in harmony with the universe, so your home becomes a sanctuary where your highest self can flourish.",
+      "Vastu Shastra, the ancient Indian science of dwelling, rooted in the Sthapathya Veda, teaches that every life in this cosmic macrocosm is ruled by the five elements or Panch Mahadhatus — Earth, water, fire, air, space.",
+      "When spaces are designed in resonance with these elements, they support health and prosperity, while mis-alignments create conflicts, disease and disappointments.",
+      "Hence, the aim of Vedic Vastu is to balance these elements in our surroundings by aligning our activities, energies and directions with these cosmic forces and not the other way around.",
+      "We at Visva Ved, seek to bust the myths and superstitions that surround the ancient science of Vastu Shastra and offer mindful yet scientific adjustments and lifestyle changes with a focus on achieving harmony with our environment to help make your home a sanctuary for self-elevation.",
     ],
     image: introPhoto,
     alt: "An ornate temple tower with carved figures against a cloudy sky",
     ratio: "4 / 5",
   },
 
+  rooted: {
+    title: "Rooted in the Sthapatya Veda",
+    text: "Visva Ved delivers pure, unadulterated and time-tested VEDIC VASTU SHASTRA principles from ancient scriptures, so that you receive the uncompromised power of pure elemental science, engineered exactly as the sages intended — free from unwarranted mixing of modern spatial theories.",
+  },
+
   core: {
-    eyebrow: "The Eight Directions",
-    title: "Ashtadisha",
-    intro: "Each direction is governed by a deity and influences a specific domain of life within your dwelling.",
-    variant: "directions" as const,
+    title: "Core Elements",
+    variant: "elements" as const,
     items: [
-      { icon: icons.north, name: "North", subtitle: "Kubera", text: "Wealth & Career", color: "#5f927a" },
-      { icon: icons.northeast, name: "Northeast", subtitle: "Ishanya", text: "Wisdom & Spirituality", color: "#c9a84c" },
-      { icon: icons.east, name: "East", subtitle: "Indra", text: "Health & Social Relations", color: "#6a9f70" },
-      { icon: icons.southeast, name: "Southeast", subtitle: "Agni", text: "Fire & Kitchen Energy", color: "#c2672a" },
-      { icon: icons.south, name: "South", subtitle: "Yama", text: "Rest & Stability", color: "#8a6f55" },
-      { icon: icons.southwest, name: "Southwest", subtitle: "Nirrti", text: "Relationships & Longevity", color: "#5b5f55" },
-      { icon: icons.west, name: "West", subtitle: "Varuna", text: "Creativity & Children", color: "#6b9dbc" },
-      { icon: icons.northwest, name: "Northwest", subtitle: "Vayu", text: "Movement & Communication", color: "#7fa3ba" },
+      { name: "Health", subtitle: "mental, Physical, emotional", text: "Main door placement threatening your vitality?" },
+      { name: "Career & Money", subtitle: "opportunities and savings", text: "Do you feel prosperity blocked at your doorstep?" },
+      { name: "Relationships", subtitle: "Deep intimacy, mutual respect, bonding", text: "Bedroom placement destroying love?" },
     ],
   },
 
-  discover: {
-    eyebrow: "Panch Mahadhatus",
-    title: "The Five Elements in Your Home",
-    rows: true,
+  faq: {
+    title: "Vastu FAQ’s",
     items: [
-      { title: "Earth", text: "Southwest zone — stability and grounding for the family." },
-      { title: "Water", text: "Northeast zone — clarity, flow, and spiritual receptivity." },
-      { title: "Fire", text: "Southeast zone — transformation, digestion, and vitality." },
-      { title: "Air", text: "Northwest zone — movement, breath, and social connections." },
-      { title: "Space", text: "Centre (Brahmasthana) — the sacred heart of any dwelling." },
+      {
+        question: "Is Vastu a religious practice?",
+        answer: "No. It is a universal energy science based on magnetic fields, solar energy, wind directions, and elemental balance that applies to everyone, regardless of faith.",
+      },
+      {
+        question: "Can Vastu fix my current life problems?",
+        answer: "While it does not change your destiny, by balancing the energy of your space and allowing it to flow freely, unseen roadblocks are removed, stagnation is dissolved, paving the way for better health, clearer thinking, and financial growth.",
+      },
+      {
+        question: "Do I need to break down walls or do major demolition for a Vastu consultation?",
+        answer: "No. At Visva Ved, we specialize in non-invasive, elemental remedies using colours, plants, fountains, crystals, and spatial realignment without structural damage.",
+      },
+      {
+        question: "Do you provide Vastu guidance for buying a new home or office plot?",
+        answer: "Yes. We analyse the land layout, soil energy, and directional alignment before you purchase to ensure you invest in a highly prosperous space.",
+      },
+      {
+        question: "Do you offer online/virtual Vastu consultations?",
+        answer: "Yes. We provide precise remote consultations globally using your accurate architectural floor plans, Google Earth data, and video walkthroughs.",
+      },
     ],
-    cta: "Explore the Sciences",
-    href: "/#paths",
   },
-
-  prev: { label: "Tarot", href: "/tarot" },
-  next: { label: "Back to Home", href: "/" },
 };
 ---
 
