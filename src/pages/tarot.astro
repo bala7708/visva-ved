@@ -1,7 +1,7 @@
 ---
 import ServicePage from "../components/ServicePage.astro";
 import heroPhoto from "../assets/images/pages/tarot-hero.jpg";
-import introPhoto from "../assets/images/pages/tarot-intro.jpg";
+import introPhoto from "../assets/images/paths/tarot-card.jpg";
 
 const page = {
   title: "Tarot | Visva Ved",
@@ -12,6 +12,9 @@ const page = {
     title: "Tarot",
     subtitle: "Tarot is not a prophecy, but a mirror — seventy-eight cards that reflect the many shades of human experience.",
     image: heroPhoto,
+    tint: "#2a1d12",
+    opacity: 0.8,
+    shade: true,
   },
 
   intro: {
@@ -23,40 +26,55 @@ const page = {
       "Symbols like The Tower or The Star help us recognize patterns, challenges, and hopes. In this way, Tarot becomes a gentle companion on the path of transformation — guiding you back to clarity, balance, and your highest self.",
     ],
     image: introPhoto,
-    alt: "A tarot deck on white linen beside a candle and clear crystals",
-    reverse: true,
+    alt: "Illustrated tarot cards, one showing a bee in sacred geometry",
     ratio: "4 / 5",
+    badge: "XVII",
+  },
+
+  rooted: {
+    title: "ROOTED in NOBILITY…",
+    text: "This profound system of psychological and spiritual mapping, reflects the energetic mirror of your current thoughts, hidden blocks, and potential timelines, allowing us to read the invisible energies surrounding a situation.",
   },
 
   core: {
-    eyebrow: "The Major Arcana",
-    title: "Archetypal Journeys",
+    title: "Core Energy",
+    variant: "energy" as const,
     items: [
-      { symbol: "0", name: "New Beginnings", text: "New beginnings, spontaneity, a free spirit leaping into the unknown with complete trust." },
-      { symbol: "II", name: "The High Priestess", text: "Intuition, sacred knowledge, the divine feminine and the mysteries of the unconscious." },
-      { symbol: "IV", name: "The Emperor", text: "Authority, structure, the father archetype establishing order and stability." },
-      { symbol: "X", name: "The Wheel of Fortune", text: "Cycles, turning points, destiny weaving its threads through time." },
-      { symbol: "XVI", name: "The Tower", text: "Sudden upheaval, revelation, the clearing of false structures to reveal truth." },
-      { symbol: "XVII", name: "The Star", text: "Hope, renewal, spiritual inspiration, and faith in the journey ahead." },
+      { name: "The High Priestess", text: "Intuition, sacred knowledge, the divine feminine and the mysteries of the unconscious." },
+      { name: "The Emperor", text: "Authority, structure, the father archetype establishing order and stability." },
+      { name: "The Star", text: "Hope, renewal, spiritual inspiration, and faith in the journey ahead." },
+      { name: "The Wheel of Fortune", text: "Cycles, turning points, destiny weaving its threads through time." },
+      { name: "The Fool", text: "New beginnings, spontaneity, a free spirit leaping into the unknown with complete trust." },
+      { name: "The Tower", text: "Sudden upheaval, revelation, the clearing of false structures to reveal truth." },
     ],
   },
 
-  discover: {
-    eyebrow: "A Tarot Reading",
-    title: "The Sacred Space of Reflection",
-    numbered: true,
+  faq: {
+    title: "Tarot FAQ’s",
     items: [
-      { title: "A Quiet, Centred Opening", text: "Your question or area of focus becomes the anchor — we create a sacred, unhurried space before any card is drawn." },
-      { title: "A Thoughtful Spread", text: "A spread is chosen for the nature of your query, each position holding a specific meaning within your larger life story." },
-      { title: "Symbolic, Intuitive Interpretation", text: "Each card's imagery, archetype, and placement are woven together into a coherent narrative that reflects your inner landscape." },
-      { title: "A Closing Reflection", text: "The reading closes with insight — illuminating where your energy flows, where it is blocked, and the pathways back to harmony." },
+      {
+        // TODO: this question and answer are about Numerology (copied in the design): ask the client for the Tarot version
+        question: "How can numbers influence my day-to-day life?",
+        answer: "Every number carries a unique vibrational frequency. When your personal numbers clash with the numbers of your home, mobile phone, or current calendar year, it can create unseen friction or delays in your progress.",
+      },
+      {
+        question: "Can I ask specific questions, or should it be a general reading?",
+        answer: "Both work beautifully. You can ask highly specific questions about your career, a relationship, or a decision, or you can opt for an open “General Energy Scan” to see what your spiritual guides want you to know right now.",
+      },
+      {
+        question: "How often should I get a Tarot reading?",
+        answer: "We recommend waiting at least 3 to 6 months between deep readings, or until a major shift or decision arises. Checking the cards too frequently for the same question creates energetic confusion and anxiety.",
+      },
+      {
+        question: "Do you offer live virtual Tarot sessions, or are they pre-recorded?",
+        answer: "We offer highly interactive, live virtual video consultations. This allows us to connect with your personal energy in real-time, hear your context, and pull clarifying cards as the conversation flows.",
+      },
+      {
+        question: "What do I need to prepare before my Tarot session?",
+        answer: "All you need is an open mind and a quiet space. We recommend writing down 3 to 5 core areas or questions you want to explore so we can maximize our time together.",
+      },
     ],
-    cta: "Book a Tarot Reading",
-    programme: "Tarot Reading",
   },
-
-  prev: { label: "Numerology", href: "/numerology" },
-  next: { label: "Explore Vastu", href: "/vastu" },
 };
 ---
 
