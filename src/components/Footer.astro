@@ -32,15 +32,6 @@ const columns = [
     ],
   },
   {
-    title: "Wisdom",
-    links: [
-      { label: "Articles", href: "/#wisdom" },
-      { label: "Panch Mahabhutas", href: "#" },
-      { label: "Vedic Philosophy", href: "/#vedic" },
-      { label: "FAQ", href: "/#faq" },
-    ],
-  },
-  {
     title: "About",
     links: [
       { label: "Our Approach", href: "/#vedic" },
@@ -63,7 +54,7 @@ const legal = [
   { label: "Cookie Policy", href: "#" },
 ];
 
-const email = "hello@visvaved.com";   // confirm with the client
+const email = "visvaved@gmail.com";   // from the final design; confirm with the client
 const year = new Date().getFullYear();
 ---
 
@@ -126,7 +117,7 @@ const year = new Date().getFullYear();
   /* ---------- Top: brand + 5 link columns ---------- */
   .footer-top {
     display: grid;
-    grid-template-columns: 1.6fr repeat(5, 1fr);
+    grid-template-columns: 1.6fr repeat(4, 1fr);
     gap: 32px;
     padding-bottom: 48px;
     border-bottom: 1px solid rgba(201, 168, 76, 0.15);
@@ -206,7 +197,7 @@ const year = new Date().getFullYear();
 
   /* ---------- Tablet: brand on top, 3 columns ---------- */
   @media (max-width: 1024px) {
-    .footer-top { grid-template-columns: repeat(3, 1fr); }
+    .footer-top { grid-template-columns: repeat(4, 1fr); }
     .brand { grid-column: 1 / -1; }
   }
 
