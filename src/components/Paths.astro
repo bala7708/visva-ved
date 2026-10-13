@@ -1,88 +1,88 @@
 ---
 import { Image } from "astro:assets";
 
-import numerology from "../assets/images/paths/numerology.jpg";
-import tarot from "../assets/images/paths/tarot.jpg";
-import vastuShastra from "../assets/images/paths/vastu-shastra.jpg";
-import tarotOnline from "../assets/images/paths/tarot-online.jpg";
+import numerology from "../assets/images/paths/numerology-light.jpg";
+import tarot from "../assets/images/paths/tarot-card.jpg";
+import vastu from "../assets/images/paths/vastu-shastra.jpg";
+import medicalAstrology from "../assets/images/paths/medical-astrology.jpg";
 import numerologyReport from "../assets/images/paths/numerology-report.jpg";
-import vastuConsultation from "../assets/images/paths/vastu-consultation.jpg";
 
-// "area" places each card in the grid (see grid-template-areas in the CSS).
-// href "#book" opens the booking popup for that service.
+// "slot" decides where each card sits in the grid (see the CSS below).
+// href "#book" opens the booking popup; "programme" is the name shown in the popup.
 const paths = [
   {
-    area: "num",
+    slot: "num",
     label: "Sacred Codes",
     title: "Numerology",
     text: "Numerology deciphers the vibrations of numbers, guiding us to recognize karmic lessons, unlock hidden strengths, and align with life's cycles of growth.",
     href: "/numerology",
     image: numerology,
-    alt: "A white lotus flower floating on dark water",
+    alt: "Golden numbers swirling upwards in a beam of light",
   },
   {
-    area: "tarot",
+    slot: "tarot",
     label: "Sacred Reflections",
     title: "Tarot",
     href: "/tarot",
     image: tarot,
-    alt: "Tarot cards beside a deck box and small white flowers",
+    alt: "Illustrated tarot cards, one showing a bee in sacred geometry",
   },
   {
-    area: "shastra",
+    slot: "vastu",
     label: "Sacred Architecture",
     title: "Vastu Shastra",
     href: "/vastu",
-    image: vastuShastra,
+    image: vastu,
     alt: "A calm, sunlit living room with plants and natural materials",
   },
   {
-    area: "consult",
-    label: "Eight Directions · Five Elements",
-    title: "Vastu Consultation",
-    text: "Vastu nurtures environments that invite prosperity, serenity, and spiritual grounding.",
+    slot: "astro",
+    label: "Planetary Wellness",
+    title: "Medical Astrology",
     href: "#book",
-    image: vastuConsultation,
-    alt: "An ornate ancient stone temple at golden hour",
+    programme: "Medical Astrology",
+    image: medicalAstrology,
+    alt: "A human figure inside a golden zodiac wheel",
   },
   {
-    area: "online",
-    label: "Remote Session",
-    title: "Tarot — Online",
-    href: "#book",
-    image: tarotOnline,
-    alt: "A woman sitting quietly, looking out over a misty landscape",
-  },
-  {
-    area: "report",
+    slot: "report",
     label: "Written Analysis + Call",
     title: "Numerology Report",
     href: "#book",
+    programme: "Numerology Report",
     image: numerologyReport,
     alt: "Sunlight streaming through a green forest",
   },
-];
+] as {
+  slot: string;
+  label: string;
+  title: string;
+  text?: string;
+  href: string;
+  programme?: string;
+  image: ImageMetadata;
+  alt: string;
+}[];
 ---
 
-<section id="paths" class="section">
-  <div class="container paths-inner">
-    <p class="eyebrow">Sacred Sciences</p>
-    <h2>Choose Your Path to Harmony</h2>
+<section id="paths" class="rhythm">
+  <div class="rhythm-inner">
+    <h2 class="rhythm-title">Reclaim your rhythm</h2>
 
-    <ul class="paths-grid">
+    <ul class="rhythm-grid">
       {paths.map((p) => (
-        <li class="card" style={`--area: ${p.area}`}>
-          <a href={p.href} class="card-link">
+        <li class={`rhythm-card rhythm-card--${p.slot}`}>
+          <a href={p.href} class="rhythm-link" data-programme={p.programme}>
             <Image
               src={p.image}
               alt={p.alt}
               widths={[400, 800]}
               sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 360px"
             />
-            <span class="card-content">
-              <span class="card-label">{p.label}</span>
-              <h3>{p.title}</h3>
-              {p.text && <span class="card-text">{p.text}</span>}
+            <span class="rhythm-content">
+              <span class="rhythm-label">{p.label}</span>
+              <h3 class="rhythm-name">{p.title}</h3>
+              {p.text && <span class="rhythm-text">{p.text}</span>}
             </span>
           </a>
         </li>
@@ -92,111 +92,180 @@ const paths = [
 </section>
 
 <style>
-  .paths-inner { max-width: calc(1096px + var(--gutter) * 2); }
-
-  h2 {
-    margin-top: 14px;
-    font-size: clamp(1.75rem, 3vw, 2.4rem);
+  .rhythm {
+    padding: 145px 24px;
+    background: #ffffff;
   }
 
-  /* ---------- The grid ---------- */
-  .paths-grid {
+  .rhythm-inner {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* Exact values from Figma: Cinzel 600, 32px, line height 45px */
+  .rhythm-title {
+    margin: 0;
+    padding-top: 12px;
+    font-family: "Cinzel", serif;
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 45px;
+    letter-spacing: 0;
+    color: #5a7a5a;
+    text-align: left;
+  }
+
+  /* ---------- The grid: 3 columns, 2 rows ---------- */
+  .rhythm-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: 280px 280px 252px;
-    grid-template-areas:
-      "num     tarot   shastra"
-      "num     consult online"
-      "report  consult .";
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: 280px 280px;
     gap: 8px;
-    margin-top: 40px;
+    margin: 40px 0 0;
     padding: 0;
     list-style: none;
   }
-  .card { grid-area: var(--area); }
+
+  .rhythm-card {
+    margin: 0;
+    min-width: 0;
+  }
+
+  /* Fixed position for each card */
+  .rhythm-card--num    { grid-column: 1; grid-row: 1 / 3; }
+  .rhythm-card--tarot  { grid-column: 2; grid-row: 1; }
+  .rhythm-card--vastu  { grid-column: 3; grid-row: 1; }
+  .rhythm-card--astro  { grid-column: 2; grid-row: 2; }
+  .rhythm-card--report { grid-column: 3; grid-row: 2; }
 
   /* ---------- A card ---------- */
-  .card-link {
+  .rhythm-link {
     position: relative;
     display: block;
+    width: 100%;
     height: 100%;
     overflow: hidden;
-    background: var(--color-forest);
+    background: #2a3b2c;
+    text-decoration: none;
   }
-    .card-link :global(img) {
+
+  .rhythm-link :global(img) {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.75;                /* the deep green background shows through */
+    opacity: 0.75;
     transition: transform 0.6s ease;
   }
-  .card-link:hover :global(img) { transform: scale(1.04); }   /* gentle zoom on hover */
 
-  /* Dark fade at the bottom, so the text is readable on any photo */
-    .card-link::after {
+  .rhythm-link:hover :global(img) {
+    transform: scale(1.04);
+  }
+
+  /* Black fade from the bottom, so the text is readable */
+  .rhythm-link::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      to top,
-      rgba(26, 46, 27, 0.85) 0%,
-      rgba(26, 46, 27, 0.3) 45%,
-      rgba(26, 46, 27, 0) 70%
-    );
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 55%);
   }
 
-  .card-content {
+  .rhythm-content {
     position: absolute;
-    z-index: 1;                   /* above the dark fade */
+    z-index: 1;
     left: 0;
     right: 0;
     bottom: 0;
     display: flex;
     flex-direction: column;
-    padding: 22px 24px;
+    padding: 20px;
   }
-  .card-label {
-    font-family: var(--font-ui);
-    font-size: 0.6rem;
-    letter-spacing: 0.2em;
+
+  .rhythm-card--num .rhythm-content {
+    padding: 28px 24px;
+  }
+
+  .rhythm-label {
+    font-family: "Inter", sans-serif;
+    font-size: 9.6px;
+    line-height: 14.4px;
+    letter-spacing: 1.73px;
     text-transform: uppercase;
-    color: var(--color-gold);
+    color: #c9a84c;
   }
-  h3 {
-    margin-top: 6px;
-    font-size: 1.1rem;
+
+  .rhythm-name {
+    margin: 4px 0 0;
+    font-family: "Cinzel", serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
     color: #ffffff;
+    text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   }
-  .card-text {
+
+  .rhythm-card--num .rhythm-name {
+    font-size: 18.4px;
+    line-height: 27.6px;
+  }
+
+  .rhythm-text {
     max-width: 240px;
-    margin-top: 12px;
+    margin-top: 10px;
+    font-family: "Lora", serif;
     font-style: italic;
-    font-size: 0.8rem;
-    line-height: 1.7;
-    color: rgba(255, 255, 255, 0.75);
+    font-size: 12.48px;
+    line-height: 20.6px;
+    color: rgba(255, 255, 255, 0.7);
   }
 
   /* ---------- Tablet: 2 columns ---------- */
   @media (max-width: 900px) {
-    .paths-grid {
-      grid-template-columns: repeat(2, 1fr);
-      grid-template-rows: repeat(4, 240px);
-      grid-template-areas:
-        "num     tarot"
-        "num     shastra"
-        "consult online"
-        "consult report";
+    .rhythm {
+      padding: 96px 24px;
     }
+
+    .rhythm-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(3, 240px);
+    }
+
+    .rhythm-card--num    { grid-column: 1; grid-row: 1 / 3; }
+    .rhythm-card--tarot  { grid-column: 2; grid-row: 1; }
+    .rhythm-card--vastu  { grid-column: 2; grid-row: 2; }
+    .rhythm-card--astro  { grid-column: 1; grid-row: 3; }
+    .rhythm-card--report { grid-column: 2; grid-row: 3; }
   }
 
-  /* ---------- Phone: one card per row ---------- */
+  /* ---------- Phone: one per row ---------- */
   @media (max-width: 600px) {
-    .paths-grid {
+    .rhythm {
+      padding: 72px 16px;
+    }
+
+    .rhythm-title {
+      font-size: 26px;
+      line-height: 36px;
+    }
+
+    .rhythm-grid {
       grid-template-columns: 1fr;
       grid-template-rows: none;
-      grid-template-areas: none;
-      grid-auto-rows: 280px;
+      grid-auto-rows: 260px;
     }
-    .card { grid-area: auto; }    /* ignore the map: cards simply follow each other */
+
+    .rhythm-card--num,
+    .rhythm-card--tarot,
+    .rhythm-card--vastu,
+    .rhythm-card--astro,
+    .rhythm-card--report {
+      grid-column: 1;
+      grid-row: auto;
+    }
+
+    .rhythm-card--num {
+      grid-row: span 2;
+    }
   }
 </style>

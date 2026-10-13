@@ -1,245 +1,82 @@
 ---
-// The twelve services. Edit this list to change the tiles.
-const services = [
-  { icon: "💼", label: "Job / Career / Business" },
-  { icon: "📈", label: "Lucky Profession" },
-  { icon: "🤝", label: "Partnerships – spouse / business" },
-  { icon: "💍", label: "Marriage – delays / matchmaking / success" },
-  { icon: "❤️", label: "Love / Arranged Marriage" },
-  { icon: "✈️", label: "Foreign Settlements" },
-  { icon: "📅", label: "Lucky C-section date" },
-  { icon: "🔤", label: "Name analysis and balancing" },
-  { icon: "👶", label: "Baby name / correction" },
-  { icon: "✍️", label: "Signature Analysis" },
-  { icon: "🚗", label: "Lucky colour / car / mobile number / house" },
-  { icon: "🌟", label: "Predictions and Remedies" },
-];
+import ServicePage from "../components/ServicePage.astro";
+import introPhoto from "../assets/images/paths/numerology-light.jpg";
 
-// Contact details. Confirm the full number (with country code) with the client.
-const phoneDisplay = "7208173256";
-const whatsappLink = "https://wa.me/917208173256";   // +91 = India's country code
+const page = {
+  title: "Numerology | Visva Ved",
+  description: "Numerology is the ancient art of decoding the vibrations hidden in names and birth dates.",
+
+  hero: {
+    eyebrow: "Sacred Codes",
+    title: "Numerology",
+    subtitle: "Numerology is the ancient art of decoding the vibrations hidden in names and birth dates.",
+    pattern: [
+      "3333333333111111111111111",
+      "3333333333333333333333333",
+      "1111111122222222222222222",
+      "3333333333331111111111111",
+    ],
+    tint: "linear-gradient(180deg, #1b2a1e 0%, #34523b 55%, #7aa382 100%)",
+  },
+
+  intro: {
+    eyebrow: "A Dialogue with the Cosmos",
+    title: "Living Energies That Shape Your Destiny",
+    paragraphs: [
+      "Numbers are not mere figures; they are living energies that shape personality, destiny, and cycles of life. Every name carries a vibrational signature; every birth date encodes a cosmic blueprint.",
+      "At Visva Ved, we use numerology as a key to self-understanding. Core numbers reveal traits and karmic lessons, while master numbers carry higher spiritual significance. By interpreting these vibrations, we uncover patterns that influence motivation, confidence, and relationships.",
+      "Numerology does not predict your future — it illuminates the energies you carry, guiding you into ideal professions, compatible marriages and new ventures that help you unleash your true potential.",
+    ],
+    image: introPhoto,
+    alt: "Golden numbers swirling upwards in a beam of light",
+  },
+
+  rooted: {
+    title: "Rooted in Chaldean and Cheironian Traditions…",
+    text: "Most numerology systems can tell you what is wrong. But diagnosis is only half the journey. At Visva Ved, we engineer the cure by introducing VEDIC NUMEROLOGY as the correctional science, utilising authentic remedies straight from our Vedas, to balance your numerical blueprint.",
+    highlight: "Discover the shift from insight to remedy. Align your energy with Visva Ved.",
+  },
+
+  core: {
+    title: "Number Talks",
+    variant: "talks" as const,
+    items: [
+      { name: "Prianca/Priyanka?", text: "“Name spelling silently sabotaging your destiny? Let’s decode yours today?”" },
+      { name: "Baby Says..!!", text: "Bless my journey with a lucky name!" },
+      { name: "Opportunities", text: "“Opportunities slipping away despite hard work?”" },
+      { name: "Conflicts", text: "“Conflicts ruining relationships?”\n“Act before cracks deepen.”" },
+      { name: "Health", text: "“Recurring health issues are not random.”\nAre numbers draining your vitality?" },
+      { name: "Signature", text: "Your signature may be sealing your failures?" },
+    ],
+  },
+
+  faq: {
+    title: "Numerology FAQ’s",
+    items: [
+      {
+        question: "How can numbers influence my day-to-day life?",
+        answer: "Every number carries a unique vibrational frequency. When your personal numbers clash with the numbers of your home, mobile phone, or current calendar year, it can create unseen friction or delays in your progress.",
+      },
+      {
+        question: "Can Numerology predict my exact future?",
+        // TODO: the design cuts this answer off after "times when you": ask the client for the final ending
+        answer: "Numerology does not predict absolute destiny; instead, it maps out your “energetic weather forecast.” It highlights peak periods of opportunity, turning points, and times when you may benefit from slowing down and reflecting.",
+      },
+      {
+        question: "Can a minor name correction really change my luck?",
+        answer: "Yes. A name correction doesn’t mean changing your legal identity entirely; even a subtle spelling tweak alters the phonetic and mathematical vibration of your name, aligning it harmoniously with your birth date to remove life blocks.",
+      },
+      {
+        question: "What kind of Numerology remedies do you provide?",
+        answer: "Our remedies are practical and non-invasive. They include custom name spelling adjustments, signature alignment, recommendations for lucky colours, vedic yantra suggestions, and selecting auspicious dates for major events.",
+      },
+      {
+        question: "What details do I need to provide for a Numerology reading?",
+        answer: "You will need to provide your exact date of birth (DD/MM/YYYY) and your full name exactly as it is spelled on your official documents or birth certificate.",
+      },
+    ],
+  },
+};
 ---
 
-<section id="numerology" class="section numerology">
-  <div class="container numerology-inner">
-    <!-- Heading row -->
-    <div class="numerology-head">
-      <div>
-        <p class="eyebrow">Visva Ved · Dr. Mayuri</p>
-        <h2>Numerology</h2>
-        <p class="subtitle">Consultation for problems related to:</p>
-      </div>
-
-      <div class="tagline">
-        <p>Right Numbers<br />Brighter<br />Destinations</p>
-        <span class="tagline-line" aria-hidden="true"></span>
-      </div>
-    </div>
-
-    <!-- Service tiles -->
-    <ul class="services">
-      {services.map((s) => (
-        <li class="service">
-          <span class="service-icon" aria-hidden="true">{s.icon}</span>
-          <span>{s.label}</span>
-        </li>
-      ))}
-    </ul>
-
-    <!-- Contact card -->
-    <div class="contact-card">
-      <div class="contact-info">
-        <p class="contact-label">Connect with</p>
-        <h3>Dr. Mayuri</h3>
-        <p class="contact-role">Certified Numerologist · Visva Ved</p>
-        <a class="contact-phone" href={whatsappLink} target="_blank" rel="noopener">
-                    <img src="/images/whatsapp.svg" alt="" width="20" height="20" />
-          <span>{phoneDisplay}</span>
-          <span class="sr-only">(opens WhatsApp in a new tab)</span>
-        </a>
-      </div>
-
-      <div class="contact-aside">
-        <ul class="values" aria-label="What a consultation offers">
-          <li>Clarity</li>
-          <li>Guidance</li>
-          <li>Positive Change</li>
-        </ul>
-        <a class="btn contact-btn" href="#book">Book a Slot →</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<style>
-  .numerology { background: var(--color-sand); }
-  .numerology-inner { max-width: calc(848px + var(--gutter) * 2); }
-
-  /* ---------- Heading row ---------- */
-  .numerology-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 32px;
-  }
-  h2 {
-    margin-top: 12px;
-    font-size: clamp(3.5rem, 8vw, 6rem);   /* 96px on desktop */
-    line-height: 1;
-  }
-  .subtitle {
-    margin-top: 12px;
-    font-size: 1rem;
-  }
-
-  .tagline {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    text-align: right;
-  }
-  .tagline p {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: clamp(1.75rem, 3vw, 2.25rem);   /* 36px on desktop */
-    line-height: 1.25;
-    color: var(--color-forest);
-  }
-  .tagline-line {
-    width: 48px;
-    height: 1px;
-    margin-top: 16px;
-    background: var(--color-gold);
-  }
-
-  /* ---------- Service tiles ---------- */
-  .services {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-top: 64px;
-    padding: 0;
-    list-style: none;
-  }
-  .service {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px 20px;
-    background: var(--color-cream);
-    border: 1px solid rgba(184, 134, 11, 0.12);
-    border-radius: var(--radius-card);
-    font-weight: 500;
-    font-size: 0.875rem;
-    line-height: 1.25;
-    color: var(--color-ink);
-  }
-  .service-icon {
-    flex-shrink: 0;             /* the emoji never gets squashed by long text */
-    font-size: 1.25rem;
-    line-height: 1.4;
-  }
-
-  /* ---------- Contact card ---------- */
-  .contact-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 32px;
-    margin-top: 64px;
-    padding: 48px;
-    background: var(--color-ink);
-    border-radius: 24px;
-  }
-
-  .contact-label {
-    font-weight: 600;
-    font-size: 0.75rem;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--color-gold-light);
-  }
-  h3 {
-    margin-top: 8px;
-    font-size: 2.25rem;        /* 36px */
-    line-height: 1.1;
-    color: var(--color-cream);
-  }
-  .contact-role {
-    margin-top: 4px;
-    font-weight: 400;
-    font-size: 0.875rem;
-    color: rgba(249, 244, 236, 0.55);
-  }
-  .contact-phone {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 16px;
-    font-weight: 700;
-    font-size: 1.125rem;
-    color: var(--color-cream);
-  }
-  .contact-phone:hover span:first-of-type {
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
-
-  .contact-aside {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .values {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 0;
-    list-style: none;
-    text-align: center;
-    font-weight: 400;
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(212, 168, 64, 0.6);
-  }
-  .contact-btn {
-    padding: 16px 32px;
-    font-size: 1rem;
-    background: var(--color-gold);
-    color: var(--color-cream);
-  }
-  .contact-btn:hover { background: #a0750a; }
-
-  /* ---------- Tablet and phone ---------- */
-  @media (max-width: 768px) {
-    .numerology-head {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    .tagline {
-      align-items: flex-start;
-      text-align: left;
-    }
-    .services {
-      grid-template-columns: 1fr;
-      margin-top: 40px;
-    }
-    .contact-card {
-      flex-direction: column;
-      align-items: stretch;
-      margin-top: 40px;
-      padding: 32px 24px;
-    }
-    .contact-aside {
-      flex-direction: column;
-      align-items: stretch;
-    }
-    .values {
-      flex-direction: row;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 4px 16px;
-    }
-  }
-</style>
+<ServicePage {...page} />
