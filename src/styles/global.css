@@ -20,6 +20,7 @@
   --font-display: "Cinzel", Georgia, "Times New Roman", serif;
   --font-serif: "Lora", Georgia, "Times New Roman", serif;
   --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-faq: "Poppins", system-ui, sans-serif;
 
   /* Layout */
   --container-max: 1200px;

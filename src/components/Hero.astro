@@ -1,46 +1,35 @@
 ---
-import { Image } from "astro:assets";
-import heroImage from "../assets/images/hero-home.jpg";
+import { getImage } from "astro:assets";
+import posterImage from "../assets/images/hero-home.jpg";
+
+// The still photo: shown while the video loads, if it's missing,
+// and for visitors who prefer reduced motion
+const poster = await getImage({ src: posterImage, width: 1920, format: "webp" });
 ---
 
 <section class="hero">
-  <!-- Background: photo at 45% on deep green, plus a green gradient -->
-  <div class="hero-bg" aria-hidden="true">
-    <Image
-      src={heroImage}
-      alt=""
-      widths={[768, 1280, 1920, 2560]}
-      sizes="100vw"
-      loading="eager"
-      fetchpriority="high"
-    />
-  </div>
+  <video
+    class="hero-video"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="metadata"
+    poster={poster.src}
+    aria-hidden="true"
+    data-hero-video
+  >
+    <source src="/videos/hero.mp4" type="video/mp4" />
+  </video>
 
-  <div class="hero-content">
-    <p class="eyebrow">Rig Veda 10.191.2</p>
+  <!-- Dark gradient over the video, for readable text -->
+  <div class="hero-overlay" aria-hidden="true"></div>
 
-    <h1>
-      <span>Living in Harmony</span>
-      <span>with the Universe</span>
-    </h1>
-
-    <p class="sanskrit" lang="sa-Latn">
-      Saṃgacchadhvaṃ saṃvadadhvaṃ saṃ vo manāṃsi jānatām
-    </p>
-    <p class="translation">May we all move together · speak in harmony · be of one mind</p>
-
-    <div class="hero-actions">
-      <a class="btn btn--saffron hero-btn" href="#seeking">
-        Find Your Path <span aria-hidden="true">→</span>
-      </a>
-      <a class="btn btn--ghost-light hero-btn" href="#paths">
-        Explore Sessions <span aria-hidden="true">→</span>
-      </a>
-    </div>
-  </div>
-
-  <!-- Thin gold line at the bottom -->
-  <span class="hero-line" aria-hidden="true"></span>
+  <h1 class="hero-title">
+    <span class="line">Embrace</span>
+    <span class="line line--gold">Your Highest</span>
+    <span class="line">Self</span>
+  </h1>
 </section>
 
 <style>
@@ -48,95 +37,53 @@ import heroImage from "../assets/images/hero-home.jpg";
     position: relative;
     display: grid;
     place-items: center;
-    min-height: 758px;              /* the height in Figma */
-    padding: 96px var(--gutter) 120px;
+    height: 659px;
+    padding: 0 var(--gutter);
     overflow: hidden;
-    background: var(--color-forest);
+    background: #1b2a1e;          /* shows for a moment before the photo or video loads */
     text-align: center;
   }
 
-  /* ---------- Background ---------- */
-  .hero-bg {
+  .hero-video,
+  .hero-overlay {
     position: absolute;
     inset: 0;
-  }
-  .hero-bg :global(img) {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    opacity: 0.45;                  /* the photo shows through the green at 45% */
   }
-  /* Green gradient on top: lighter at the top-left, darker at the bottom */
-  .hero-bg::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      170deg,
-      rgba(26, 46, 27, 0.55) 8%,
-      rgba(26, 46, 27, 0.8) 92%
-    );
+  .hero-video { object-fit: cover; }
+
+  /* Figma: a linear gradient at 60% over the video */
+  .hero-overlay {
+    background: linear-gradient(180deg, rgba(10, 16, 12, 0.1) 0%, rgba(10, 16, 12, 0.55) 100%);
+    opacity: 0.6;
   }
 
-  /* ---------- Text ---------- */
-  .hero-content {
-    position: relative;             /* sits above the background */
-    max-width: 780px;
+  .hero-title {
+    position: relative;           /* above the video and overlay */
+    font-family: "DM Serif Display", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(3rem, 7vw, 6.5rem);   /* 104px on desktop */
+    line-height: 1.05;
+    color: #f9f4ec;
+    text-shadow: 10px 4px 144px rgba(0, 0, 0, 0.9);
+  }
+  .line { display: block; }
+  .line--gold {
+    font-family: "Faculty Glyphic", Georgia, serif;
+    color: #d4a840;
   }
 
-  h1 {
-    margin-top: 20px;
-    font-weight: 500;
-    font-size: clamp(2.25rem, 5vw, 4.2rem);   /* 67px on desktop */
-    line-height: 1.15;
-    color: #ffffff;
-  }
-  h1 span { display: block; }
-
-  .sanskrit {
-    margin-top: 24px;
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: clamp(1rem, 1.6vw, 1.15rem);   /* 18.4px on desktop */
-    line-height: 1.75;
-    color: rgba(255, 255, 255, 0.75);
-  }
-  .translation {
-    margin-top: 12px;
-    font-family: var(--font-ui);
-    font-size: 0.85rem;                       /* 13.6px */
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.55);
-  }
-
-  /* ---------- Buttons ---------- */
-  .hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 16px;
-    margin-top: 40px;
-  }
-
-  /* ---------- Gold line ---------- */
-  .hero-line {
-    position: absolute;
-    left: 50%;
-    bottom: 36px;
-    width: 1px;
-    height: 48px;
-    background: linear-gradient(to bottom, rgba(196, 147, 58, 0), rgba(196, 147, 58, 0.7));
-  }
-
-  /* ---------- Phone ---------- */
   @media (max-width: 600px) {
-    .hero {
-      min-height: 620px;
-      padding-top: 72px;
-    }
-    .hero-actions {
-      flex-direction: column;
-      align-items: stretch;
-    }
+    .hero { height: 520px; }
   }
 </style>
+
+<script>
+  // Visitors who turned on "reduce motion" see the still photo instead of the moving video
+  const video = document.querySelector<HTMLVideoElement>("[data-hero-video]");
+  if (video && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    video.pause();
+    video.removeAttribute("autoplay");
+  }
+</script>
