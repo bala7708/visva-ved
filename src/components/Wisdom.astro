@@ -1,68 +1,77 @@
 ---
-// Testimonials for the slider. Add the other two here once you have them
-// (real, with permission).
-const testimonials = [
-  {
-    quote:
-      "My Numerology session revealed patterns I had been struggling with for years. Within weeks of applying the guidance, my career shifted in ways I never imagined.",
-    name: "Ananya S.",
-    role: "Marketing Director, 38",
-  },
+import { Image } from "astro:assets";
+import lotus from "../assets/images/paths/numerology.jpg";
+
+const paragraphs = [
+  "At Visva Ved, we see life as a grand play of energies — flowing in countless forms, shapes, and frequencies, all in perfect unison, just as the cosmos meant for it to be. Yet, in the rush of modern living — endless schedules, restless nights, digital distractions, competitive circles, and the weight of family and societal demands — these energies often lose their rhythm. Even the smallest imbalance can ripple outward creating a butterfly effect, disturbing our energy fields, manifesting as unexplained fatigue, strained relationships, low confidence, diseases or what we casually call “bad luck.”",
+  "And yet, time and again, mother nature reminds us of our true essence. A walk by the river, the hush of the forest, the vastness of the mountains — these spaces reset us, re-tune our senses, bring clarity and restore the harmony we so cherish. The five elements or our Panch Mahadhatus that constitute our nature, and of which we are an inseparable part, selflessly re-energise every fibre of our being, bringing back the very focus we seem to have lost.",
+  "Our wise Vedas reiterate that inner clarity is the key, external practices are mere guides, but true metamorphosis happens when we realign our own energy and get centred. Visva Ved draws upon this timeless wisdom, rooted in our ancient texts and lived by our ancestors, to bring resonance through knowledge and simple daily practices. We approach sciences like Vastu, not with fear or superstition, but with the simplicity that the panch-dhatus demand and nature commands. With minor course corrections and gentle lifestyle changes, we subtly change the ways in which the energies affect you, thus fulfilling our core mission of helping you reach your highest potential!",
+  "For in truth, the secret to a happy and content life lies in living in harmony with the universe.",
 ];
-
-const initials = (name: string) =>
-  name.replace(/\./g, "").split(" ").map((w) => w[0]).join("").toUpperCase();
-
-// Only show the dots when there is more than one testimonial
-const showDots = testimonials.length > 1;
 ---
 
-<section id="vedic" class="section section--sand">
-  <div class="container wisdom">
-    <div class="wisdom-text">
-      <p class="eyebrow">Our Approach</p>
-      <h2>Vedic Wisdom for Modern Living</h2>
-
-      <p>
-        At Visva Ved, we see life as a grand play of energies — flowing in countless forms,
-        shapes, and frequencies, as if the cosmos itself wished to watch its own drama unfold.
-      </p>
-      <p>
-        Like the wing-beats of a butterfly far away causing ripples in a distant ocean, our
-        thoughts, feelings and the energies that surround us shape the quality of our lives in
-        imperceptible ways. We live in a modern era where the unexplained fatigue, strained
-        relationships, low confidence, diseases or what we casually call 'bad luck' are
-        increasingly challenging us.
-      </p>
-      <p>
-        Yet the Vedas remind us that our cosmos is designed in perfect harmony — and that nature
-        has always had a way of resetting us, returning us back to our beautiful natural state.
-        The Panch Mahabhutas (five great elements of Earth, water, fire, air, and space) flow
-        through us and around us; with gentle, ancient wisdom we can restore that rhythm.
-      </p>
+<section id="vedic" class="vw">
+  <div class="vw-inner">
+    <div class="vw-media">
+      <Image src={lotus} alt="A white lotus flower floating on dark water" widths={[400, 800]} sizes="(max-width: 900px) 100vw, 360px" />
     </div>
 
-    <div class="slider" data-slider aria-roledescription="carousel" aria-label="What our clients say">
-      <div class="slides">
-        {testimonials.map((t, i) => (
-          <figure class:list={["slide", { "is-active": i === 0 }]} aria-roledescription="slide" aria-label={`${i + 1} of ${testimonials.length}`}>
-            <span class="avatar" aria-hidden="true">{initials(t.name)}</span>
-            <blockquote><p>"{t.quote}"</p></blockquote>
-            <figcaption>
-              <span class="t-name">{t.name}</span>
-              <span class="t-role">{t.role}</span>
-            </figcaption>
-          </figure>
-        ))}
-      </div>
-
-      {showDots && (
-        <div class="dots">
-          {testimonials.map((t, i) => (
-            <button type="button" class="dot" data-dot={i} aria-label={`Show testimonial ${i + 1}`} aria-current={i === 0 ? "true" : "false"}></button>
-          ))}
-        </div>
-      )}
+    <div class="vw-text">
+      <h2 class="vw-title">Vedic Wisdom for Modern Living</h2>
+      {paragraphs.map((text) => <p>{text}</p>)}
     </div>
   </div>
 </section>
+
+<style>
+  .vw {
+    padding: 96px 24px;
+    background: #f7f1e1;
+  }
+
+  .vw-inner {
+    display: grid;
+    grid-template-columns: 360px minmax(0, 1fr);
+    gap: 48px;
+    align-items: start;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .vw-media :global(img) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 9 / 17;
+    object-fit: cover;
+  }
+
+  .vw-title {
+    margin: 0;
+    font-family: "Cinzel", serif;
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 45px;
+    color: #5a7a5a;
+  }
+
+  .vw-text p {
+    margin: 24px 0 0;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    line-height: 1.85;
+    color: #4a5e4b;
+  }
+
+  .vw-title + p { margin-top: 28px; }
+
+  @media (max-width: 900px) {
+    .vw-inner { grid-template-columns: 1fr; gap: 40px; }
+    .vw-media { max-width: 360px; }
+    .vw-media :global(img) { aspect-ratio: 4 / 5; }
+  }
+
+  @media (max-width: 600px) {
+    .vw { padding: 72px 16px; }
+    .vw-title { font-size: 26px; line-height: 36px; }
+  }
+</style>
