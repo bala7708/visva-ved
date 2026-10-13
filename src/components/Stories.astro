@@ -1,0 +1,153 @@
+---
+// PLACEHOLDERS from the design: replace with real testimonials (with written permission) before launch.
+const stories = [
+  {
+    quote: "I came to VISVA VED burnt out and hollow. Three days later, something fundamental shifted — not just relaxation, but a deep homecoming. The Sudarshan Kriya changed how I breathe through life.",
+    name: "Priya Sharma",
+    meta: "Mumbai · Happiness Program",
+  },
+  {
+    quote: "The silence of the forest, the quality of the teachings, the simplicity of sattvic food — every element was intentional. I left carrying practices I still use two years on.",
+    name: "Arjun Mehta",
+    meta: "Bengaluru · 7-Day Sadhana",
+  },
+  // TODO: add the remaining testimonials from the design here
+];
+
+const initials = (name: string) =>
+  name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+---
+
+<section class="stories" aria-labelledby="stories-title">
+  <div class="stories-head">
+    <p class="stories-eyebrow">Their Words</p>
+    <h2 id="stories-title" class="stories-title">Stories of Becoming</h2>
+  </div>
+
+  <ul class="stories-track" tabindex="0" aria-label="Testimonials, scroll sideways for more">
+    {stories.map((s) => (
+      <li class="story">
+        <span class="story-stars" role="img" aria-label="5 out of 5 stars">★★★★★</span>
+        <blockquote class="story-quote"><p>“{s.quote}”</p></blockquote>
+        <div class="story-person">
+          <span class="story-avatar" aria-hidden="true">{initials(s.name)}</span>
+          <div>
+            <p class="story-name">{s.name}</p>
+            <p class="story-meta">{s.meta}</p>
+          </div>
+        </div>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .stories {
+    padding: 72px 0 88px;
+    background: #f7f1e1;
+    overflow: hidden;
+  }
+
+  .stories-head {
+    padding: 0 24px;
+    text-align: center;
+  }
+
+  .stories-eyebrow {
+    margin: 0;
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #b8860b;
+  }
+
+  .stories-title {
+    margin: 14px 0 0;
+    font-family: "Cinzel", serif;
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 45px;
+    color: #5a7a5a;
+  }
+
+  /* A row of cards that scrolls sideways (swipe on phones) */
+  .stories-track {
+    display: flex;
+    gap: 24px;
+    margin: 48px 0 0;
+    padding: 8px max(24px, calc((100vw - 1100px) / 2)) 24px;
+    list-style: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+  }
+  .stories-track:focus-visible { outline: 2px solid #c9a84c; outline-offset: 4px; }
+
+  .story {
+    flex: 0 0 min(360px, 85vw);
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 22px;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 6px 18px rgba(30, 46, 32, 0.08);
+  }
+
+  .story-stars {
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: #b8860b;
+  }
+
+  .story-quote { margin: 14px 0 0; flex: 1; }
+  .story-quote p {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+    line-height: 1.75;
+    color: #2b2f22;
+  }
+
+  .story-person {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .story-avatar {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #b8860b;
+    font-family: "Inter", sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: #ffffff;
+  }
+
+  .story-name {
+    margin: 0;
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: #1e2e20;
+  }
+
+  .story-meta {
+    margin: 2px 0 0;
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    color: #7a7d70;
+  }
+
+  @media (max-width: 600px) {
+    .stories-title { font-size: 26px; line-height: 36px; }
+  }
+</style>

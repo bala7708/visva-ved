@@ -12,11 +12,6 @@ const faqs = [
       "None at all. Every session starts from the basics and is explained in simple, practical terms. All you need is an open mind and a question you'd like to explore.",
   },
   {
-    question: "Will Vastu require major renovations to my home?",
-    answer:
-      "Rarely. Most recommendations are simple adjustments, such as the placement of objects, colours, light and the balance of elements, that work with the space you already have.",
-  },
-  {
     question: "How soon will I see results?",
     answer:
       "Everyone's journey is different. Many people feel greater clarity soon after a session; lasting change grows gradually as the guidance is applied in daily life.",
@@ -29,19 +24,18 @@ const faqs = [
 ];
 ---
 
-<section id="faq" class="section section--sand">
-  <div class="container faq-inner">
-    <p class="eyebrow">Questions</p>
-    <h2>I Want to Begin, But…</h2>
+<section id="faq" class="hfaq">
+  <div class="hfaq-inner">
+    <h2 class="hfaq-title">I Want to Begin, But…</h2>
 
-    <div class="faq-list">
+    <div class="hfaq-list">
       {faqs.map((item) => (
-        <details class="faq-item">
+        <details class="hfaq-item">
           <summary>
             <span>{item.question}</span>
-            <span class="faq-icon" aria-hidden="true"></span>
+            <span class="hfaq-icon" aria-hidden="true"></span>
           </summary>
-          <p class="faq-answer">{item.answer}</p>
+          <p class="hfaq-answer">{item.answer}</p>
         </details>
       ))}
     </div>
@@ -49,64 +43,76 @@ const faqs = [
 </section>
 
 <style>
-  .faq-inner {
-    max-width: calc(760px + var(--gutter) * 2);
+  .hfaq {
+    padding: 80px 24px;
+    background: #f7f1e1;
+  }
+
+  .hfaq-inner {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .hfaq-title {
+    margin: 0;
+    font-family: "Cinzel", serif;
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 45px;
+    color: #5a7a5a;
     text-align: center;
   }
 
-  h2 {
-    margin-top: 14px;
-    font-size: clamp(1.75rem, 3vw, 2.4rem);
-  }
+  .hfaq-list { margin-top: 40px; }
 
-  .faq-list {
-    margin-top: 48px;
-    text-align: left;
-  }
+  .hfaq-item { border-bottom: 1px solid rgba(30, 46, 32, 0.15); }
 
-  .faq-item { border-bottom: 1px solid rgba(30, 46, 32, 0.15); }
-
-  /* The question row: the part you click */
-  summary {
+  .hfaq-item summary {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 24px;
-    padding: 24px 0;
-    font-family: var(--font-display);
-    font-size: 0.85rem;
-    letter-spacing: 0.03em;
-    color: var(--color-ink);
+    padding: 18px 0;
+    font-family: "Cinzel", serif;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    color: #1e2e20;
     cursor: pointer;
-    list-style: none;               /* hides the default triangle */
+    list-style: none;
   }
-  summary::-webkit-details-marker { display: none; }   /* …also in Safari */
-  summary:hover { color: var(--color-saffron-dark); }
+  .hfaq-item summary::-webkit-details-marker { display: none; }
+  .hfaq-item summary:hover { color: #d4841a; }
 
-  /* A "+" drawn with two thin lines; it turns into "×" when open */
-  .faq-icon {
+  /* "+" that turns into "×" when open */
+  .hfaq-icon {
     position: relative;
     flex-shrink: 0;
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     transition: transform 0.25s ease;
   }
-  .faq-icon::before,
-  .faq-icon::after {
+  .hfaq-icon::before,
+  .hfaq-icon::after {
     content: "";
     position: absolute;
     inset: 50% 0 auto;
     height: 1px;
-    background: var(--color-gold);
+    background: #c9a84c;
   }
-  .faq-icon::after { transform: rotate(90deg); }
-  .faq-item[open] .faq-icon { transform: rotate(45deg); }
+  .hfaq-icon::after { transform: rotate(90deg); }
+  .hfaq-item[open] .hfaq-icon { transform: rotate(45deg); }
 
-  .faq-answer {
-    max-width: 640px;
-    padding-bottom: 24px;
-    font-size: 0.95rem;
+  .hfaq-answer {
+    margin: 0;
+    padding-bottom: 20px;
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
     line-height: 1.8;
-    color: #4f5a45;
+    color: #4a5e4b;
+  }
+
+  @media (max-width: 600px) {
+    .hfaq { padding: 64px 16px; }
+    .hfaq-title { font-size: 26px; line-height: 36px; }
   }
 </style>
