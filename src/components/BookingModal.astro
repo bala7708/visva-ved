@@ -1,5 +1,5 @@
 ---
-// The booking popup: calendar → details → payment (QR, UTR) → booked.
+// The booking popup: calendar → details → payment (QR, UTR) → confirmation card.
 // Settings (time slots, prices…) live in src/config/booking.mjs.
 ---
 
@@ -134,7 +134,7 @@
       <button id="pay-back" class="link-btn" type="button">Choose a different time</button>
     </section>
 
-       <!-- ========== 3a. Booked ========== -->
+    <!-- ========== 3a. Booked: confirmation card ========== -->
     <section id="done-view" class="done" hidden>
       <span class="done-icon" aria-hidden="true">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -184,7 +184,11 @@
 <style>
   /* ---------- Popup box ---------- */
   .booking {
+    position: fixed;
+    inset: 0;
+    margin: auto;                      /* centres the popup on the screen */
     width: min(780px, calc(100% - 32px));
+    height: fit-content;
     max-height: calc(100dvh - 32px);
     padding: 0;
     border: 0;
@@ -215,105 +219,9 @@
   .result[hidden],
   .done[hidden] { display: none; }
 
-  /* While the confirmation is showing: narrow card, no header */
+  /* While the confirmation card is showing: narrow popup, no header */
   .booking:has(#done-view:not([hidden])) { width: min(520px, calc(100% - 32px)); }
   .booking:has(#done-view:not([hidden])) .booking-header { display: none; }
-
-  /* ---------- Confirmation card ---------- */
-  .done {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 48px 40px 32px;
-    overflow-y: auto;
-    font-family: "Inter", sans-serif;
-    text-align: center;
-  }
-  .done-icon {
-    display: grid;
-    place-items: center;
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #d4a840, #a8872f);
-    color: #ffffff;
-    box-shadow: 0 6px 16px rgba(168, 135, 47, 0.3);
-  }
-  .done-title {
-    margin: 22px 0 0;
-    font-family: "Inter", sans-serif;
-    font-weight: 700;
-    font-size: 24px;
-    line-height: 1.3;
-    color: #1c1408;
-  }
-  .done-text {
-    max-width: 340px;
-    margin: 12px 0 0;
-    font-size: 13px;
-    line-height: 1.6;
-    color: #4b4a3f;
-  }
-  .done-text strong { font-weight: 700; color: #1c1408; }
-  .done-note {
-    margin: 8px 0 0;
-    font-size: 12px;
-    color: #8a5a00;
-  }
-  .done-note:empty { display: none; }
-
-  .done-summary {
-    width: 100%;
-    margin: 28px 0 0;
-    padding: 6px 18px;
-    border: 1px solid #ece2cf;
-    border-radius: 12px;
-    background: #fbf8f2;
-  }
-  .done-summary div {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 11px 0;
-    border-bottom: 1px solid #efe7d6;
-    font-size: 12px;
-  }
-  .done-summary div:last-child { border-bottom: 0; }
-  .done-summary dt { color: #4b4a3f; }
-  .done-summary dd {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin: 0;
-    font-weight: 700;
-    color: #1c1408;
-    text-align: right;
-  }
-
-  .done-btn {
-    display: block;
-    width: 100%;
-    margin-top: 22px;
-    padding: 14px;
-    border-radius: 10px;
-    background: #b8860b;
-    font-weight: 600;
-    font-size: 14px;
-    color: #ffffff;
-    text-decoration: none;
-    transition: filter 0.2s;
-  }
-  .done-btn:hover { filter: brightness(1.08); }
-  .done-footer {
-    margin: 16px 0 0;
-    font-size: 11px;
-    color: #b9b2a3;
-  }
-
-  @media (max-width: 640px) {
-    .done { padding: 40px 20px 24px; }
-    .done-title { font-size: 21px; }
-  }
 
   /* ---------- Header ---------- */
   .booking-header {
@@ -634,7 +542,100 @@
     cursor: pointer;
   }
 
-  /* ---------- Results ---------- */
+  /* ---------- Confirmation card ---------- */
+  .done {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 40px 32px;
+    overflow-y: auto;
+    font-family: "Inter", sans-serif;
+    text-align: center;
+  }
+  .done-icon {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #d4a840, #a8872f);
+    color: #ffffff;
+    box-shadow: 0 6px 16px rgba(168, 135, 47, 0.3);
+  }
+  .done-title {
+    margin: 22px 0 0;
+    font-family: "Inter", sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1.3;
+    letter-spacing: 0;
+    text-transform: none;
+    color: #1c1408;
+  }
+  .done-text {
+    max-width: 340px;
+    margin: 12px 0 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #4b4a3f;
+  }
+  .done-text strong { font-weight: 700; color: #1c1408; }
+  .done-note {
+    margin: 8px 0 0;
+    font-size: 12px;
+    color: #8a5a00;
+  }
+  .done-note:empty { display: none; }
+
+  .done-summary {
+    width: 100%;
+    margin: 28px 0 0;
+    padding: 6px 18px;
+    border: 1px solid #ece2cf;
+    border-radius: 12px;
+    background: #fbf8f2;
+  }
+  .done-summary div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 11px 0;
+    border-bottom: 1px solid #efe7d6;
+    font-size: 12px;
+  }
+  .done-summary div:last-child { border-bottom: 0; }
+  .done-summary dt { color: #4b4a3f; }
+  .done-summary dd {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-weight: 700;
+    color: #1c1408;
+    text-align: right;
+  }
+
+  .done-btn {
+    display: block;
+    width: 100%;
+    margin-top: 22px;
+    padding: 14px;
+    border-radius: 10px;
+    background: #b8860b;
+    font-weight: 600;
+    font-size: 14px;
+    color: #ffffff;
+    text-decoration: none;
+    transition: filter 0.2s;
+  }
+  .done-btn:hover { filter: brightness(1.08); }
+  .done-footer {
+    margin: 16px 0 0;
+    font-size: 11px;
+    color: #b9b2a3;
+  }
+
+  /* ---------- Time ran out ---------- */
   .result {
     display: grid;
     justify-items: center;
@@ -645,8 +646,6 @@
   }
   .result h3 { font-size: 1.6rem; }
   .result p { max-width: 420px; }
-  .result-summary { font-weight: 500; color: var(--color-ink); }
-  .result-note { font-size: 0.85rem; color: #6b725f; }
   .result-icon {
     display: grid;
     place-items: center;
@@ -656,7 +655,6 @@
     color: #ffffff;
     font-size: 1.5rem;
   }
-  .result-icon--ok { background: #46955a; }
   .result-icon--wait { background: var(--color-gold); }
   .result .btn { margin-top: 12px; }
 
@@ -676,6 +674,8 @@
     }
     .slot-list :global(button) { padding: 10px 4px; font-size: 0.8125rem; }
     .slot-list :global(.slot-empty) { grid-column: 1 / -1; }
+    .done { padding: 40px 20px 24px; }
+    .done-title { font-size: 21px; }
   }
 </style>
 
@@ -705,6 +705,12 @@
   };
 
   const byId = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+  // Sets text only if the element exists, so a missing element can never stop the flow
+  const setText = (id: string, text: string) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  };
 
   const dialog = document.getElementById("booking-modal") as HTMLDialogElement | null;
 
@@ -743,24 +749,6 @@
     const utrInput = byId<HTMLInputElement>("utr-input");
     const utrSubmit = byId<HTMLButtonElement>("utr-submit");
     const utrError = byId<HTMLElement>("utr-error");
-
-    // Step 3
-    const doneSummary = byId<HTMLElement>("done-summary");
-    const doneTitle = byId<HTMLElement>("done-title");
-    const doneEmail = byId<HTMLElement>("done-email");
-    const doneSession = byId<HTMLElement>("done-session");
-    const doneDate = byId<HTMLElement>("done-date");
-    const doneTime = byId<HTMLElement>("done-time");
-    const doneHome = byId<HTMLAnchorElement>("done-home");
-
-    // "Return to Home": on the home page, just close the popup and scroll up
-    doneHome.addEventListener("click", (event) => {
-      if (window.location.pathname === "/") {
-        event.preventDefault();
-        dialog.close();
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-    });
 
     // ---------- Date helpers ----------
     const today = new Date();
@@ -927,23 +915,27 @@
     optIn.addEventListener("change", () => { phoneInput.required = optIn.checked; });
 
     // ---------- Result screens ----------
-       const showDone = (hold: Hold, verifying: boolean) => {
+    const showDone = (hold: Hold, verifying: boolean) => {
       stopTimers();
-      doneTitle.textContent = verifying ? "Your Slot Has Been Booked" : "Booking Slot Confirmed!";
-      doneEmail.textContent = emailInput.value || "your email";
-      doneNote.textContent = verifying
-        ? "We'll verify your payment shortly and then send your confirmation."
-        : "";
-      doneSession.textContent = `${hold.programme} · 45 min`;
-      doneDate.textContent = fromIso(hold.date).toLocaleDateString("en-US", {
-        weekday: "short", month: "short", day: "numeric", year: "numeric",
-      });
-      doneTime.textContent = `${formatTime(hold.time)} (India time)`;
       currentHold = null;
-      show("done");
+      try {
+        setText("done-title", verifying ? "Your Slot Has Been Booked" : "Booking Slot Confirmed!");
+        setText("done-email", emailInput?.value || "your email");
+        setText("done-note", verifying ? "We'll verify your payment shortly and then send your confirmation." : "");
+        setText("done-session", `${hold.programme} · 45 min`);
+        setText(
+          "done-date",
+          fromIso(hold.date).toLocaleDateString("en-US", {
+            weekday: "short", month: "short", day: "numeric", year: "numeric",
+          })
+        );
+        setText("done-time", `${formatTime(hold.time)} (India time)`);
+      } catch (error) {
+        console.error("Filling in the confirmation failed:", error);
+      }
+      show("done");   // always show the card, even if a detail above failed
     };
 
-    
     const showExpired = () => {
       stopTimers();
       currentHold = null;
@@ -962,6 +954,15 @@
         selectDate(first);
       }
     };
+
+    // "Return to Home": on the home page, just close the popup and scroll up
+    document.getElementById("done-home")?.addEventListener("click", (event) => {
+      if (window.location.pathname === "/") {
+        event.preventDefault();
+        dialog.close();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    });
 
     // ---------- Step 1 → 2: hold the slot ----------
     form.addEventListener("submit", async (event) => {

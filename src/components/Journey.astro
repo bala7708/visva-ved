@@ -152,6 +152,24 @@ const steps = [
     background: #ffffff;
     border: 1px solid #e3dccb;
     box-shadow: 0 4px 14px rgba(30, 46, 32, 0.04);
+    transition: background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  }
+
+  /* Hover: solid gold card with white text */
+  .jr-card:hover {
+    background: #d3a940;
+    border-color: #d3a940;
+    box-shadow: 0 10px 24px rgba(168, 135, 47, 0.25);
+  }
+
+  .jr-card:hover .jr-step-label,
+  .jr-card:hover .jr-step-title,
+  .jr-card:hover .jr-step-text {
+    color: #ffffff;
+  }
+
+  .jr-card:hover .jr-step-label {
+    opacity: 0.8;
   }
   .jr-step--left .jr-card { grid-column: 1; }
   .jr-step--right .jr-card { grid-column: 3; }
@@ -171,6 +189,12 @@ const steps = [
     font-weight: 600;
     font-size: 16px;
     color: #c9a84c;
+  }
+
+  .jr-step-label,
+  .jr-step-title,
+  .jr-step-text {
+    transition: color 0.35s ease;
   }
 
   .jr-step-text {
