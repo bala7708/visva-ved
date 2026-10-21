@@ -1,35 +1,65 @@
 ---
-import { getImage } from "astro:assets";
-import posterImage from "../assets/images/hero-home.jpg";
+import { Image } from "astro:assets";
+import hero1 from "../assets/images/hero/hero-1.jpg";
+import hero2 from "../assets/images/hero/hero-2.jpg";
+import hero3 from "../assets/images/hero/hero-3.jpg";
 
-// The still photo: shown while the video loads, if it's missing,
-// and for visitors who prefer reduced motion
-const poster = await getImage({ src: posterImage, width: 1920, format: "webp" });
+// The banner photos, in order. To add or change one, edit this list.
+const slides = [
+  { image: hero1, alt: "Misty green valley with waterfalls" },
+  { image: hero2, alt: "Sunset over a sea of clouds and snowy peaks" },
+  { image: hero3, alt: "Misty hills under a sunrise sky" },
+];
 ---
 
-<section class="hero">
-  <video
-    class="hero-video"
-    autoplay
-    muted
-    loop
-    playsinline
-    preload="metadata"
-    poster={poster.src}
-    aria-hidden="true"
-    data-hero-video
-  >
-    <source src="/videos/hero.mp4" type="video/mp4" />
-  </video>
+<section class="hero" data-hero aria-roledescription="carousel" aria-label="Visva Ved">
+  <!-- Photos, stacked on top of each other; the active one is visible -->
+  <div class="hero-slides">
+    {slides.map((slide, i) => (
+      <div class:list={["hero-slide", { "is-active": i === 0 }]} aria-hidden={i === 0 ? "false" : "true"}>
+        <Image
+          src={slide.image}
+          alt={slide.alt}
+          widths={[768, 1280, 1920, 2560]}
+          sizes="100vw"
+          loading={i === 0 ? "eager" : "lazy"}
+          fetchpriority={i === 0 ? "high" : "auto"}
+        />
+      </div>
+    ))}
+  </div>
 
-  <!-- Dark gradient over the video, for readable text -->
+  <!-- Dark gradient over the photos, for readable text -->
   <div class="hero-overlay" aria-hidden="true"></div>
 
   <h1 class="hero-title">
     <span class="line">Embrace</span>
-    <span class="line line--gold">Your Highest</span>
+    <span class="line line--italic">Your Highest</span>
     <span class="line">Self</span>
   </h1>
+
+  <!-- Controls: dots + pause/play -->
+  <div class="hero-controls">
+    <div class="hero-dots">
+      {slides.map((slide, i) => (
+        <button
+          type="button"
+          class="hero-dot"
+          data-dot={i}
+          aria-label={`Show photo ${i + 1} of ${slides.length}`}
+          aria-current={i === 0 ? "true" : "false"}
+        ></button>
+      ))}
+    </div>
+    <button type="button" class="hero-pause" data-pause aria-label="Pause the slideshow">
+      <svg class="icon-pause" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <rect x="5" y="4" width="5" height="16" rx="1" /><rect x="14" y="4" width="5" height="16" rx="1" />
+      </svg>
+      <svg class="icon-play" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M7 4.5v15a1 1 0 0 0 1.5.87l12-7.5a1 1 0 0 0 0-1.74l-12-7.5A1 1 0 0 0 7 4.5Z" />
+      </svg>
+    </button>
+  </div>
 </section>
 
 <style>
@@ -38,52 +68,180 @@ const poster = await getImage({ src: posterImage, width: 1920, format: "webp" })
     display: grid;
     place-items: center;
     height: 659px;
-    padding: 0 var(--gutter);
+    padding: 0 24px;
     overflow: hidden;
-    background: #1b2a1e;          /* shows for a moment before the photo or video loads */
+    background: #1b2a1e;
     text-align: center;
   }
 
-  .hero-video,
+  /* ---------- Slides ---------- */
+  .hero-slides,
   .hero-overlay {
     position: absolute;
     inset: 0;
+  }
+
+  .hero-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.4s ease;
+  }
+  .hero-slide.is-active { opacity: 1; }
+
+  .hero-slide :global(img) {
+    display: block;
     width: 100%;
     height: 100%;
+    object-fit: cover;
+    transform: scale(1);
+    transition: transform 7s ease-out;
   }
-  .hero-video { object-fit: cover; }
+  /* Slow, gentle zoom on the visible photo */
+  .hero-slide.is-active :global(img) { transform: scale(1.06); }
 
-  /* Figma: a linear gradient at 60% over the video */
   .hero-overlay {
-    background: linear-gradient(180deg, rgba(10, 16, 12, 0.1) 0%, rgba(10, 16, 12, 0.55) 100%);
-    opacity: 0.6;
+    background: linear-gradient(180deg, rgba(10, 16, 12, 0.08) 0%, rgba(10, 16, 12, 0.4) 100%);
   }
 
+  /* ---------- Heading ---------- */
   .hero-title {
-    position: relative;           /* above the video and overlay */
+    position: relative;
+    z-index: 1;
+    margin: 0;
     font-family: "DM Serif Display", Georgia, serif;
     font-weight: 400;
-    font-size: clamp(3rem, 7vw, 6.5rem);   /* 104px on desktop */
+    font-size: clamp(3rem, 7vw, 6.5rem);
     line-height: 1.05;
     color: #f9f4ec;
-    text-shadow: 10px 4px 144px rgba(0, 0, 0, 0.9);
+    text-shadow: 0 4px 40px rgba(0, 0, 0, 0.55);
   }
   .line { display: block; }
-  .line--gold {
-    font-family: "Faculty Glyphic", Georgia, serif;
-    color: #d4a840;
+  .line--italic {
+    font-style: italic;
+    color: #ffffff;
+  }
+
+  /* ---------- Controls ---------- */
+  .hero-controls {
+    position: absolute;
+    z-index: 2;
+    left: 50%;
+    bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transform: translateX(-50%);
+  }
+
+  .hero-dots { display: flex; gap: 8px; }
+
+  .hero-dot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.55);
+    cursor: pointer;
+    transition: width 0.3s ease, background-color 0.3s ease;
+  }
+  .hero-dot[aria-current="true"] {
+    width: 26px;
+    background: #d4a840;
+  }
+
+  .hero-pause {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.2);
+    color: #ffffff;
+    cursor: pointer;
+  }
+  .hero-pause:hover { border-color: #d4a840; color: #d4a840; }
+  .hero-pause .icon-play { display: none; }
+  .hero-pause[aria-pressed="true"] .icon-play { display: block; }
+  .hero-pause[aria-pressed="true"] .icon-pause { display: none; }
+
+  .hero-dot:focus-visible,
+  .hero-pause:focus-visible {
+    outline: 2px solid #d4a840;
+    outline-offset: 3px;
+  }
+
+  /* Visitors who prefer less motion: no zoom, instant change */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-slide,
+    .hero-slide :global(img) { transition: none; }
+    .hero-slide.is-active :global(img) { transform: none; }
   }
 
   @media (max-width: 600px) {
     .hero { height: 520px; }
+    .hero-controls { bottom: 20px; }
   }
 </style>
 
 <script>
-  // Visitors who turned on "reduce motion" see the still photo instead of the moving video
-  const video = document.querySelector<HTMLVideoElement>("[data-hero-video]");
-  if (video && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    video.pause();
-    video.removeAttribute("autoplay");
+  const hero = document.querySelector<HTMLElement>("[data-hero]");
+
+  if (hero) {
+    const slides = hero.querySelectorAll<HTMLElement>(".hero-slide");
+    const dots = hero.querySelectorAll<HTMLButtonElement>("[data-dot]");
+    const pauseBtn = hero.querySelector<HTMLButtonElement>("[data-pause]");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let current = 0;
+    let timer: number | undefined;
+    let pausedByUser = reduceMotion;   // reduced motion: start paused
+
+    const show = (index: number) => {
+      current = (index + slides.length) % slides.length;   // wrap around
+      slides.forEach((slide, i) => {
+        slide.classList.toggle("is-active", i === current);
+        slide.setAttribute("aria-hidden", String(i !== current));
+      });
+      dots.forEach((dot, i) => dot.setAttribute("aria-current", String(i === current)));
+    };
+
+    const start = () => {
+      stop();
+      if (!pausedByUser && slides.length > 1) {
+        timer = window.setInterval(() => show(current + 1), 6000);
+      }
+    };
+    const stop = () => window.clearInterval(timer);
+
+    const updatePauseButton = () => {
+      pauseBtn?.setAttribute("aria-pressed", String(pausedByUser));
+      pauseBtn?.setAttribute("aria-label", pausedByUser ? "Play the slideshow" : "Pause the slideshow");
+    };
+
+    dots.forEach((dot, i) =>
+      dot.addEventListener("click", () => {
+        show(i);
+        start();   // restart the 6-second count from this photo
+      })
+    );
+
+    pauseBtn?.addEventListener("click", () => {
+      pausedByUser = !pausedByUser;
+      updatePauseButton();
+      start();
+    });
+
+    // Pause while the mouse is over the banner or a control has keyboard focus
+    hero.addEventListener("mouseenter", stop);
+    hero.addEventListener("mouseleave", start);
+    hero.addEventListener("focusin", stop);
+    hero.addEventListener("focusout", start);
+
+    updatePauseButton();
+    start();
   }
 </script>
