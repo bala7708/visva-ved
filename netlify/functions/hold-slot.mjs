@@ -1,6 +1,14 @@
 import { randomUUID } from "node:crypto";
 import { store, slotKey, isValidSlot, isBlocking, json } from "../lib/bookings.mjs";
-import { HOLD_MINUTES, DEFAULT_PROGRAMME, priceFor } from "../../src/config/booking.mjs";
+import {
+  HOLD_MINUTES,
+  DEFAULT_PROGRAMME,
+  priceFor,
+  programmeFitsDate,
+  programmeForBooking,
+  serviceOfProgramme,
+  daysForProgramme,
+} from "../../src/config/booking.mjs";
 import { createPayment } from "../lib/payments.mjs";
 
 const TAKEN = "Sorry, this slot was just taken. Please choose another time.";
@@ -22,12 +30,24 @@ export default async (req) => {
   const name = String(body.name ?? "").trim().slice(0, 100);
   const email = String(body.email ?? "").trim().slice(0, 200);
   const whatsapp = String(body.whatsapp ?? "").trim().slice(0, 20);
-  const programme = String(body.programme || DEFAULT_PROGRAMME).trim().slice(0, 100);
+  const requested = String(body.programme || DEFAULT_PROGRAMME).trim().slice(0, 100);
 
   if (!isValidSlot(date, time)) return json({ error: "This slot can't be booked." }, 400);
+  if (!programmeFitsDate(requested, date)) {
+    return json({
+      error: `${serviceOfProgramme(requested)} sessions are on ${daysForProgramme(requested)}. Please choose one of those days.`,
+    }, 400);
+  }
   if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return json({ error: "Please enter your name and a valid email." }, 400);
   }
+  const whatsappDigits = whatsapp.replace(/\D/g, "");
+  if (whatsappDigits.length < 10 || whatsappDigits.length > 15) {
+    return json({ error: "Please enter a valid WhatsApp number, with country code (e.g. +91)." }, 400);
+  }
+
+  // A general booking takes that day's service, e.g. "Tarot" on a Monday
+  const programme = programmeForBooking(requested, date);
 
   const bookings = store();
   const key = slotKey(date, time);
@@ -75,6 +95,7 @@ export default async (req) => {
   return json({
     date,
     time,
+    programme,
     amount,
     expiresAt: booking.expiresAt,
     holdToken: booking.holdToken,

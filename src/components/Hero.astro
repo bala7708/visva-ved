@@ -12,7 +12,7 @@ const slides = [
 ];
 ---
 
-<section class="hero" data-hero aria-roledescription="carousel" aria-label="Visva Ved">
+<section class="hero" data-hero aria-label="Visva Ved">
   <!-- Photos, stacked on top of each other; the active one is visible -->
   <div class="hero-slides">
     {slides.map((slide, i) => (
@@ -38,27 +38,17 @@ const slides = [
     <span class="line">Self</span>
   </h1>
 
-  <!-- Controls: dots + pause/play -->
-  <div class="hero-controls">
-    <div class="hero-dots">
-      {slides.map((slide, i) => (
-        <button
-          type="button"
-          class="hero-dot"
-          data-dot={i}
-          aria-label={`Show photo ${i + 1} of ${slides.length}`}
-          aria-current={i === 0 ? "true" : "false"}
-        ></button>
-      ))}
-    </div>
-    <button type="button" class="hero-pause" data-pause aria-label="Pause the slideshow">
-      <svg class="icon-pause" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <rect x="5" y="4" width="5" height="16" rx="1" /><rect x="14" y="4" width="5" height="16" rx="1" />
-      </svg>
-      <svg class="icon-play" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M7 4.5v15a1 1 0 0 0 1.5.87l12-7.5a1 1 0 0 0 0-1.74l-12-7.5A1 1 0 0 0 7 4.5Z" />
-      </svg>
-    </button>
+  <!-- Dots: show which photo is visible; click one to jump to it -->
+  <div class="hero-dots">
+    {slides.map((slide, i) => (
+      <button
+        type="button"
+        class="hero-dot"
+        data-dot={i}
+        aria-label={`Show photo ${i + 1} of ${slides.length}`}
+        aria-current={i === 0 ? "true" : "false"}
+      ></button>
+    ))}
   </div>
 </section>
 
@@ -85,7 +75,7 @@ const slides = [
     position: absolute;
     inset: 0;
     opacity: 0;
-    transition: opacity 1.4s ease;
+    transition: opacity 1s ease;
   }
   .hero-slide.is-active { opacity: 1; }
 
@@ -95,7 +85,7 @@ const slides = [
     height: 100%;
     object-fit: cover;
     transform: scale(1);
-    transition: transform 7s ease-out;
+    transition: transform 4s ease-out;
   }
   /* Slow, gentle zoom on the visible photo */
   .hero-slide.is-active :global(img) { transform: scale(1.06); }
@@ -122,19 +112,16 @@ const slides = [
     color: #ffffff;
   }
 
-  /* ---------- Controls ---------- */
-  .hero-controls {
+  /* ---------- Dots ---------- */
+  .hero-dots {
     position: absolute;
     z-index: 2;
     left: 50%;
     bottom: 28px;
     display: flex;
-    align-items: center;
-    gap: 14px;
+    gap: 8px;
     transform: translateX(-50%);
   }
-
-  .hero-dots { display: flex; gap: 8px; }
 
   .hero-dot {
     width: 8px;
@@ -150,26 +137,7 @@ const slides = [
     width: 26px;
     background: #d4a840;
   }
-
-  .hero-pause {
-    display: grid;
-    place-items: center;
-    width: 26px;
-    height: 26px;
-    padding: 0;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.2);
-    color: #ffffff;
-    cursor: pointer;
-  }
-  .hero-pause:hover { border-color: #d4a840; color: #d4a840; }
-  .hero-pause .icon-play { display: none; }
-  .hero-pause[aria-pressed="true"] .icon-play { display: block; }
-  .hero-pause[aria-pressed="true"] .icon-pause { display: none; }
-
-  .hero-dot:focus-visible,
-  .hero-pause:focus-visible {
+  .hero-dot:focus-visible {
     outline: 2px solid #d4a840;
     outline-offset: 3px;
   }
@@ -183,25 +151,24 @@ const slides = [
 
   @media (max-width: 600px) {
     .hero { height: 520px; }
-    .hero-controls { bottom: 20px; }
+    .hero-dots { bottom: 20px; }
   }
 </style>
 
 <script>
+  const SLIDE_SECONDS = 3;   // how long each photo shows
+
   const hero = document.querySelector<HTMLElement>("[data-hero]");
 
   if (hero) {
     const slides = hero.querySelectorAll<HTMLElement>(".hero-slide");
     const dots = hero.querySelectorAll<HTMLButtonElement>("[data-dot]");
-    const pauseBtn = hero.querySelector<HTMLButtonElement>("[data-pause]");
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     let current = 0;
     let timer: number | undefined;
-    let pausedByUser = reduceMotion;   // reduced motion: start paused
 
     const show = (index: number) => {
-      current = (index + slides.length) % slides.length;   // wrap around
+      current = (index + slides.length) % slides.length;   // after the last photo, back to the first
       slides.forEach((slide, i) => {
         slide.classList.toggle("is-active", i === current);
         slide.setAttribute("aria-hidden", String(i !== current));
@@ -210,38 +177,19 @@ const slides = [
     };
 
     const start = () => {
-      stop();
-      if (!pausedByUser && slides.length > 1) {
-        timer = window.setInterval(() => show(current + 1), 6000);
+      window.clearInterval(timer);
+      if (slides.length > 1) {
+        timer = window.setInterval(() => show(current + 1), SLIDE_SECONDS * 1000);
       }
-    };
-    const stop = () => window.clearInterval(timer);
-
-    const updatePauseButton = () => {
-      pauseBtn?.setAttribute("aria-pressed", String(pausedByUser));
-      pauseBtn?.setAttribute("aria-label", pausedByUser ? "Play the slideshow" : "Pause the slideshow");
     };
 
     dots.forEach((dot, i) =>
       dot.addEventListener("click", () => {
         show(i);
-        start();   // restart the 6-second count from this photo
+        start();   // count 3 seconds again from this photo
       })
     );
 
-    pauseBtn?.addEventListener("click", () => {
-      pausedByUser = !pausedByUser;
-      updatePauseButton();
-      start();
-    });
-
-    // Pause while the mouse is over the banner or a control has keyboard focus
-    hero.addEventListener("mouseenter", stop);
-    hero.addEventListener("mouseleave", start);
-    hero.addEventListener("focusin", stop);
-    hero.addEventListener("focusout", start);
-
-    updatePauseButton();
     start();
   }
 </script>

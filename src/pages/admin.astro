@@ -72,7 +72,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 </BaseLayout>
 
 <script>
-  import { formatTime } from "../config/booking.mjs";
+  import { formatRange } from "../config/booking.mjs";
 
   type Status = "pending" | "expired" | "verifying" | "confirmed" | "rejected" | "cancelled";
   type Booking = {
@@ -246,7 +246,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
       tr.append(
         cell("Date", prettyDate(b.date)),
-        cell("Time", formatTime(b.time)),
+        cell("Time", formatRange(b.date, b.time)),
         cell("Client", client),
         cell("Programme", b.programme),
         cell("Amount", rupees.format(b.amount)),
@@ -259,7 +259,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
   // ---------- Accept / reject / confirm / cancel / send invite ----------
   async function updateBooking(booking: Booking, action: Action, button: HTMLButtonElement) {
-    const when = `${prettyDate(booking.date)} at ${formatTime(booking.time)}`;
+    const when = `${prettyDate(booking.date)}, ${formatRange(booking.date, booking.time)}`;
     const questions: Record<Action, string> = {
       confirm: booking.utr
         ? `Accept the payment of ${rupees.format(booking.amount)} from ${booking.name}?\n\n` +

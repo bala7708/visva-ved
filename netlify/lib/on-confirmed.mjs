@@ -1,14 +1,14 @@
 import { store } from "./bookings.mjs";
-import { formatTime } from "../../src/config/booking.mjs";
+import { formatRange } from "../../src/config/booking.mjs";
 import { createCalendarEvent } from "./google-calendar.mjs";
 import { sendWhatsAppConfirmation } from "./whatsapp.mjs";
 import { sendConfirmationEmail } from "./email.mjs";
 
-// "2026-10-03" + "10:00" → "Saturday, 3 October 2026 at 10:00 AM"
+// "2026-10-03" + "10:00" → "Saturday, 3 October 2026, 10:00 AM – 11:30 AM"
 const describeWhen = (date, time) =>
   `${new Date(`${date}T00:00:00Z`).toLocaleDateString("en-IN", {
     weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
-  })} at ${formatTime(time)}`;
+  })}, ${formatRange(date, time)}`;
 
 /**
  * Runs after a booking is confirmed: 1. calendar + Meet link, 2. email, 3. WhatsApp.

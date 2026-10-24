@@ -1,0 +1,58 @@
+---
+// Public page with all three policies.
+// Google (Calendar app publishing) and payment providers need a real URL:
+// https://<domain>/privacy  (Terms: /privacy#terms, Refunds: /privacy#refund)
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import PolicyContent from "../components/PolicyContent.astro";
+---
+
+<BaseLayout title="Policies | Visva Ved">
+  <Header />
+  <main class="policy-page">
+    <h1 class="policy-page-title">Our Policies</h1>
+    <nav class="policy-page-nav" aria-label="Policies">
+      <a href="#terms">Terms &amp; Conditions</a>
+      <a href="#privacy">Privacy Policy</a>
+      <a href="#refund">Refund Policy</a>
+    </nav>
+    <PolicyContent />
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .policy-page {
+    width: min(800px, calc(100% - 48px));
+    margin: 0 auto;
+    padding: 64px 0 96px;
+  }
+  .policy-page :global(.policy) { scroll-margin-top: 110px; }
+
+  .policy-page-title {
+    margin: 0 0 16px;
+    font-family: "Cinzel", Georgia, serif;
+    font-weight: 600;
+    font-size: 32px;
+    color: #5a7a5a;
+    text-align: center;
+  }
+  .policy-page-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 48px;
+  }
+  .policy-page-nav a {
+    padding: 8px 16px;
+    border: 1px solid #e6dcc4;
+    border-radius: 999px;
+    font-family: "Poppins", system-ui, sans-serif;
+    font-size: 14px;
+    color: #5a7a5a;
+    text-decoration: none;
+  }
+  .policy-page-nav a:hover { border-color: #d3a940; background: #d3a940; color: #ffffff; }
+</style>

@@ -11,7 +11,7 @@
         <span class="avatar" aria-hidden="true">VV</span>
         <div>
           <h2 id="booking-title" class="teacher-name">Visva Ved Teacher</h2>
-          <p id="booking-meta" class="teacher-meta">Healing Consultation · 45 min</p>
+          <p id="booking-meta" class="teacher-meta">General consultation</p>
         </div>
       </div>
       <div class="header-actions">
@@ -36,7 +36,7 @@
 
     <!-- ========== 1. Choose a time and enter details ========== -->
     <form id="booking-form" class="booking-form">
-      <input type="hidden" id="booking-programme" value="Healing Consultation" />
+      <input type="hidden" id="booking-programme" value="General consultation" />
 
       <div class="picker">
         <div class="calendar">
@@ -84,14 +84,22 @@
             <input id="booking-email" type="email" autocomplete="email" placeholder="priya@gmail.com" required />
           </div>
           <div class="field">
-            <label for="booking-phone">WhatsApp Number <span class="optional">Optional</span></label>
-            <input id="booking-phone" type="tel" autocomplete="tel" placeholder="+91 98765 43210" />
-            <label class="consent">
-              <input type="checkbox" id="booking-optin" />
-              <span>Send me booking updates on WhatsApp</span>
-            </label>
+            <label for="booking-phone">WhatsApp Number</label>
+            <input id="booking-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+91 98765 43210"
+                   pattern="[+0-9 ()\-]{10,20}" title="Your WhatsApp number with country code, e.g. +91 98765 43210" required />
           </div>
         </div>
+
+        <p class="legal-note">
+          Your booking confirmation and Google Meet link will be sent to your email and WhatsApp., you agree to our{" "}
+          <a href="/privacy#terms" data-policy="terms">Terms &amp; Conditions</a>{" "}and{" "}
+          <a href="/privacy#privacy" data-policy="privacy">Privacy Policy</a>.
+          We collect your details solely to process payment and deliver your spiritual consultation.
+          Visva Ved strictly adheres to ethical guidelines: we do not entertain queries regarding prenatal
+          sex determination or predictions on the time of death. All personal data is kept strictly
+          confidential and never sold to third parties. For data deletion requests, contact us at{" "}
+          <a href="mailto:visvaved@gmail.com">visvaved@gmail.com</a>.
+        </p>
 
         <button type="submit" id="booking-submit" class="submit" disabled>
           Continue to Payment
@@ -403,14 +411,6 @@
     font-size: 0.875rem;
     color: var(--color-ink);
   }
-  .optional {
-    padding: 2px 8px;
-    border: 1px solid #d4c4a8;
-    border-radius: 999px;
-    font-weight: 600;
-    font-size: 0.625rem;
-    text-transform: uppercase;
-  }
   .field input {
     width: 100%;
     padding: 12px 16px;
@@ -421,23 +421,15 @@
     font-size: 0.875rem;
   }
   .field input:focus { outline: none; border-color: var(--color-saffron); }
-  .field .consent {
-    align-items: flex-start;
-    gap: 10px;
-    margin: 10px 0 0;
-    font-weight: 400;
-    font-size: 0.8125rem;
-    color: var(--color-text);
-    cursor: pointer;
+
+  .legal-note {
+    margin-top: 20px;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: #6b725f;
   }
-  .field .consent input {
-    flex-shrink: 0;
-    width: 18px;
-    height: 18px;
-    margin-top: 1px;
-    padding: 0;
-    accent-color: var(--color-saffron);
-  }
+  .legal-note a { color: #8a6a1f; text-decoration: underline; text-underline-offset: 2px; }
+  .legal-note a:hover { color: var(--color-ink); }
 
   .submit {
     display: flex;
@@ -446,7 +438,7 @@
     gap: 8px;
     width: 100%;
     height: 56px;
-    margin-top: 24px;
+    margin-top: 16px;
     border: 0;
     border-radius: 12px;
     background: linear-gradient(169deg, var(--color-saffron), var(--color-saffron-dark));
@@ -682,12 +674,15 @@
 <script>
   import QRCode from "qrcode";
   import {
-    TIME_SLOTS,
-    CLOSED_WEEKDAYS,
     MIN_DAYS_AHEAD,
     MONTHS_SHOWN,
     DEFAULT_PROGRAMME,
-    formatTime,
+    slotsFor,
+    serviceFor,
+    sessionMinutes,
+    formatRange,
+    programmeFitsDate,
+    programmeForBooking,
   } from "../config/booking.mjs";
 
   const API = "/.netlify/functions";
@@ -735,7 +730,7 @@
     const nameInput = byId<HTMLInputElement>("booking-name");
     const emailInput = byId<HTMLInputElement>("booking-email");
     const phoneInput = byId<HTMLInputElement>("booking-phone");
-    const optIn = byId<HTMLInputElement>("booking-optin");
+    
 
     // Step 2
     const payAmount = byId<HTMLElement>("pay-amount");
@@ -759,19 +754,32 @@
     const firstMonth = monthNumber(today.getFullYear(), today.getMonth());
     const lastMonth = firstMonth + MONTHS_SHOWN - 1;
 
-    const isBookable = (d: Date) =>
-      d >= firstBookable &&
-      !CLOSED_WEEKDAYS.includes(d.getDay()) &&
-      monthNumber(d.getFullYear(), d.getMonth()) <= lastMonth;
-
     const pad = (n: number) => String(n).padStart(2, "0");
     const isoDate = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+    // Open day in the timetable AND the right day for the chosen programme (Tarot → Mon/Thu…)
+    const isBookable = (d: Date) =>
+      d >= firstBookable &&
+      monthNumber(d.getFullYear(), d.getMonth()) <= lastMonth &&
+      programmeFitsDate(programmeInput.value, isoDate(d));
     const longDate = (d: Date) =>
       d.toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
     const shortDate = (d: Date) => d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
     const fromIso = (iso: string) => new Date(`${iso}T00:00:00`);
     const describe = (hold: Hold) =>
-      `${hold.programme} · ${longDate(fromIso(hold.date))} at ${formatTime(hold.time)} (India time)`;
+      `${hold.programme} · ${longDate(fromIso(hold.date))}, ${formatRange(hold.date, hold.time)} (India time)`;
+
+    // Header line, e.g. "Tarot · 60 min" once a day is chosen
+    const updateMeta = () => {
+      if (!selectedDate) {
+        meta.textContent = programmeInput.value;
+        return;
+      }
+      const iso = isoDate(selectedDate);
+      const name = programmeForBooking(programmeInput.value, iso);
+      const first = slotsFor(iso)[0];
+      meta.textContent = first ? `${name} · ${sessionMinutes(iso, first)} min` : name;
+    };
 
     const findFirstAvailable = () => {
       const d = new Date(firstBookable);
@@ -854,14 +862,27 @@
         return;
       }
 
-      slotDay.textContent = shortDate(selectedDate);
-      for (const time of TIME_SLOTS) {
+      const iso = isoDate(selectedDate);
+      const service = serviceFor(iso);
+      slotDay.textContent = service ? `${shortDate(selectedDate)} · ${service}` : shortDate(selectedDate);
+
+      const times = slotsFor(iso);
+      if (times.length === 0) {
+        const message = document.createElement("p");
+        message.className = "slot-empty";
+        message.textContent = "No sessions on this day.";
+        slotList.append(message);
+        return;
+      }
+
+      for (const time of times) {
         const isTaken = takenTimes.includes(time);
+        const label = formatRange(iso, time);
         const button = document.createElement("button");
         button.type = "button";
-        button.textContent = formatTime(time);
+        button.textContent = label;
         button.disabled = isTaken;
-        if (isTaken) button.setAttribute("aria-label", `${formatTime(time)}, not available`);
+        if (isTaken) button.setAttribute("aria-label", `${label}, not available`);
         button.setAttribute("aria-pressed", String(time === selectedTime));
         button.addEventListener("click", () => {
           selectedTime = time;
@@ -876,7 +897,7 @@
       submitBtn.disabled = !(selectedDate && selectedTime);
       if (!selectedDate) hint.textContent = "Select a date to continue";
       else if (!selectedTime) hint.textContent = "Select a time slot to continue";
-      else hint.textContent = `${shortDate(selectedDate)} at ${formatTime(selectedTime)} (India time)`;
+      else hint.textContent = `${shortDate(selectedDate)}, ${formatRange(isoDate(selectedDate), selectedTime)} (India time)`;
     };
 
     const selectDate = async (date: Date) => {
@@ -887,6 +908,7 @@
       renderCalendar();
       renderSlots();
       updateSubmit();
+      updateMeta();
 
       try {
         const response = await fetch(`${API}/availability?date=${isoDate(date)}`);
@@ -912,7 +934,6 @@
       renderCalendar();
     });
 
-    optIn.addEventListener("change", () => { phoneInput.required = optIn.checked; });
 
     // ---------- Result screens ----------
     const showDone = (hold: Hold, verifying: boolean) => {
@@ -922,14 +943,14 @@
         setText("done-title", verifying ? "Your Slot Has Been Booked" : "Booking Slot Confirmed!");
         setText("done-email", emailInput?.value || "your email");
         setText("done-note", verifying ? "We'll verify your payment shortly and then send your confirmation." : "");
-        setText("done-session", `${hold.programme} · 45 min`);
+        setText("done-session", `${hold.programme} · ${sessionMinutes(hold.date, hold.time)} min`);
         setText(
           "done-date",
           fromIso(hold.date).toLocaleDateString("en-US", {
             weekday: "short", month: "short", day: "numeric", year: "numeric",
           })
         );
-        setText("done-time", `${formatTime(hold.time)} (India time)`);
+        setText("done-time", `${formatRange(hold.date, hold.time)} (India time)`);
       } catch (error) {
         console.error("Filling in the confirmation failed:", error);
       }
@@ -947,7 +968,9 @@
       currentHold = null;
       show("form");
       submitBtn.disabled = true;
-      const first = selectedDate ?? findFirstAvailable();
+      // Keep the chosen day only if it still fits the programme
+      const keep = selectedDate && isBookable(selectedDate) ? selectedDate : null;
+      const first = keep ?? findFirstAvailable();
       if (first) {
         viewYear = first.getFullYear();
         viewMonth = first.getMonth();
@@ -968,6 +991,7 @@
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (!selectedDate || !selectedTime) return;
+      if (!form.reportValidity()) return;   // name, email and WhatsApp number are required
 
       submitBtn.disabled = true;
       hint.textContent = "Reserving your slot…";
@@ -982,8 +1006,8 @@
             time: selectedTime,
             name: nameInput.value,
             email: emailInput.value,
-            whatsapp: optIn.checked ? toWhatsAppNumber(phoneInput.value) : phoneInput.value,
-            whatsappOptIn: optIn.checked,
+            whatsapp: toWhatsAppNumber(phoneInput.value),
+            whatsappOptIn: true,
             programme: programmeInput.value,
           }),
         });
@@ -1007,7 +1031,7 @@
         return;
       }
 
-      currentHold = { ...(data as Hold), programme: programmeInput.value };
+      currentHold = { ...(data as Hold), programme: data.programme ?? programmeInput.value };
       await showPayment();
     });
 
@@ -1150,17 +1174,25 @@
 
       const fromAttribute = (link as HTMLElement).dataset.programme;
       const cardTitle = link.closest(".card")?.querySelector("h3")?.textContent?.trim();
-      const programme = fromAttribute || cardTitle || DEFAULT_PROGRAMME;
+      // On a service page, "Book a Session" books that service (Tarot page → Tarot days)
+      const pageProgrammes: Record<string, string> = {
+        "/tarot": "Tarot Reading",
+        "/numerology": "Numerology Reading",
+        "/vastu": "Vastu Consultation",
+      };
+      const fromPage = pageProgrammes[window.location.pathname.replace(/\/$/, "")];
+      const programme = fromAttribute || cardTitle || fromPage || DEFAULT_PROGRAMME;
+      const changed = programmeInput.value !== programme;
       programmeInput.value = programme;
-      meta.textContent = `${programme} · 45 min`;
+      updateMeta();
 
       dialog.showModal();
 
       if (currentHold && Date.now() < currentHold.expiresAt) {
         show("pay");
         startTimers();
-      } else if (form.hidden) {
-        resetToForm();
+      } else if (form.hidden || changed) {
+        resetToForm();   // also moves to a day that fits the new programme
       }
     });
 
@@ -1172,7 +1204,6 @@
       stopTimers();
       if (!doneView.hidden || !expiredView.hidden) {
         form.reset();
-        phoneInput.required = false;
         show("form");
       }
     });

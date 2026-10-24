@@ -1,4 +1,4 @@
-import { SESSION_MINUTES } from "../../src/config/booking.mjs";
+import { sessionMinutes } from "../../src/config/booking.mjs";
 
 const isConfigured = () =>
   Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_REFRESH_TOKEN);
@@ -20,7 +20,7 @@ async function getAccessToken() {
   return data.access_token;
 }
 
-// "2026-10-03" + "10:00" + 45 → "2026-10-03T10:45:00"
+// "2026-10-03" + "10:00" + 90 → "2026-10-03T11:30:00"
 function localDateTime(date, time, addMinutes = 0) {
   const [h, m] = time.split(":").map(Number);
   const total = h * 60 + m + addMinutes;
@@ -47,7 +47,7 @@ export async function createCalendarEvent(booking) {
       `Booked via the Visva Ved website (order ${booking.orderId})`,
     ].filter(Boolean).join("\n"),
     start: { dateTime: localDateTime(booking.date, booking.time), timeZone: "Asia/Kolkata" },
-    end: { dateTime: localDateTime(booking.date, booking.time, SESSION_MINUTES), timeZone: "Asia/Kolkata" },
+    end: { dateTime: localDateTime(booking.date, booking.time, sessionMinutes(booking.date, booking.time)), timeZone: "Asia/Kolkata" },
     attendees: [{ email: booking.email, displayName: booking.name }],
     conferenceData: {
       createRequest: { requestId: booking.orderId, conferenceSolutionKey: { type: "hangoutsMeet" } },

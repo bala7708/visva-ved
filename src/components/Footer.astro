@@ -48,10 +48,11 @@ const socials = [
   { label: "YouTube", href: "#" },
 ];
 
+// "policy" opens the policy popup (PolicyModal.astro); href is the fallback page
 const legal = [
-  { label: "Privacy Policy", href: "#" },
-  { label: "Terms of Use", href: "#" },
-  { label: "Cookie Policy", href: "#" },
+  { label: "Privacy Policy", href: "/privacy#privacy", policy: "privacy" },
+  { label: "Terms & Conditions", href: "/privacy#terms", policy: "terms" },
+  { label: "Refund Policy", href: "/privacy#refund", policy: "refund" },
 ];
 
 const email = "visvaved@gmail.com";   // from the final design; confirm with the client
@@ -93,7 +94,7 @@ const year = new Date().getFullYear();
       <p>© {year} Visva Ved — Spiritual Coaching. All rights reserved.</p>
       <ul class="legal">
         {legal.map((link) => (
-          <li><a href={link.href}>{link.label}</a></li>
+          <li><a href={link.href} data-policy={link.policy}>{link.label}</a></li>
         ))}
       </ul>
     </div>

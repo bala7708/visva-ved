@@ -17,6 +17,7 @@ import "@fontsource/cinzel/500.css";
 import "@fontsource/cinzel/600.css";
 import "@fontsource/cinzel/700.css";
 import "@fontsource/dm-serif-display/400-italic.css";
+import PolicyModal from "../components/PolicyModal.astro";
 
 interface Props {
   title?: string;
@@ -48,5 +49,6 @@ const {
   </head>
   <body>
     <slot />
+    <PolicyModal />
   </body>
 </html>
