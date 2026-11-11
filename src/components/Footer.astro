@@ -1,6 +1,8 @@
 ---
 import { Image } from "astro:assets";
-import logo from "../assets/images/logo.png";
+import logoWordmark from "../assets/images/logo-wordmark.png";
+
+const email = "visvaved@gmail.com";
 
 // Footer columns. "#" = page or link not decided yet (ask the client).
 const columns = [
@@ -35,13 +37,14 @@ const columns = [
     title: "About",
     links: [
       { label: "Our Approach", href: "/#vedic" },
-      { label: "Our Story", href: "#" },
+      { label: "Our Story", href: "/#vedic" },
       { label: "Testimonials", href: "/#vedic" },
-      { label: "Contact Us", href: "mailto:hello@visvaved.com" },
+      { label: "Contact Us", href: `mailto:${email}` },
     ],
   },
 ];
 
+// Replace "#" with the client's real profile links (or delete a line they don't have)
 const socials = [
   { label: "Instagram", href: "#" },
   { label: "Facebook", href: "#" },
@@ -55,7 +58,6 @@ const legal = [
   { label: "Refund Policy", href: "/privacy#refund", policy: "refund" },
 ];
 
-const email = "visvaved@gmail.com";   // from the final design; confirm with the client
 const year = new Date().getFullYear();
 ---
 
@@ -64,11 +66,10 @@ const year = new Date().getFullYear();
     <div class="footer-top">
       <!-- Brand column -->
       <div class="brand">
-        <Image src={logo} alt="Visva Ved" width={140} height={108} />
-        <p class="brand-text">
-             Embrace your Highest Self. Guiding you back to harmony through
-          Numerology, Tarot, and Vastu Shastra.
-        </p>
+        <a href="/" class="wordmark" aria-label="Visva Ved, home">
+          <Image src={logoWordmark} alt="" height={60} />
+        </a>
+        <p class="brand-text">Embrace your Highest Self</p>
         <a class="email" href={`mailto:${email}`}>✉ {email}</a>
         <ul class="socials">
           {socials.map((s) => (
@@ -108,13 +109,7 @@ const year = new Date().getFullYear();
     font-family: var(--font-ui);
   }
 
-  .mantra {
-    font-family: var(--font-serif);
-    font-style: italic;
-    color: rgba(201, 168, 76, 0.45);
-  }
-  
-  /* ---------- Top: brand + 5 link columns ---------- */
+  /* ---------- Top: brand + 4 link columns ---------- */
   .footer-top {
     display: grid;
     grid-template-columns: 1.6fr repeat(4, 1fr);
@@ -123,21 +118,25 @@ const year = new Date().getFullYear();
     border-bottom: 1px solid rgba(201, 168, 76, 0.15);
   }
 
-  .brand :global(img) {
-    width: 70px;
-    height: 54px;
-    object-fit: contain;
+  /* "VISVA VED" lettering on a white plate, as in the design */
+  .wordmark {
+    display: inline-block;
+    padding: 6px 10px;
+    background: #ffffff;
+    line-height: 0;
   }
+  .wordmark :global(img) { width: auto; height: 22px; }
+
   .brand-text {
     max-width: 260px;
-    margin-top: 16px;
-    font-size: 0.8125rem;
-    line-height: 1.7;
-    color: rgba(245, 239, 226, 0.7);
+    margin-top: 28px;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #f5efe2;
   }
   .email {
     display: inline-block;
-    margin-top: 16px;
+    margin-top: 32px;
     font-size: 0.8125rem;
     color: var(--color-gold);
   }
@@ -195,7 +194,7 @@ const year = new Date().getFullYear();
   }
   .legal a:hover { color: var(--color-gold); }
 
-  /* ---------- Tablet: brand on top, 3 columns ---------- */
+  /* ---------- Tablet: brand on top, 4 columns ---------- */
   @media (max-width: 1024px) {
     .footer-top { grid-template-columns: repeat(4, 1fr); }
     .brand { grid-column: 1 / -1; }

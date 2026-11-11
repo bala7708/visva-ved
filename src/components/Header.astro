@@ -1,6 +1,7 @@
 ---
 import { Image } from "astro:assets";
-import logo from "../assets/images/logo.png";
+import logoMark from "../assets/images/logo-mark.png";
+import logoWordmark from "../assets/images/logo-wordmark.png";
 
 // Navigation links. Edit this list to change the menu.
 const links = [
@@ -18,7 +19,8 @@ const isActive = (href: string) => href === currentPath;
 <header class="site-header">
   <div class="header-inner">
     <a href="/" class="logo" aria-label="Visva Ved, home">
-      <Image src={logo} alt="Visva Ved" width={120} height={92} />
+      <Image src={logoMark} alt="" height={72} class="logo-mark" />
+      <Image src={logoWordmark} alt="" height={30} class="logo-word" />
     </a>
 
     <nav id="site-nav" class="nav" aria-label="Main">
@@ -63,12 +65,15 @@ const isActive = (href: string) => href === currentPath;
     padding-inline: 40px;
   }
 
-  .logo { justify-self: start; }
-  .logo :global(img) {
-    width: 60px;
-    height: 46px;
-    object-fit: contain;
+  /* Logo: trident emblem + "VISVA VED" lettering */
+  .logo {
+    justify-self: start;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
+  .logo :global(.logo-mark) { width: auto; height: 36px; }
+  .logo :global(.logo-word) { width: auto; height: 15px; }
 
   .nav { display: flex; align-items: center; }
   .nav ul {

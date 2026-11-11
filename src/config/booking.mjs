@@ -40,10 +40,10 @@ export const HOLD_MINUTES = 15;    // how long a slot is held while the visitor 
 export const DEFAULT_PROGRAMME = "General consultation";
 
 export const PRICES = {
-  default: 500,
-  // "Tarot": 500,
-  // "Numerology": 700,
-  // "Vedic Vastu": 900,
+  //default: 500,
+   "Tarot": 1499,
+   "Numerology": 3201,
+   "Vedic Vastu": 5001,
 };
 
 export const priceFor = (programme) => PRICES[programme] ?? PRICES.default;
