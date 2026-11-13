@@ -4,7 +4,7 @@ const isConfigured = () =>
 /** Sends the approved "booking confirmed" template via the WhatsApp Cloud API (Meta). */
 export async function sendWhatsAppConfirmation(booking, { when, meetLink }) {
   if (!booking.whatsappOptIn || !booking.whatsapp) return { skipped: null };   // customer chose not to: no warning
-  if (!isConfigured()) return { skipped: "WhatsApp is not set up yet" };
+  if (!isConfigured()) return { skipped: null };   // manual mode: "Send on WhatsApp" button in admin
 
   const version = process.env.WHATSAPP_API_VERSION || "v21.0";
   const template = process.env.WHATSAPP_TEMPLATE;

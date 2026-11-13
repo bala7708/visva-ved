@@ -39,18 +39,18 @@ export const HOLD_MINUTES = 15;    // how long a slot is held while the visitor 
 // ---------- Programme & price ----------
 export const DEFAULT_PROGRAMME = "General consultation";
 
+// Price per service in ₹. "Tarot Reading", "Book Tarot" etc. use the Tarot price automatically.
+// "default" is used for anything else (e.g. Medical Astrology, Numerology Report). Never remove it.
 export const PRICES = {
-  //default: 500,
-   "Tarot": 1499,
-   "Numerology": 3201,
-   "Vedic Vastu": 5001,
+  default: 1499,
+  "Tarot": 1499,
+  "Numerology": 3201,
+  "Vedic Vastu": 5001,
 };
 
-export const priceFor = (programme) => PRICES[programme] ?? PRICES.default;
-
 // ---------- UPI ----------
-export const UPI_ID = "CHANGE-ME@upi";
-export const PAYEE_NAME = "Visva Ved";
+export const UPI_ID = "gedam.mayuri@okicici";
+export const PAYEE_NAME = "Mayuri Gedam";
 
 // ============================================================
 //  Helpers (no need to edit below this line)
@@ -140,8 +140,13 @@ export function programmeForBooking(programme, dateStr) {
   return name;
 }
 
+// Price for a booking: exact name first, then its service, then "default"
+export const priceFor = (programme) =>
+  PRICES[programme] ?? PRICES[serviceOfProgramme(programme)] ?? PRICES.default;
+
 // "14:30" -> "2:30 PM"
 export function formatTime(hhmm) {
+  if (typeof hhmm !== "string" || !hhmm.includes(":")) return "–";   // missing or broken time
   const [h, m] = hhmm.split(":").map(Number);
   const suffix = h >= 12 ? "PM" : "AM";
   const hour = h % 12 || 12;

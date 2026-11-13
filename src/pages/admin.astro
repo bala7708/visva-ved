@@ -73,6 +73,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
 <script>
   import { formatRange } from "../config/booking.mjs";
+  import { confirmationText } from "../config/messages.mjs";
 
   type Status = "pending" | "expired" | "verifying" | "confirmed" | "rejected" | "cancelled";
   type Booking = {
@@ -203,12 +204,36 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     return button;
   }
 
+  // Opens WhatsApp (app or web) with the confirmation already typed to the customer.
+  // Works without a Meta account: the admin just presses Send.
+  function whatsappButton(b: Booking) {
+    const when = `${new Date(`${b.date}T00:00:00Z`).toLocaleDateString("en-IN", {
+      weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
+    })}, ${formatRange(b.date, b.time)}`;
+    const text = confirmationText({
+      name: b.name,
+      bookingId: b.orderId,
+      programme: b.programme,
+      when,
+      amount: b.amount,
+      utr: b.utr,
+      meetLink: b.meetLink,
+    });
+    const link = element("a", "act act--wa", "Send on WhatsApp") as HTMLAnchorElement;
+    link.href = `https://wa.me/${String(b.whatsapp).replace(/\D/g, "")}?text=${encodeURIComponent(text)}`;
+    link.target = "_blank";
+    link.rel = "noopener";
+    return link;
+  }
+
   function renderList() {
     const list = visibleBookings();
     tbody.replaceChildren();
     listMessage.textContent = list.length === 0 ? "No bookings here yet." : "";
 
     for (const b of list) {
+      // One broken booking must never blank the whole list
+      try {
       const tr = document.createElement("tr");
 
       // Client
@@ -241,6 +266,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       } else {
         if (b.status === "pending" || b.status === "expired") actions.append(actionButton("Confirm", "confirm", b));
         if (b.status === "confirmed" && !b.meetLink) actions.append(actionButton("Send invite", "notify", b));
+        if (b.status === "confirmed" && b.whatsapp) actions.append(whatsappButton(b));
         if (b.status === "confirmed" || b.status === "pending") actions.append(actionButton("Cancel", "cancel", b));
       }
 
@@ -254,6 +280,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         cell("Actions", actions),
       );
       tbody.append(tr);
+      } catch (error) {
+        console.error("Could not show booking", b, error);   // see F12 → Console
+      }
     }
   }
 
@@ -493,6 +522,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   .admin-app .act--confirm:hover { background: #3a7f4b; }
   .admin-app .act--cancel { border-color: #e6b8b3; background: transparent; color: #9b2c22; }
   .admin-app .act--cancel:hover { background: #fbe4e2; }
+  .admin-app .act--wa { border-color: #25d366; background: #25d366; color: #ffffff; text-decoration: none; }
+  .admin-app .act--wa:hover { background: #1ebe5b; }
 
   .admin-app .note { margin-top: 16px; font-size: 0.8rem; color: #8a8d7e; }
 
