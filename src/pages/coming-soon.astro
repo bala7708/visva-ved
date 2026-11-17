@@ -1,0 +1,204 @@
+---
+// "Coming soon" page with a countdown, shown before the launch time.
+// The launch gate (netlify/edge-functions/launch-gate.js) shows this page instead of
+// the real site until LAUNCH_AT, and fills in the launch time below.
+import { Image } from "astro:assets";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import logoMark from "../assets/images/logo-mark.png";
+import logoWordmark from "../assets/images/logo-wordmark.png";
+
+const whatsapp = "919065333156";
+const email = "visvaved@gmail.com";
+---
+
+<BaseLayout title="Visva Ved | Coming soon" noindex>
+  <main class="soon" data-launch="__LAUNCH_AT__">
+    <div class="soon-inner">
+      <div class="soon-logo">
+        <Image src={logoMark} alt="" height={240} class="soon-mark" />
+        <Image src={logoWordmark} alt="Visva Ved" height={60} class="soon-word" />
+      </div>
+
+      <p class="soon-tagline">Embrace your Highest Self</p>
+
+      <h1 class="soon-title">Our website opens soon</h1>
+      <p class="soon-date" data-date>&nbsp;</p>
+
+      <ol class="countdown" aria-label="Time until launch" data-countdown>
+        <li><span data-days>--</span><small>Days</small></li>
+        <li><span data-hours>--</span><small>Hours</small></li>
+        <li><span data-minutes>--</span><small>Minutes</small></li>
+        <li><span data-seconds>--</span><small>Seconds</small></li>
+      </ol>
+
+      <p class="soon-text">
+        Numerology, Tarot and Vedic Vastu guidance with Dr. Mayuri.
+        Until then, we're happy to hear from you.
+      </p>
+
+      <div class="soon-actions">
+        <a class="soon-btn" href={`https://wa.me/${whatsapp}?text=${encodeURIComponent("Namaste, I'd like to know more about Visva Ved.")}`}
+           target="_blank" rel="noopener">WhatsApp us</a>
+        <a class="soon-link" href={`mailto:${email}`}>{email}</a>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .soon {
+    display: grid;
+    place-items: center;
+    min-height: 100dvh;
+    padding: 48px 24px;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(201, 168, 76, 0.18), transparent 60%),
+      #1e2e20;
+    color: #f5efe2;
+    text-align: center;
+  }
+  .soon-inner { width: min(640px, 100%); }
+
+  .soon-logo {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    padding: 28px 36px 22px;
+    background: #ffffff;
+  }
+  .soon-logo :global(.soon-mark) { width: auto; height: 110px; }
+  .soon-logo :global(.soon-word) { width: auto; height: 28px; }
+
+  .soon-tagline {
+    margin-top: 28px;
+    font-family: "Lora", Georgia, serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: #c9a84c;
+  }
+
+  .soon-title {
+    margin-top: 28px;
+    font-family: "Cinzel", Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(1.75rem, 5vw, 2.6rem);
+    line-height: 1.2;
+    color: #ffffff;
+  }
+  .soon-date {
+    margin-top: 10px;
+    font-family: "Inter", sans-serif;
+    font-size: 1rem;
+    color: rgba(245, 239, 226, 0.75);
+  }
+
+  .countdown {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 32px auto 0;
+    padding: 0;
+    max-width: 480px;
+    list-style: none;
+  }
+  .countdown li {
+    padding: 16px 6px 12px;
+    border: 1px solid rgba(201, 168, 76, 0.45);
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .countdown span {
+    display: block;
+    font-family: "Cinzel", Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(1.6rem, 6vw, 2.4rem);
+    line-height: 1;
+    color: #ffffff;
+    font-variant-numeric: tabular-nums;
+  }
+  .countdown small {
+    display: block;
+    margin-top: 8px;
+    font-family: "Inter", sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #c9a84c;
+  }
+
+  .soon-text {
+    margin-top: 32px;
+    font-family: "Inter", sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: rgba(245, 239, 226, 0.8);
+  }
+
+  .soon-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 16px 24px;
+    margin-top: 24px;
+  }
+  .soon-btn {
+    padding: 13px 30px;
+    border-radius: 999px;
+    background: #e8892c;
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #ffffff;
+    text-decoration: none;
+    transition: transform 0.25s ease;
+  }
+  .soon-btn:hover { transform: translateY(-2px) scale(1.04); }
+  .soon-link {
+    font-family: "Inter", sans-serif;
+    font-size: 0.9rem;
+    color: #c9a84c;
+  }
+  .soon-btn:focus-visible,
+  .soon-link:focus-visible { outline: 2px solid #c9a84c; outline-offset: 3px; }
+
+  @media (max-width: 480px) {
+    .countdown { gap: 8px; }
+    .soon-logo { padding: 22px 26px 18px; }
+    .soon-logo :global(.soon-mark) { height: 88px; }
+    .soon-logo :global(.soon-word) { height: 22px; }
+  }
+</style>
+
+<script>
+  const main = document.querySelector<HTMLElement>("[data-launch]");
+  const launch = main ? Date.parse(main.dataset.launch ?? "") : NaN;
+
+  if (main && !Number.isNaN(launch)) {
+    // "Wednesday, 25 November 2026 at 10:00 AM (India time)"
+    const dateText = new Date(launch).toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      weekday: "long", day: "numeric", month: "long", year: "numeric",
+      hour: "numeric", minute: "2-digit", hour12: true,
+    });
+    main.querySelector("[data-date]")!.textContent = `Opening on ${dateText} (India time)`;
+
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const set = (sel: string, value: string) => (main.querySelector(sel)!.textContent = value);
+
+    const tick = () => {
+      const left = launch - Date.now();
+      if (left <= 0) {
+        window.location.reload();   // launch time reached: load the real website
+        return;
+      }
+      const s = Math.floor(left / 1000);
+      set("[data-days]", pad(Math.floor(s / 86400)));
+      set("[data-hours]", pad(Math.floor((s % 86400) / 3600)));
+      set("[data-minutes]", pad(Math.floor((s % 3600) / 60)));
+      set("[data-seconds]", pad(s % 60));
+    };
+    tick();
+    window.setInterval(tick, 1000);
+  }
+</script>
