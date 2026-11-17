@@ -18,8 +18,12 @@ export default async (request, context) => {
 
   const url = new URL(request.url);
 
-  // Files (images, CSS, JS, fonts, icons…) are never blocked
-  if (/\.[a-z0-9]{2,5}$/i.test(url.pathname)) return context.next();
+  // Only page visits are gated. Images, CSS, JS, fonts and icons always load,
+  // including image addresses without a file ending (e.g. /_image?… while developing).
+  const wantsPage = (request.headers.get("accept") ?? "").includes("text/html");
+  if (!wantsPage || /\.[a-z0-9]{2,5}$/i.test(url.pathname) || url.pathname.startsWith("/_")) {
+    return context.next();
+  }
 
   // Secret preview link for the developer and the client
   const previewCode = Netlify.env.get("PREVIEW_CODE");
