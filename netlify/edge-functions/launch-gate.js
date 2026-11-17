@@ -13,10 +13,18 @@
 const COOKIE = "vv_preview";
 
 export default async (request, context) => {
-  const launchAt = Date.parse(Netlify.env.get("LAUNCH_AT") ?? "");
-  if (Number.isNaN(launchAt) || Date.now() >= launchAt) return context.next();   // launched (or no gate)
+  // The gate's own request for the template page: let it through
+  if (request.headers.get("x-vv-gate") === "1") return context.next();
 
   const url = new URL(request.url);
+  const isSoonPage = url.pathname.startsWith("/coming-soon");
+  const launchAt = Date.parse(Netlify.env.get("LAUNCH_AT") ?? "");
+
+  if (Number.isNaN(launchAt) || Date.now() >= launchAt) {
+    // Launched (or no gate): the old "coming soon" address goes to the homepage
+    return isSoonPage ? Response.redirect(new URL("/", url), 302) : context.next();
+  }
+  if (isSoonPage) return gatePage(url, launchAt);   // visited directly: still show the countdown
 
   // Only page visits are gated. Images, CSS, JS, fonts and icons always load,
   // including image addresses without a file ending (e.g. /_image?… while developing).
@@ -45,7 +53,7 @@ export default async (request, context) => {
 
 // The "Coming soon" page, with the launch time filled in
 async function gatePage(url, launchAt) {
-  const page = await fetch(new URL("/coming-soon/", url));
+  const page = await fetch(new URL("/coming-soon/", url), { headers: { "x-vv-gate": "1" } });
   const html = (await page.text()).replace("__LAUNCH_AT__", new Date(launchAt).toISOString());
   return new Response(html, {
     status: 200,
@@ -59,5 +67,5 @@ async function gatePage(url, launchAt) {
 
 export const config = {
   path: "/*",
-  excludedPath: ["/admin", "/admin/*", "/coming-soon", "/coming-soon/*", "/.netlify/*"],
+  excludedPath: ["/admin", "/admin/*", "/.netlify/*"],
 };
