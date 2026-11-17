@@ -7,12 +7,16 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import logoMark from "../assets/images/logo-mark.png";
 import logoWordmark from "../assets/images/logo-wordmark.png";
 
+// Fallback launch time written at build (the page normally asks the server)
+const launchAt = process.env.LAUNCH_AT ?? "";
+const launchIso = Number.isNaN(Date.parse(launchAt)) ? "" : new Date(launchAt).toISOString();
+
 const whatsapp = "919065333156";
 const email = "visvaved@gmail.com";
 ---
 
 <BaseLayout title="Visva Ved | Coming soon" noindex>
-  <main class="soon" data-launch="__LAUNCH_AT__">
+  <main class="soon" data-launch={launchIso}>
     <div class="soon-inner">
       <div class="soon-logo">
         <Image src={logoMark} alt="" height={240} loading="eager" class="soon-mark" />
@@ -172,33 +176,60 @@ const email = "visvaved@gmail.com";
 
 <script>
   const main = document.querySelector<HTMLElement>("[data-launch]");
-  const launch = main ? Date.parse(main.dataset.launch ?? "") : NaN;
 
-  if (main && !Number.isNaN(launch)) {
-    // "Wednesday, 25 November 2026 at 10:00 AM (India time)"
-    const dateText = new Date(launch).toLocaleString("en-IN", {
-      timeZone: "Asia/Kolkata",
-      weekday: "long", day: "numeric", month: "long", year: "numeric",
-      hour: "numeric", minute: "2-digit", hour12: true,
+  // The launch time: asked from the server (LAUNCH_AT setting); the value written
+  // into the page is only a fallback.
+  async function getLaunch(): Promise<number> {
+    try {
+      const res = await fetch("/.netlify/functions/launch-time", { cache: "no-store" });
+      const data = await res.json();
+      const t = Date.parse(data.launchAt ?? "");
+      if (!Number.isNaN(t)) return t;
+    } catch {
+      /* fall back below */
+    }
+    return Date.parse(main?.dataset.launch ?? "");
+  }
+
+  if (main) {
+    getLaunch().then((launch) => {
+      if (Number.isNaN(launch)) return;   // no launch time set: leave "--"
+
+      // "Wednesday, 18 November 2026 at 7:20 am (India time)"
+      const dateText = new Date(launch).toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        weekday: "long", day: "numeric", month: "long", year: "numeric",
+        hour: "numeric", minute: "2-digit", hour12: true,
+      });
+      main.querySelector("[data-date]")!.textContent = `Opening on ${dateText} (India time)`;
+
+      const pad = (n: number) => String(n).padStart(2, "0");
+      const set = (sel: string, value: string) => (main.querySelector(sel)!.textContent = value);
+
+      let leaving = false;
+      const tick = () => {
+        const left = launch - Date.now();
+        if (left <= 0) {
+          // Launch time reached: open the real website. Wait a few seconds first, so a
+          // slightly fast phone clock can't make the page bounce back and forth.
+          if (!leaving) {
+            leaving = true;
+            set("[data-seconds]", "00");
+            window.setTimeout(() => {
+              const onSoonPage = window.location.pathname.startsWith("/coming-soon");
+              window.location.replace(onSoonPage ? "/" : window.location.href);
+            }, 4000);
+          }
+          return;
+        }
+        const s = Math.floor(left / 1000);
+        set("[data-days]", pad(Math.floor(s / 86400)));
+        set("[data-hours]", pad(Math.floor((s % 86400) / 3600)));
+        set("[data-minutes]", pad(Math.floor((s % 3600) / 60)));
+        set("[data-seconds]", pad(s % 60));
+      };
+      tick();
+      window.setInterval(tick, 1000);
     });
-    main.querySelector("[data-date]")!.textContent = `Opening on ${dateText} (India time)`;
-
-    const pad = (n: number) => String(n).padStart(2, "0");
-    const set = (sel: string, value: string) => (main.querySelector(sel)!.textContent = value);
-
-    const tick = () => {
-      const left = launch - Date.now();
-      if (left <= 0) {
-        window.location.reload();   // launch time reached: load the real website
-        return;
-      }
-      const s = Math.floor(left / 1000);
-      set("[data-days]", pad(Math.floor(s / 86400)));
-      set("[data-hours]", pad(Math.floor((s % 86400) / 3600)));
-      set("[data-minutes]", pad(Math.floor((s % 3600) / 60)));
-      set("[data-seconds]", pad(s % 60));
-    };
-    tick();
-    window.setInterval(tick, 1000);
   }
 </script>
