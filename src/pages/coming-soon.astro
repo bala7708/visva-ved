@@ -7,16 +7,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import logoMark from "../assets/images/logo-mark.png";
 import logoWordmark from "../assets/images/logo-wordmark.png";
 
-// Launch time from the LAUNCH_AT setting (read when the site is built or, locally, per visit)
-const launchAt = process.env.LAUNCH_AT ?? import.meta.env.LAUNCH_AT ?? "";
-const launchIso = Number.isNaN(Date.parse(launchAt)) ? "" : new Date(launchAt).toISOString();
-
 const whatsapp = "919065333156";
 const email = "visvaved@gmail.com";
 ---
 
 <BaseLayout title="Visva Ved | Coming soon" noindex>
-  <main class="soon" data-launch={launchIso}>
+  <main class="soon" data-launch="__LAUNCH_AT__">
     <div class="soon-inner">
       <div class="soon-logo">
         <Image src={logoMark} alt="" height={240} loading="eager" class="soon-mark" />
@@ -190,16 +186,10 @@ const email = "visvaved@gmail.com";
     const pad = (n: number) => String(n).padStart(2, "0");
     const set = (sel: string, value: string) => (main.querySelector(sel)!.textContent = value);
 
-    let leaving = false;
     const tick = () => {
       const left = launch - Date.now();
       if (left <= 0) {
-        // Launch time reached: open the real website. Wait a few seconds first, so a
-        // slightly fast phone clock can't make the page bounce back and forth.
-        if (!leaving) {
-          leaving = true;
-          window.setTimeout(() => window.location.replace(window.location.pathname === "/coming-soon/" ? "/" : window.location.href), 4000);
-        }
+        window.location.reload();   // launch time reached: load the real website
         return;
       }
       const s = Math.floor(left / 1000);
